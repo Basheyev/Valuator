@@ -132,11 +132,11 @@ public class CountryDataService {
         if (jsonResponse==null) throw new IllegalArgumentException("Can't fetch data from " + url);
 
 
-        // todo
+        // todo fetch interest rate
 
-        System.out.println("BASE RATE:" + jsonResponse);
+        //System.out.println("BASE RATE:" + jsonResponse);
 
-        return 0.1425;
+        return Double.NaN;
     }
 
 
@@ -252,7 +252,7 @@ public class CountryDataService {
                 sb.append("growth ");
                 sb.append(Math.round((gdpValues[i] / gdpValues[i-1] - 1) * 10000.0) / 100.0);
                 sb.append("%, ");
-            };
+            }
             sb.append("inflation ")
                 .append(Math.round(inflationValues[i] * 10000.0) / 100.0)
                 .append("%)\n");
