@@ -1,40 +1,7 @@
 package com.axiom.valuator.math;
 
-import com.axiom.valuator.services.CountryDataService;
-
-import java.text.NumberFormat;
-import java.util.Locale;
 
 public class FinancialMath {
-
-
-    private final double CORPORATE_TAX;
-    private final Locale country;
-    private final NumberFormat currencyFormatter;
-    private final CountryDataService wbs;
-
-    /**
-     *
-     * @param countryCode country name by Alpha-2 code (ISO3166)
-     */
-    public FinancialMath(String countryCode) {
-        country = CountryDataService.getCountryByCode(countryCode);
-        currencyFormatter = NumberFormat.getCurrencyInstance(country);
-        wbs = new CountryDataService(countryCode);
-        CORPORATE_TAX = wbs.getCorporateTax();
-
-        System.out.println(wbs);
-        int begin = wbs.getFirstYear();
-        int end = wbs.getLastYear();
-        int periods = (end - begin) + 1;
-        double cagr = getCAGR(wbs.getGDPValue(begin), wbs.getGDPValue(end), periods) * 100;
-        System.out.println("CAGR (%) " + cagr);
-    }
-
-
-    public Locale getCountry() {
-        return country;
-    }
 
     /**
      * Calculates compound average growth rate - CAGR (%)
@@ -43,7 +10,7 @@ public class FinancialMath {
      * @param periods number of periods (non-zero)
      * @return CAGR (%) or NaN if ending value or number of periods is zero.
      */
-    public double getCAGR(double beginningValue, double endingValue, double periods) {
+    public static double getCAGR(double beginningValue, double endingValue, double periods) {
         if (beginningValue==0 || periods==0) return Double.NaN;
         return Math.pow(endingValue / beginningValue, 1 / periods) - 1.0d;
     }
@@ -57,12 +24,12 @@ public class FinancialMath {
      * @param Ec equity cost (rate)
      * @return WACC or zero if equity and debt are zero
      */
-    public double getWACC(double D, double Dc, double E, double Ec) {
+    public static double getWACC(double D, double Dc, double E, double Ec, double corporateTax) {
         double V = D + E;
         if (V==0) return 0.0;
         if (D==0 & E!=0) return Ec;
         if (D!=0 & E==0) return Dc;
-        return (E/V * Ec) + (D/V * Dc * (1.0 - CORPORATE_TAX));
+        return (E/V * Ec) + (D/V * Dc * (1.0 - corporateTax));
     }
 
 
@@ -72,7 +39,7 @@ public class FinancialMath {
      * @param WACC weighted average cost of capital
      * @return discounted cash flow
      */
-    public double getDCF(double[] fcf, double WACC) {
+    public static double getDCF(double[] fcf, double WACC) {
         if (fcf.length==0) return 0;
         double sum = 0;
         for (int t=0; t<fcf.length; t++) {
@@ -82,8 +49,28 @@ public class FinancialMath {
     }
 
 
-    public String formatMoney(double moneyValue) {
-        return currencyFormatter.format(moneyValue);
+    /**
+     * Calculates terminal value
+     * @param lastFCF last year free cash flow
+     * @param WACC weighted average cost of capital
+     * @param growthRate average GDP growth rate
+     * @return terminal value or NaN if growth rate higher than WACC
+     */
+    public static double getTerminalValue(double lastFCF, double WACC, double growthRate) {
+        if (growthRate > WACC) return Double.NaN;
+        return (lastFCF * (1 + growthRate)) / (WACC - growthRate);
+    }
+
+
+    /**
+     * Calculates present value by discounting exit value
+     * @param exitValue projected exit value
+     * @param wacc weighted average cost of capital
+     * @param periods number of periods till exit
+     * @return present value
+     */
+    public static double getPresentValue(double exitValue, double wacc, int periods) {
+        return exitValue / Math.pow(1 + wacc, periods);
     }
 
 }
