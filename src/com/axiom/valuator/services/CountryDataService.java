@@ -39,6 +39,7 @@ public class CountryDataService {
     private final int lastYear;
     private final int firstYear;
     private final double corporateTax;
+    private final double interestRate;
 
 
     /**
@@ -79,10 +80,10 @@ public class CountryDataService {
         averageInflationRate = (sum / inflationValues.length);
 
         // load base rate
-        fetchBaseRate();
+        interestRate = fetchInterestRate();
 
         // Load country corporate tax
-        corporateTax = 0.2;
+        corporateTax = CountryTaxData.taxRate(country);
     }
 
 
@@ -124,17 +125,18 @@ public class CountryDataService {
     }
 
 
-    private void fetchBaseRate() {
+    private double fetchInterestRate() {
         String url = WORLD_BANK_API + WORLD_BANK_BASE_RATE + "?date=" + (lastYear-1) + "&format=json";
+
         String jsonResponse = getRequest(url);
         if (jsonResponse==null) throw new IllegalArgumentException("Can't fetch data from " + url);
 
 
         // todo
 
-        System.out.println(jsonResponse);
+        System.out.println("BASE RATE:" + jsonResponse);
 
-
+        return 0.1425;
     }
 
 
@@ -179,6 +181,10 @@ public class CountryDataService {
 
     public double getCorporateTax() {
         return corporateTax;
+    }
+
+    public double getInterestRate() {
+        return interestRate;
     }
 
 
@@ -259,6 +265,14 @@ public class CountryDataService {
 
         sb.append("Average Inflation Rate: ")
             .append(Math.round(getAverageInflationRate() * 10000.0) / 100.0)
+            .append("%\n");
+
+        sb.append("Interest Rate: ")
+            .append(Math.round(getInterestRate() * 10000.0) / 100.0)
+            .append("%\n");
+
+        sb.append("Corporate Tax Rate: ")
+            .append(Math.round(getCorporateTax() * 10000.0) / 100.0)
             .append("%");
 
         return sb.toString();
