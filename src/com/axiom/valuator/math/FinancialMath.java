@@ -24,8 +24,8 @@ public class FinancialMath {
         CORPORATE_TAX = wbs.getCorporateTax();
 
         System.out.println(wbs);
-        int begin = wbs.getGDPFirstYear();
-        int end = wbs.getGDPLastYear();
+        int begin = wbs.getFirstYear();
+        int end = wbs.getLastYear();
         int periods = (end - begin) + 1;
         double cagr = getCAGR(wbs.getGDPValue(begin), wbs.getGDPValue(end), periods) * 100;
         System.out.println("CAGR (%) " + cagr);

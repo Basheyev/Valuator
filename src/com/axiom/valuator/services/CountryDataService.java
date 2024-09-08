@@ -23,73 +23,90 @@ public class CountryDataService {
     public static final String ERROR_MESSAGE = "Invalid country ISO Alpha-2 code: ";
     public static final String WORLD_BANK_URL = "https://api.worldbank.org/v2/country/";
     public static final String WORLD_BANK_REAL_GDP = "NY.GDP.MKTP.KD";
-    public static final String WORLD_BANK_INFLATION = "";
-    public static final int YEARS_OF_HISTORY = 15;
+    public static final String WORLD_BANK_INFLATION = "FP.CPI.TOTL.ZG";
+    public static final int YEARS_OF_HISTORY = 10;
 
     private final String WORLD_BANK_API;
     private final Locale country;
     private final double[] gdpValues;
-    private final int gdpLastYear;
-    private final int gdpFirstYear;
+    private final double[] inflationValues;
+    private final int lastYear;
+    private final int firstYear;
 
     public CountryDataService(String countryCode) {
         country = CountryDataService.getCountryByCode(countryCode);
         if (country == null) throw new IllegalArgumentException(ERROR_MESSAGE + countryCode);
 
-        // Load country GDP data
+        // Initialize constants
         WORLD_BANK_API = WORLD_BANK_URL + countryCode + "/indicator/";
+        lastYear = Year.now().getValue() - 1;
+        firstYear = lastYear - (YEARS_OF_HISTORY - 1);
+
+        // Load country GDP data
         gdpValues = new double[YEARS_OF_HISTORY];
-        gdpLastYear = CountryDataService.lastYear();
-        gdpFirstYear = gdpLastYear - (YEARS_OF_HISTORY - 1);
         loadRealGDPData();
 
         // Load country inflation data
-
+        inflationValues = new double[YEARS_OF_HISTORY];
+        loadInflationData();
     }
 
-    public int getGDPFirstYear() {
-        return gdpFirstYear;
+
+    private void loadRealGDPData() {
+        String url = WORLD_BANK_API + WORLD_BANK_REAL_GDP + "?date=" + firstYear + ":" + lastYear + "&format=json";
+        String jsonResponse = getRequest(url, null);
+        if (jsonResponse==null) return;
+        JSONArray response = new JSONArray(jsonResponse);
+        JSONArray jsonArray = (JSONArray) response.get(1);
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject gdpEntry = jsonArray.getJSONObject(i);
+            int year = Integer.parseInt(gdpEntry.getString("date"));
+            int index = year - firstYear;
+            double value = gdpEntry.isNull("value") ? Double.NaN : gdpEntry.getDouble("value");
+            gdpValues[index] = value;
+        }
     }
 
-    public int getGDPLastYear() {
-        return gdpLastYear;
+
+    private void loadInflationData() {
+        String url = WORLD_BANK_API + WORLD_BANK_INFLATION + "?date=" + firstYear + ":" + lastYear + "&format=json";
+        String jsonResponse = getRequest(url, null);
+        if (jsonResponse==null) return;
+        JSONArray response = new JSONArray(jsonResponse);
+        JSONArray jsonArray = (JSONArray) response.get(1);
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject gdpEntry = jsonArray.getJSONObject(i);
+            int year = Integer.parseInt(gdpEntry.getString("date"));
+            int index = year - firstYear;
+            double value = gdpEntry.isNull("value") ? Double.NaN : gdpEntry.getDouble("value");
+            inflationValues[index] = value;
+        }
+    }
+
+
+    public String getCountry() {
+        return country.getDisplayCountry();
+    }
+
+
+    public int getFirstYear() {
+        return firstYear;
+    }
+
+    public int getLastYear() {
+        return lastYear;
     }
 
     public double getGDPValue(int year) {
-        int index = year - gdpFirstYear;
+        int index = year - firstYear;
         if (index < 0 || index >= gdpValues.length) return Double.NaN;
         return gdpValues[index];
     }
-
-    public String getCountry() {
-        return country.getCountry();
-    }
-
 
     public double getCorporateTax() {
         return 0.2;
     }
 
-
-
-    private boolean loadRealGDPData() {
-
-        String url = WORLD_BANK_API + WORLD_BANK_REAL_GDP + "?date=" + gdpFirstYear + ":" + gdpLastYear + "&format=json";
-        String jsonResponse = getRequest(url, null);
-        if (jsonResponse==null) return false;
-
-        JSONArray response = new JSONArray(jsonResponse);
-         JSONArray jsonArray = (JSONArray) response.get(1);
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject gdpEntry = jsonArray.getJSONObject(i);
-            int year = Integer.parseInt(gdpEntry.getString("date"));
-            int index = year - gdpFirstYear;
-            gdpValues[index] = gdpEntry.getDouble("value");
-        }
-
-
-        return true;
-    }
 
 
 
@@ -107,6 +124,13 @@ public class CountryDataService {
         return null;
     }
 
+
+    /**
+     * Sends HTTP request
+     * @param URL required URL
+     * @param token authorization token
+     * @return response body
+     */
     private String getRequest(String URL, String token) {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -126,21 +150,18 @@ public class CountryDataService {
     }
 
 
-    private static int lastYear() {
-        return Year.now().getValue() - 1;
-    }
-
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(country.getCountry());
+        sb.append(getCountry() + " (" + country.getCountry() + ")");
         sb.append("\n");
         Locale region = CountryDataService.getCountryByCode("US");
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(region);
         for (int i = 0; i < YEARS_OF_HISTORY; i++) {
-            sb.append("Year: " + (gdpFirstYear + i) + ", GDP: " + currencyFormatter.format(gdpValues[i]) + "\n");
+            sb.append((firstYear + i) + " GDP: " + currencyFormatter.format(gdpValues[i]));
+            sb.append("  inflat: " + (Math.round(inflationValues[i] * 100.0) / 100.0) + "%");
+            sb.append("\n");
         }
 
         return sb.toString();

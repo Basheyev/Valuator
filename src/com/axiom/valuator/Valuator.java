@@ -7,7 +7,7 @@ public class Valuator {
 
 
     public static void main(String[] args) {
-        FinancialMath fm = new FinancialMath("KZ");
+        FinancialMath fm = new FinancialMath("CN");
         double[] fcf = {200000000,450000000,830000000};
         double cagr = fm.getCAGR(fcf[0], fcf[2], 2);
         double wacc = fm.getWACC(125000000, 0.35, 80000000, 0.58);
