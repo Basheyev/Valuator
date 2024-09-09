@@ -22,6 +22,7 @@ public class FinancialMath {
      * @param Dc debt cost (rate)
      * @param E equity size
      * @param Ec equity cost (rate)
+     * @param corporateTax corporate income tax rate
      * @return WACC or zero if equity and debt are zero
      */
     public static double getWACC(double D, double Dc, double E, double Ec, double corporateTax) {
@@ -34,7 +35,20 @@ public class FinancialMath {
 
 
     /**
-     * Calculates discounted cash flow DCF
+     * Calculates Capital Asset Pricing Model (CAPM)
+     * @param riskFreeRate risk-free rate (base rate)
+     * @param beta company sensitivity to market volatility
+     * @param marketReturn expected market return
+     * @return cost of capital using Capital Asset Pricing Model
+     */
+    public static double getCAPM(double riskFreeRate, double beta, double marketReturn) {
+        return riskFreeRate + beta * (marketReturn - riskFreeRate);
+    }
+
+
+
+    /**
+     * Calculates discounted cash flow (DCF) or net present value (NPV)
      * @param fcf array of free cash flow values by periods
      * @param WACC weighted average cost of capital
      * @return discounted cash flow

@@ -120,6 +120,12 @@ public class StockDataService {
         sb.append("Enterprise Value: ");
         sb.append(currencyFormatter.format(getEnterpriseValue()));
         sb.append("\n");
+        sb.append("EV\\Revenue: ");
+        sb.append(getEVToRevenue());
+        sb.append("x\n");
+        sb.append("EV\\EBITDA: ");
+        sb.append(getEVToEBITDA());
+        sb.append("x\n");
 
         return sb.toString();
     }

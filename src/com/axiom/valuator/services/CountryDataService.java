@@ -40,6 +40,7 @@ public class CountryDataService {
     private final int firstYear;
     private final double corporateTax;
     private final double interestRate;
+    private final double marketReturnRate;
 
 
     /**
@@ -81,6 +82,7 @@ public class CountryDataService {
 
         // load base rate
         interestRate = fetchInterestRate();
+        marketReturnRate = 0.2493; // todo fetch market return rate
 
         // Load country corporate tax
         corporateTax = CountryTaxData.taxRate(country);
@@ -131,12 +133,11 @@ public class CountryDataService {
         String jsonResponse = getRequest(url);
         if (jsonResponse==null) throw new IllegalArgumentException("Can't fetch data from " + url);
 
-
         // todo fetch interest rate
 
         //System.out.println("BASE RATE:" + jsonResponse);
 
-        return Double.NaN;
+        return 0.1425;
     }
 
 
@@ -183,10 +184,13 @@ public class CountryDataService {
         return corporateTax;
     }
 
-    public double getInterestRate() {
+    public double getRiskFreeRate() {
         return interestRate;
     }
 
+    public double getMarketReturn() {
+        return marketReturnRate;
+    }
 
     /**
      * Validates country ISO3166 Alpha-2 code
@@ -268,7 +272,7 @@ public class CountryDataService {
             .append("%\n");
 
         sb.append("Interest Rate: ")
-            .append(Math.round(getInterestRate() * 10000.0) / 100.0)
+            .append(Math.round(getRiskFreeRate() * 10000.0) / 100.0)
             .append("%\n");
 
         sb.append("Corporate Tax Rate: ")
