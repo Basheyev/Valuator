@@ -24,7 +24,7 @@ public class CountryDataService {
     public static final String ERROR_MESSAGE = "Invalid country ISO Alpha-2 code: ";
     public static final String WORLD_BANK_URL = "https://api.worldbank.org/v2/country/";
     public static final String WORLD_BANK_REAL_GDP = "NY.GDP.MKTP.KD";
-    public static final String WORLD_BANK_INFLATION = "NY.GDP.DEFL.KD.ZG"; //"FP.CPI.TOTL.ZG";
+    public static final String WORLD_BANK_INFLATION = "NY.GDP.DEFL.KD.ZG";
     public static final String WORLD_BANK_BASE_RATE = "NY.GDP.DEFL.KD.ZG";
 
 
@@ -85,7 +85,7 @@ public class CountryDataService {
         marketReturnRate = 0.2493; // todo fetch market return rate
 
         // Load country corporate tax
-        corporateTax = CountryTaxData.taxRate(country);
+        corporateTax = CountryTaxService.taxRate(country);
     }
 
 

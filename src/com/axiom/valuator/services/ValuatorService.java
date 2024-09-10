@@ -1,11 +1,11 @@
-package com.axiom.valuator.methods;
+package com.axiom.valuator.services;
 
 import com.axiom.valuator.data.CompanyData;
 import com.axiom.valuator.math.FinancialMath;
 import com.axiom.valuator.services.CountryDataService;
 import com.axiom.valuator.services.StockDataService;
 
-public class Valuator {
+public class ValuatorService {
 
     public static final int HISTORICAL_DATA_YEARS = 5;
     public static final int DEFAULT_GROWTH_EBITDA_MULTIPLE = 4;

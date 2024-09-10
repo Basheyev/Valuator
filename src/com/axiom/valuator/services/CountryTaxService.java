@@ -2,7 +2,7 @@ package com.axiom.valuator.services;
 
 import java.util.Locale;
 
-public class CountryTaxData {
+public class CountryTaxService {
 
     // Tax data for 2023
     private static final Object[][] taxData = {

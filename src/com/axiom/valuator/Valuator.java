@@ -1,16 +1,14 @@
 package com.axiom.valuator;
 
 import com.axiom.valuator.data.CompanyData;
-import com.axiom.valuator.methods.Valuator;
 import com.axiom.valuator.services.CountryDataService;
 
 import java.text.NumberFormat;
 import java.util.Locale;
 
-public class ValuatorService {
+public class Valuator {
 
-
-    public static void main(String[] args) {
+    public static void testARTA() {
 
         Locale region = CountryDataService.getCountryByCode("KZ");
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(region);
@@ -23,9 +21,9 @@ public class ValuatorService {
         arta.setDebt(125_000_000, 0.35);
         arta.setEquity(50_000_000, 0.24);
 
-        double dcf = Valuator.valuateDCF(arta, "KZ");
-        double multiples = Valuator.valuateMultiples(arta, "APPN");
-        double ebitda = Valuator.valuateEBITDA(arta);
+        double dcf = com.axiom.valuator.services.ValuatorService.valuateDCF(arta, "KZ");
+        double multiples = com.axiom.valuator.services.ValuatorService.valuateMultiples(arta, "APPN");
+        double ebitda = com.axiom.valuator.services.ValuatorService.valuateEBITDA(arta);
         double average = (dcf + multiples + ebitda) / 3.0;
 
         System.out.println("------------------------------------------");
@@ -36,8 +34,10 @@ public class ValuatorService {
         System.out.println("EBITDA MULTIPLES: " + currencyFormatter.format(ebitda));
         System.out.println("------------------------------------------");
         System.out.println("Valuation: " + currencyFormatter.format(average));
+    }
 
-
+    public static void main(String[] args) {
+        testARTA();
     }
 
 }
