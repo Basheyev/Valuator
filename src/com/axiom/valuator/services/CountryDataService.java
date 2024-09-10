@@ -25,7 +25,7 @@ public class CountryDataService {
     public static final String WORLD_BANK_URL = "https://api.worldbank.org/v2/country/";
     public static final String WORLD_BANK_REAL_GDP = "NY.GDP.MKTP.KD";
     public static final String WORLD_BANK_INFLATION = "NY.GDP.DEFL.KD.ZG";
-    public static final String WORLD_BANK_BASE_RATE = "NY.GDP.DEFL.KD.ZG";
+    public static final String WORLD_BANK_BASE_RATE = "NY.GDP.DEFL.KD.ZG"; // todo collect base rate
 
 
     private final int YEARS_OF_HISTORY;
@@ -56,6 +56,7 @@ public class CountryDataService {
 
         // initialize currency formatter
         currencyFormatter = NumberFormat.getCurrencyInstance(country);
+        currencyFormatter.setMaximumFractionDigits(0);
 
         // Initialize constants
         WORLD_BANK_API = WORLD_BANK_URL + countryCode + "/indicator/";
