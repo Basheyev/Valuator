@@ -28,8 +28,8 @@ public class DCFValuator {
     private double valuate(double[] fcf, double cash, double equity, double equityRate, double debt, double debtRate) {
         double corporateTax = countryData.getCorporateTax();
         double growthRate = countryData.getAverageGDPGrowthRate();
-        double baseRate = countryData.getRiskFreeRate();     // 14.25%
-        double marketReturn = 0.2493; // fixme 24.93%
+        double baseRate = countryData.getRiskFreeRate();
+        double marketReturn = countryData.getMarketReturn();
         double WACC = FinancialMath.getWACC(debt, debtRate, equity, equityRate, corporateTax);
         if (WACC==0.0) WACC = FinancialMath.getCAPM(baseRate, 1, marketReturn);
         double DCF = FinancialMath.getDCF(fcf, WACC);

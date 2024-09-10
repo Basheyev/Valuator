@@ -36,10 +36,24 @@ public class CompanyData {
         return name;
     }
 
+    public double[] getRevenue() {
+        return revenue;
+    }
 
+    public void setRevenue(double[] revenue) {
+        this.revenue = revenue;
+    }
 
-    public void setFCF(double[] revenue) {
-        fcf = revenue;
+    public double[] getEbitda() {
+        return ebitda;
+    }
+
+    public void setEbitda(double[] ebitda) {
+        this.ebitda = ebitda;
+    }
+
+    public void setFCF(double[] cashFlow) {
+        fcf = cashFlow;
     }
 
     public double[] getFCF() {
