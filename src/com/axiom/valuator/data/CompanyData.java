@@ -1,10 +1,18 @@
 package com.axiom.valuator.data;
 
-import java.util.Locale;
 
+/**
+ * Company Financial Data
+ * Represents a data structure used to store and manage key financial information
+ * related to a company's valuation. It includes attributes for cash flows, equity,
+ * debts and their interest rates, as well as other financial metrics necessary
+ * for the valuation process.
+ */
 public class CompanyData {
 
     private final String name;
+    private double[] revenue;
+    private double[] ebitda;
     private double[] fcf;
     private double cash;
     private double equity;
@@ -14,13 +22,27 @@ public class CompanyData {
 
     public CompanyData(String name) {
         this.name = name;
+        this.revenue = null;
+        this.ebitda = null;
+        this.fcf = null;
+        this.cash = 0;
+        this.equity = 0;
+        this.equityRate = 0;
+        this.debt = 0;
+        this.debtRate = 0;
     }
 
-    public void setFreeCashFlow(double[] revenue) {
+    public String getName() {
+        return name;
+    }
+
+
+
+    public void setFCF(double[] revenue) {
         fcf = revenue;
     }
 
-    public double[] getFreeCashFlow() {
+    public double[] getFCF() {
         return fcf;
     }
 
@@ -37,33 +59,28 @@ public class CompanyData {
         return equity;
     }
 
-    public void setEquity(double equity) {
+    public void setEquity(double equity, double equityRate) {
         this.equity = equity;
+        this.equityRate = equityRate;
     }
 
     public double getEquityRate() {
         return equityRate;
     }
 
-    public void setEquityRate(double equityRate) {
-        this.equityRate = equityRate;
-    }
-
     public double getDebt() {
         return debt;
     }
 
-    public void setDebt(double debt) {
+    public void setDebt(double debt, double debtRate) {
         this.debt = debt;
+        this.debtRate = debtRate;
     }
 
     public double getDebtRate() {
         return debtRate;
     }
 
-    public void setDebtRate(double debtRate) {
-        this.debtRate = debtRate;
-    }
 
 
 
