@@ -44,11 +44,11 @@ public class CompanyData {
         this.revenue = revenue;
     }
 
-    public double[] getEbitda() {
+    public double[] getEBITDA() {
         return ebitda;
     }
 
-    public void setEbitda(double[] ebitda) {
+    public void setEBITDA(double[] ebitda) {
         this.ebitda = ebitda;
     }
 
