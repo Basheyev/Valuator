@@ -57,7 +57,9 @@ public class FinancialMath {
         if (fcf.length==0) return 0;
         double sum = 0;
         for (int t=0; t<fcf.length; t++) {
-            sum += fcf[t] / Math.pow(1.0 + WACC, t);
+            double value = fcf[t] / Math.pow(1.0 + WACC, 1 + t);
+            System.out.println(fcf[t]/1000000 + " discounted " + value/1000000);
+            sum += value;
         }
         return sum;
     }

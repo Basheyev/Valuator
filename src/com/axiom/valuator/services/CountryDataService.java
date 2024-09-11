@@ -15,6 +15,7 @@ import java.time.Year;
 import java.util.Locale;
 
 import static java.net.HttpURLConnection.HTTP_OK;
+import static java.net.http.HttpClient.newHttpClient;
 
 /**
  * Country Open Data API caller service
@@ -214,7 +215,7 @@ public class CountryDataService {
      * @return response body
      */
     private String getRequest(String URL) {
-        HttpClient client = HttpClient.newHttpClient();
+        HttpClient client = newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(URL))
             .GET().build();

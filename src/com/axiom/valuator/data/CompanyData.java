@@ -1,38 +1,43 @@
 package com.axiom.valuator.data;
 
-
-import com.axiom.valuator.math.FinancialMath;
 import com.axiom.valuator.services.CountryDataService;
 
 import java.text.NumberFormat;
 import java.util.Locale;
 
 /**
- * Company Financial Data
- * Represents a data structure used to store and manage key financial information
- * related to a company's valuation. It includes attributes for cash flows, equity,
- * debts and their interest rates, as well as other financial metrics necessary
- * for the valuation process.
+ * COMPANY DATA
+ * Represents a minimal data structure used to store key financial information
+ * related to a company's valuation. It includes attributes for revenue, ebitda,
+ * cash flows, equity, debts and their interest rates, as well as other financial
+ * metrics necessary for the valuation process.
  */
 public class CompanyData {
 
-    private final String name;
-    private Locale country;
-    private double[] revenue;
-    private double[] ebitda;
-    private double[] fcf;
-    private double cash;
-    private double equity;
-    private double equityRate;
-    private double debt;
-    private double debtRate;
+    private final String name;                  // Company legal entity name
+    private final Locale country;               // Company head office location country
+    private final int dataFirstYear;            // Data beginning year
+    private double[] revenue;                   // Revenue values by periods
+    private double[] ebitda;                    // EBITDA values by periods
+    private double[] freeCashFlow;              // Free Cash Flow values by periods
+    private double equity, equityRate;          // Equity capital and its cost
+    private double debt, debtRate;              // Debt capital and its cost
+    private double cash;                        // Cash and cash equivalents
 
-    public CompanyData(String name, String countryISO2alphaCode) {
+
+    /**
+     * Company Data Constructor
+     * @param name company legal entity name for reporting
+     * @param countryCode head office country (ISO Alpha-2 Country Code)
+     * @param startYear beginning year of Revenue, EBITDA, Free Cash Flow data
+     */
+    public CompanyData(String name, String countryCode, int startYear) {
         this.name = name;
-        this.country = CountryDataService.getCountryByCode(countryISO2alphaCode);
+        this.country = CountryDataService.getCountryByCode(countryCode);
+        this.dataFirstYear = startYear;
         this.revenue = null;
         this.ebitda = null;
-        this.fcf = null;
+        this.freeCashFlow = null;
         this.cash = 0;
         this.equity = 0;
         this.equityRate = 0;
@@ -40,96 +45,138 @@ public class CompanyData {
         this.debtRate = 0;
     }
 
-    public String getName() {
-        return name;
-    }
 
-    public double[] getRevenue() {
-        return revenue;
-    }
-
-    public void setRevenue(double[] revenue) {
-        this.revenue = revenue;
-    }
-
-    public double[] getEBITDA() {
-        return ebitda;
-    }
-
-    public void setEBITDA(double[] ebitda) {
-        this.ebitda = ebitda;
-    }
-
-    public void setFCF(double[] cashFlow) {
-        fcf = cashFlow;
-    }
-
-    public double[] getFCF() {
-        return fcf;
+    /**
+     * Sets values for revenue by periods starting from the first year
+     * @param revenueValue array of revenue values by periods
+     * @return this company data object
+     */
+    public CompanyData setRevenue(double[] revenueValue) {
+        revenue = revenueValue;
+        return this;
     }
 
 
-    public double getCash() {
-        return cash;
+    /**
+     * Sets values for EBITDA by periods starting from the first year
+     * @param ebitdaValue array of EBITDA values by periods
+     * @return this company data object
+     */
+    public CompanyData setEBITDA(double[] ebitdaValue) {
+        ebitda = ebitdaValue;
+        return this;
     }
 
-    public void setCash(double cash) {
+
+    /**
+     * Sets values for Free Cash Flow by periods starting from the first year
+     * @param freeCashFlowValue array of Free Cash Flow values by periods
+     * @return this company data object
+     */
+    public CompanyData setFreeCashFlow(double[] freeCashFlowValue) {
+        freeCashFlow = freeCashFlowValue;
+        return this;
+    }
+
+
+    /**
+     * Sets cash and cash equivalents amount
+     * @param cash cash and cash equivalents amount
+     * @return this company data object
+     */
+    public CompanyData setCashAndEquivalents(double cash) {
         this.cash = cash;
+        return this;
     }
 
-    public double getEquity() {
-        return equity;
-    }
 
-    public void setEquity(double equity, double equityRate) {
+    /**
+     * Sets equity capital amount and its cost (interest Rate)
+     * @param equity amount of equity capital
+     * @param equityRate equity interest rate
+     * @return this company data object
+     */
+    public CompanyData setEquity(double equity, double equityRate) {
         this.equity = equity;
         this.equityRate = equityRate;
+        return this;
     }
 
-    public double getEquityRate() {
-        return equityRate;
-    }
 
-    public double getDebt() {
-        return debt;
-    }
-
-    public void setDebt(double debt, double debtRate) {
+    /**
+     * Sets debt capital amount and its cost (interest Rate)
+     * @param debt amount of debt capital
+     * @param debtRate debt interest rate
+     * @return this company data object
+     */
+    public CompanyData setDebt(double debt, double debtRate) {
         this.debt = debt;
         this.debtRate = debtRate;
+        return this;
     }
 
-    public double getDebtRate() {
-        return debtRate;
-    }
+    public String getName() { return name; }
+    public int getDataFirstYear() { return dataFirstYear; }
+    public double[] getRevenue() { return revenue; }
+    public double[] getEBITDA() { return ebitda; }
+    public double[] getFreeCashFlow() { return freeCashFlow; }
+    public double getEquity() { return equity; }
+    public double getEquityRate() { return equityRate; }
+    public double getDebt() { return debt; }
+    public double getDebtRate() { return debtRate; }
+    public double getCash() { return cash; }
 
-
-    private String generateStringOfValues(String header, double[] values) {
+    /**
+     * Formats numeric values in the string with header and formatting
+     * @param header header string
+     * @param values array of money or numeric values
+     * @return formatted string
+     */
+    private String generateStringOfValues(String header, double[] values, boolean money) {
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(country);
         currencyFormatter.setMaximumFractionDigits(0);
-        StringBuilder sb = new StringBuilder();
-        sb.append(header);
-        for (int i = 0; i < values.length; i++) {
-            sb.append("\t\t");
-            sb.append(currencyFormatter.format(values[i]));
-            //sb.append(" (Y").append(i).append(")");
+        StringBuilder sbFormat = new StringBuilder(header + "\t");
+        int length = values.length;
+        Object[] valuesObj = new String[length];
+        for (int i=0; i<length; i++) {
+            sbFormat.append("%18s ");
+            if (money)
+                valuesObj[i] = currencyFormatter.format(values[i]);
+            else valuesObj[i] = Long.toString(Math.round(values[i]));
         }
-        sb.append("\n");
-        return sb.toString();
+        sbFormat.append("\n");
+        return String.format(sbFormat.toString(), valuesObj);
     }
 
 
+    /**
+     * Generate formatted string containing company data
+     * @return formatted string containing company data
+     */
     @Override
     public String toString() {
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(country);
         currencyFormatter.setMaximumFractionDigits(0);
         StringBuilder sb = new StringBuilder();
-        sb.append("-------------------------------------------------------------------------------------\n")
-          .append(name).append(" (").append(country.getCountry()).append(")\n")
-          .append("-------------------------------------------------------------------------------------\n");
-        if (revenue != null) sb.append(generateStringOfValues("Revenue", revenue));
-        if (ebitda != null) sb.append(generateStringOfValues("EBITDA", ebitda));
-        if (fcf != null) sb.append(generateStringOfValues("Free CF", fcf));
+
+        double[] years = null;
+        if (revenue != null || ebitda !=null || freeCashFlow != null) {
+            int revenueLen = revenue != null ? revenue.length : 0;
+            int ebitdaLen = ebitda != null ? ebitda.length : 0;
+            int fcfLen = freeCashFlow != null ? freeCashFlow.length : 0;
+            int len = Math.max(Math.max(revenueLen, ebitdaLen), fcfLen);
+            years = new double[len];
+            for (int i = 0; i < len; i++) {
+                years[i] = dataFirstYear + i;
+            }
+        }
+        sb.append("-------------------------------------------------------------------------------------\n");
+        if (years != null) sb.append(generateStringOfValues(name + " ", years, false));
+        sb.append("-------------------------------------------------------------------------------------\n");
+
+        if (revenue != null) sb.append(generateStringOfValues("Revenue", revenue, true));
+        if (ebitda != null) sb.append(generateStringOfValues("EBITDA", ebitda, true));
+        if (freeCashFlow != null) sb.append(generateStringOfValues("Free CF", freeCashFlow, true));
         sb.append("-------------------------------------------------------------------------------------\n");
         double eRate = Math.round(equityRate * 100);
         sb.append("Equity:\t")

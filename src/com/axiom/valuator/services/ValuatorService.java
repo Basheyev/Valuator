@@ -2,10 +2,7 @@ package com.axiom.valuator.services;
 
 import com.axiom.valuator.data.CompanyData;
 import com.axiom.valuator.math.FinancialMath;
-import com.axiom.valuator.services.CountryDataService;
-import com.axiom.valuator.services.StockDataService;
 
-import java.text.NumberFormat;
 import java.util.Locale;
 
 public class ValuatorService {
@@ -21,7 +18,9 @@ public class ValuatorService {
 
         CountryDataService countryData = new CountryDataService(isoAlpha2Code, HISTORICAL_DATA_YEARS);
 
-        double[] fcf = company.getFCF();
+
+        double[] fcf = company.getFreeCashFlow();
+
         double cash = company.getCash();
         double equity = company.getEquity();
         double equityRate = company.getEquityRate();
@@ -43,6 +42,8 @@ public class ValuatorService {
             WACC = FinancialMath.getCAPM(baseRate, 1, marketReturn);
             if (logReport) report.append("CAPM = ").append(Math.round(WACC*10000.0)/100.0).append("%\n");
         } else if (logReport) report.append("WACC = " ).append(Math.round(WACC*10000.0)/100.0).append("%\n");
+
+        if (logReport) report.append("Growth = ").append(Math.round(growthRate * 10000) / 100.0).append("%\n");
 
         double DCF = FinancialMath.getDCF(fcf, WACC);
         if (logReport) report.append("DCF = ").append(countryData.formatMoney(DCF)).append("\n");
