@@ -1,0 +1,13 @@
+{
+  "name": "ARTA",
+  "country": "KZ",
+  "dataFirstYear": 2024,
+  "revenue": [8.3E8, 1.2E9, 1.5E9, 1.8E9],
+  "ebitda": [2.0E8, 2.6E8, 3.0E8, 4.8E8],
+  "freeCashFlow": [120000000, 1.8E8, 2.4E8, 3.0E8],
+  "debt": 1.25E8,
+  "debtRate": 0.35,
+  "equity": 5.0E7,
+  "equityRate": 0.58,
+  "cash": 3.0E7
+}

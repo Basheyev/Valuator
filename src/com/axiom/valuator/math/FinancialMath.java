@@ -48,7 +48,7 @@ public class FinancialMath {
 
 
     /**
-     * Calculates discounted cash flow (DCF) or net present value (NPV)
+     * Calculates discounted cash flow (DCF)
      * @param fcf array of free cash flow values by periods
      * @param WACC weighted average cost of capital
      * @return discounted cash flow
@@ -57,9 +57,7 @@ public class FinancialMath {
         if (fcf.length==0) return 0;
         double sum = 0;
         for (int t=0; t<fcf.length; t++) {
-            double value = fcf[t] / Math.pow(1.0 + WACC, 1 + t);
-            System.out.println(fcf[t]/1000000 + " discounted " + value/1000000);
-            sum += value;
+            sum += getPresentValue(fcf[t], WACC, 1 + t);
         }
         return sum;
     }
@@ -81,12 +79,12 @@ public class FinancialMath {
     /**
      * Calculates present value by discounting exit value
      * @param exitValue projected exit value
-     * @param wacc weighted average cost of capital
+     * @param WACC weighted average cost of capital
      * @param periods number of periods till exit
      * @return present value
      */
-    public static double getPresentValue(double exitValue, double wacc, int periods) {
-        return exitValue / Math.pow(1 + wacc, periods);
+    public static double getPresentValue(double exitValue, double WACC, int periods) {
+        return exitValue / Math.pow(1.0 + WACC, periods);
     }
 
 }

@@ -64,7 +64,7 @@ public class ValuatorService {
     }
 
 
-    public static double valuateMultiples(CompanyData company, String listedCompanyTicker, StringBuffer report) {
+    public static double valuateMultiples(CompanyData company, String listedCompanyTicker, StringBuilder report) {
         try {
             StockDataService sds = new StockDataService(listedCompanyTicker);
             double EVtoRevenue = sds.getEVToRevenue();
@@ -80,7 +80,7 @@ public class ValuatorService {
     }
 
 
-    public static double valuateEBITDA(CompanyData companyData, StringBuffer report) {
+    public static double valuateEBITDA(CompanyData companyData, StringBuilder report) {
         double[] ebitda = companyData.getEBITDA();
         if (ebitda==null || ebitda.length == 0) return 0;
         double beginningValue = ebitda[0];

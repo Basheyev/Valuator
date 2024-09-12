@@ -1,8 +1,11 @@
 package com.axiom.valuator.data;
 
 import com.axiom.valuator.services.CountryDataService;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.text.NumberFormat;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 
 /**
@@ -43,6 +46,39 @@ public class CompanyData {
         this.equityRate = 0;
         this.debt = 0;
         this.debtRate = 0;
+    }
+
+
+    /**
+     * Company Data Constructor
+     * @param json JSONObject containing company financial data
+     */
+    public CompanyData(JSONObject json) {
+        this.name = json.getString("name");
+        this.country = CountryDataService.getCountryByCode(json.getString("country"));
+        this.dataFirstYear = json.getInt("dataFirstYear");
+        this.revenue = jsonArrayToDoubleArray(json.getJSONArray("revenue"));
+        this.ebitda = jsonArrayToDoubleArray(json.getJSONArray("ebitda"));
+        this.freeCashFlow = jsonArrayToDoubleArray(json.getJSONArray("freeCashFlow"));
+        this.cash = json.getDouble("cash");
+        this.equity = json.getDouble("equity");
+        this.equityRate = json.getDouble("equityRate");
+        this.debt = json.getDouble("debt");
+        this.debtRate = json.getDouble("debtRate");
+    }
+
+
+    /**
+     * Converts JSONArray to double array
+     * @param array JSONArray
+     * @return double array
+     */
+    private double[] jsonArrayToDoubleArray(JSONArray array) {
+        int length = array.length();
+        double[] values = new double[length];
+        for (int i=0; i<length; i++)
+            values[i] = array.getDouble(i);
+        return values;
     }
 
 
@@ -116,6 +152,7 @@ public class CompanyData {
     }
 
     public String getName() { return name; }
+    public Locale getCountry() { return country; }
     public int getDataFirstYear() { return dataFirstYear; }
     public double[] getRevenue() { return revenue; }
     public double[] getEBITDA() { return ebitda; }
@@ -125,6 +162,27 @@ public class CompanyData {
     public double getDebt() { return debt; }
     public double getDebtRate() { return debtRate; }
     public double getCash() { return cash; }
+
+
+    /**
+     * Serializes this company data object to JSON
+     * @return serialized JSONObject
+     */
+    public JSONObject toJson() {
+        LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
+        map.put("name", name);
+        map.put("country", country.getCountry());
+        map.put("dataFirstYear", dataFirstYear);
+        map.put("revenue", revenue);
+        map.put("ebitda", ebitda);
+        map.put("freeCashFlow", freeCashFlow);
+        map.put("equity", equity);
+        map.put("equityRate", equityRate);
+        map.put("debt", debt);
+        map.put("debtRate", debtRate);
+        map.put("cash", cash);
+        return new JSONObject(map);
+    }
 
     /**
      * Formats numeric values in the string with header and formatting
