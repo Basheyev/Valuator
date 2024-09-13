@@ -28,11 +28,11 @@ public class CountryDataService {
     public static final String WORLD_BANK_INFLATION = "NY.GDP.DEFL.KD.ZG";
     public static final String WORLD_BANK_BASE_RATE = "NY.GDP.DEFL.KD.ZG"; // todo collect base rate
 
-
+    private final Locale country;
     private final int YEARS_OF_HISTORY;
     private final NumberFormat currencyFormatter;
+
     private final String WORLD_BANK_API;
-    private final Locale country;
     private final double[] gdpValues;
     private final double[] inflationValues;
     private final double averageGDPGrowthRate;
@@ -47,20 +47,22 @@ public class CountryDataService {
     /**
      * Constructor that loads economic data about the country
      * (GDP, Inflation, Corporate Tax) from open data sources
-     * @param countryCode ISO Alpha-2 Country Code
+     * @param countryLocale country
+     * @param howManyYears how many years of history to load
      */
-    public CountryDataService(String countryCode, int howManyYears) {
-        country = CountryDataService.getCountryByCode(countryCode);
-        if (country == null) throw new IllegalArgumentException(ERROR_MESSAGE + countryCode);
-        if (howManyYears < 1) throw new IllegalArgumentException(ERROR_MESSAGE + countryCode);
+    public CountryDataService(Locale countryLocale, int howManyYears) {
+
+        if (countryLocale == null) throw new IllegalArgumentException(ERROR_MESSAGE);
+        if (howManyYears < 1) throw new IllegalArgumentException(ERROR_MESSAGE);
+        this.country = countryLocale;
         YEARS_OF_HISTORY = howManyYears;
 
         // initialize currency formatter
-        currencyFormatter = NumberFormat.getCurrencyInstance(country);
+        currencyFormatter = NumberFormat.getCurrencyInstance(countryLocale);
         currencyFormatter.setMaximumFractionDigits(0);
 
         // Initialize constants
-        WORLD_BANK_API = WORLD_BANK_URL + countryCode + "/indicator/";
+        WORLD_BANK_API = WORLD_BANK_URL + countryLocale.getCountry() + "/indicator/";
         lastYear = Year.now().getValue() - 1;
         firstYear = lastYear - (YEARS_OF_HISTORY - 1);
 
@@ -87,7 +89,7 @@ public class CountryDataService {
         marketReturnRate = 0.2493; // todo fetch market return rate
 
         // Load country corporate tax
-        corporateTax = CountryTaxService.taxRate(country);
+        corporateTax = CountryTaxService.taxRate(countryLocale);
     }
 
 

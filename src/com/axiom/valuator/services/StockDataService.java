@@ -20,12 +20,15 @@ public class StockDataService {
     private final JSONObject stock;
 
     public StockDataService(String symbol) {
+
         String urlString = API_URL + "?function=OVERVIEW&symbol=" + symbol + "&apikey=" + API_KEY;
         String response = getRequest(urlString);
-        if (response==null) throw new IllegalArgumentException("Can't request " + urlString);
+        if (response==null) {
+            throw new IllegalArgumentException("Can't request " + urlString);
+        }
+        // fixme sometimes alpha vantage returns empty object {}
         stock = new JSONObject(response);
     }
-
 
     private String getRequest(String URL) {
         HttpClient client = HttpClient.newHttpClient();

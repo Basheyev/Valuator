@@ -239,11 +239,11 @@ public class CompanyData {
         double eRate = Math.round(equityRate * 100);
         sb.append("Equity:\t")
           .append(currencyFormatter.format(equity))
-          .append(" (rate ").append(eRate).append("%)\n");
+          .append(" (interest rate ").append(eRate).append("%)\n");
         double dRate = Math.round(debtRate * 100);
         sb.append("Debt:\t")
                 .append(currencyFormatter.format(debt))
-                .append(" (rate ").append(dRate).append("%)\n");
+                .append(" (interest rate ").append(dRate).append("%)\n");
         sb.append("Cash:\t")
                 .append(currencyFormatter.format(cash));
         sb.append("\n-------------------------------------------------------------------------------------\n");

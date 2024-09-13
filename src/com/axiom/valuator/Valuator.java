@@ -24,23 +24,12 @@ public class Valuator {
         JSONObject jsonObject = new JSONObject(content);
         CompanyData cargon = new CompanyData(jsonObject);
 
-        /*
-        CompanyData arta = new CompanyData("ARTA", "KZ", 2024);
-        arta.setRevenue(new double[]{830_000_000.0, 1_200_000_000.0, 1_500_000_000.0, 1_800_000_000.0})
-            .setEBITDA(new double[]{200_000_000.0, 260_000_000.0, 300_000_000.0, 480_000_000.0})
-            .setFreeCashFlow(new double[]{120_000_000.0, 180_000_000.0, 240_000_000.0, 300_000_000.0})
-            .setCashAndEquivalents(30_000_000)
-            .setDebt(125_000_000, 0.35)
-            .setEquity(50_000_000, 0.58);*/
-
-        //System.out.println(arta.toJson().toString(4));
-
-
         StringBuilder sb = new StringBuilder();
         sb.append(cargon);
-        double dcf = ValuatorService.valuateDCF(cargon, "US", sb);
-        double ebitda = ValuatorService.valuateEBITDA(cargon, sb);
-        double multiples = ValuatorService.valuateMultiples(cargon, "DHL.GR", sb);
+        ValuatorService valuator = new ValuatorService(cargon);
+        double dcf = valuator.valuateDCF(sb);
+        double ebitda = valuator.valuateEBITDA(sb);
+        double multiples = valuator.valuateMultiples("MSFT", sb);
         System.out.println(sb);
     }
 

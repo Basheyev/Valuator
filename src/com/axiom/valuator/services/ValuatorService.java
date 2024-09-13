@@ -3,24 +3,24 @@ package com.axiom.valuator.services;
 import com.axiom.valuator.data.CompanyData;
 import com.axiom.valuator.math.FinancialMath;
 
-import java.util.Locale;
-
 public class ValuatorService {
 
     public static final int HISTORICAL_DATA_YEARS = 5;
-    public static final int DEFAULT_GROWTH_EBITDA_MULTIPLE = 4;
-    public static final int FAST_GROWTH_EBITDA_MULTIPLE = 6;
+    public static final int DEFAULT_GROWTH_MULTIPLE = 4;
+    public static final int FAST_GROWTH_MULTIPLE = 6;
 
+    private CountryDataService countryData;
+    private CompanyData company;
 
-    public static double valuateDCF(CompanyData company, String isoAlpha2Code, StringBuilder report) {
+    public ValuatorService(CompanyData companyData) {
+        company = companyData;
+        countryData = new CountryDataService(company.getCountry(), HISTORICAL_DATA_YEARS);
+    }
+
+    public double valuateDCF(StringBuilder report) {
         boolean logReport = report != null;
-        Locale country = CountryDataService.getCountryByCode(isoAlpha2Code);
-
-        CountryDataService countryData = new CountryDataService(isoAlpha2Code, HISTORICAL_DATA_YEARS);
-
 
         double[] fcf = company.getFreeCashFlow();
-
         double cash = company.getCash();
         double equity = company.getEquity();
         double equityRate = company.getEquityRate();
@@ -31,48 +31,55 @@ public class ValuatorService {
         double baseRate = countryData.getRiskFreeRate();
         double marketReturn = countryData.getMarketReturn();
 
+        double WACC = FinancialMath.getWACC(debt, debtRate, equity, equityRate, corporateTax);
+        if (WACC==0.0) // todo calculate beta
+            WACC = FinancialMath.getCAPM(baseRate, 1, marketReturn);
+        double DCF = FinancialMath.getDCF(fcf, WACC);
+        double TV = FinancialMath.getTerminalValue(fcf[fcf.length-1], WACC, growthRate);
+        double NFP = debt - cash;
+        double equityValue = DCF + TV - NFP;
+
         if (logReport) {
             report.append("\n--------------------------------------------\n");
-            report.append("Discounted Cash Flow (FCF) Valuation\n");
+            report.append(company.getName());
+            report.append(" Discounted Cash Flow (FCF) Valuation\n");
             report.append("--------------------------------------------\n");
-        }
-
-        double WACC = FinancialMath.getWACC(debt, debtRate, equity, equityRate, corporateTax);
-        if (WACC==0.0) {
-            WACC = FinancialMath.getCAPM(baseRate, 1, marketReturn);
-            if (logReport) report.append("CAPM = ").append(Math.round(WACC*10000.0)/100.0).append("%\n");
-        } else if (logReport) report.append("WACC = " ).append(Math.round(WACC*10000.0)/100.0).append("%\n");
-
-        if (logReport) report.append("Growth = ").append(Math.round(growthRate * 10000) / 100.0).append("%\n");
-
-        double DCF = FinancialMath.getDCF(fcf, WACC);
-        if (logReport) report.append("DCF = ").append(countryData.formatMoney(DCF)).append("\n");
-
-        double TV = FinancialMath.getTerminalValue(fcf[fcf.length-1], WACC, growthRate);
-        if (logReport) report.append("TV = ").append(countryData.formatMoney(TV)).append("\n");
-
-        double NFP = debt - cash;
-        if (logReport) report.append("NFP = ").append(countryData.formatMoney(NFP)).append("\n");
-
-        double equityValue = DCF + TV - NFP;
-        if (logReport) {
+            report.append("WACC = ").append(Math.round(WACC*10000.0)/100.0).append("%\n");
+            report.append("Growth = ").append(Math.round(growthRate * 10000) / 100.0).append("%\n");
+            report.append("DCF = ").append(countryData.formatMoney(DCF)).append("\n");
+            report.append("TV = ").append(countryData.formatMoney(TV)).append("\n");
+            report.append("NFP = ").append(countryData.formatMoney(NFP)).append("\n");
             report.append("Valuation = ").append(countryData.formatMoney(equityValue)).append("\n");
-            report.append("--------------------------------------------\n");
+            //report.append("--------------------------------------------\n");
         }
 
         return equityValue;
     }
 
 
-    public static double valuateMultiples(CompanyData company, String listedCompanyTicker, StringBuilder report) {
+    public double valuateMultiples(String listedCompanyTicker, StringBuilder report) {
         try {
+            boolean logReport = report != null;
             StockDataService sds = new StockDataService(listedCompanyTicker);
+            System.out.println(sds);
             double EVtoRevenue = sds.getEVToRevenue();
             double EVtoEBITDA = sds.getEVToEBITDA();
             double[] revenue = company.getRevenue();
             double[] ebitda = company.getEBITDA();
-            if (revenue != null) return revenue[0] * EVtoRevenue;
-            if (ebitda != null) return ebitda[0] * EVtoEBITDA;
+            double valuation = 0;
+            if (revenue != null) valuation = revenue[0] * EVtoRevenue;
+            if (ebitda != null) valuation = ebitda[0] * EVtoEBITDA;
+            if (logReport) {
+                report.append("\n--------------------------------------------\n");
+                report.append(company.getName());
+                report.append(" Multiples Valuation\n");
+                report.append("--------------------------------------------\n");
+                report.append(sds);
+                report.append(company.getName());
+                report.append(" valuation: ");
+                report.append(countryData.formatMoney(valuation));
+            }
+            return valuation;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -80,17 +87,29 @@ public class ValuatorService {
     }
 
 
-    public static double valuateEBITDA(CompanyData companyData, StringBuilder report) {
-        double[] ebitda = companyData.getEBITDA();
+    public double valuateEBITDA(StringBuilder report) {
+        boolean logReport = report != null;
+
+        double[] ebitda = company.getEBITDA();
         if (ebitda==null || ebitda.length == 0) return 0;
         double beginningValue = ebitda[0];
         double endingValue = ebitda[ebitda.length-1];
         int periods = ebitda.length-1;
         double CAGR = FinancialMath.getCAGR(beginningValue, endingValue, periods);
-        if (CAGR >= 0.5)
-            return beginningValue * FAST_GROWTH_EBITDA_MULTIPLE;
-        else
-            return beginningValue * DEFAULT_GROWTH_EBITDA_MULTIPLE;
+        double multiple = (CAGR >= 0.5) ? FAST_GROWTH_MULTIPLE : DEFAULT_GROWTH_MULTIPLE;
+        double valuation = beginningValue * multiple;
+
+        if (logReport) {
+            report.append("\n--------------------------------------------\n");
+            report.append(company.getName());
+            report.append(" EBITDA Multiple Valuation\n");
+            report.append("--------------------------------------------\n");
+            report.append("Growth rate: ").append(Math.round(CAGR*10000.0)/100.0).append("\n");
+            report.append("Multiple: ").append(multiple).append("x\n");
+            report.append("Valuation: ").append(countryData.formatMoney(valuation)).append("\n");
+        }
+
+        return valuation;
     }
 
 
