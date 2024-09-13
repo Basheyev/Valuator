@@ -9,5 +9,7 @@
   "debtRate": 0.35,
   "equity": 5.0E7,
   "equityRate": 0.58,
-  "cash": 3.0E7
+  "cash": 3.0E7,
+  "isLeader": "false",
+  "comparableStock": "APPN"
 }

@@ -3,11 +3,14 @@ package com.axiom.valuator.services;
 import com.axiom.valuator.data.CompanyData;
 import com.axiom.valuator.math.FinancialMath;
 
+import java.time.Year;
+
 public class ValuatorService {
 
     public static final int HISTORICAL_DATA_YEARS = 5;
     public static final int DEFAULT_GROWTH_MULTIPLE = 4;
     public static final int FAST_GROWTH_MULTIPLE = 6;
+    public static final int LEADER_GROWTH_MULTIPLE = 8;
 
     private CountryDataService countryData;
     private CompanyData company;
@@ -58,9 +61,10 @@ public class ValuatorService {
 
 
     // fixme wrong for negative ebitda
-    public double valuateMultiples(String listedCompanyTicker, StringBuilder report) {
+    public double valuateMultiples(StringBuilder report) {
         try {
             boolean logReport = report != null;
+            String listedCompanyTicker = company.getComparableStock();
             StockDataService sds = new StockDataService(listedCompanyTicker);
             double EVtoRevenue = sds.getEVToRevenue();
             double EVtoEBITDA = sds.getEVToEBITDA();
@@ -101,19 +105,34 @@ public class ValuatorService {
         int periods = ebitda.length-1;
         double CAGR = FinancialMath.getCAGR(beginningValue, endingValue, periods);
         double multiple = (CAGR >= 0.5) ? FAST_GROWTH_MULTIPLE : DEFAULT_GROWTH_MULTIPLE;
-        double valuation = beginningValue * multiple;
+        if (company.isLeader()) multiple = LEADER_GROWTH_MULTIPLE;
+
+        double baseEBITDA = beginningValue;
+        int currentYear = Year.now().getValue();
+        // find first positive ebitda
+        for (int i=0; i<ebitda.length; i++) {
+            double value = ebitda[i];
+            int year = company.getDataFirstYear() + i;
+            if (value > 0 && year >= currentYear) {
+                baseEBITDA = value;
+                break;
+            }
+        }
+
+        double enterpriseValue = baseEBITDA * multiple;
+        double equityValuation = enterpriseValue - company.getDebt();
 
         if (logReport) {
             report.append("\n--------------------------------------------\n");
             report.append(company.getName());
             report.append(" EBITDA Multiple Valuation\n");
             report.append("--------------------------------------------\n");
-            report.append("Growth rate: ").append(Math.round(CAGR*10000.0)/100.0).append("\n");
+            report.append("Growth rate: ").append(Math.round(CAGR*10000.0)/100.0).append("%\n");
             report.append("Multiple: ").append(multiple).append("x\n");
-            report.append("Valuation: ").append(countryData.formatMoney(valuation)).append("\n");
+            report.append("Valuation: ").append(countryData.formatMoney(equityValuation)).append("\n");
         }
 
-        return valuation;
+        return equityValuation;
     }
 
 

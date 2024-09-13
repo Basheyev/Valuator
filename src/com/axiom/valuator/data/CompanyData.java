@@ -26,6 +26,8 @@ public class CompanyData {
     private double equity, equityRate;          // Equity capital and its cost
     private double debt, debtRate;              // Debt capital and its cost
     private double cash;                        // Cash and cash equivalents
+    private boolean isLeader;                   // Is company a leader of market
+    private String comparableStock;             // Comparable stock ticker
 
 
     /**
@@ -46,6 +48,8 @@ public class CompanyData {
         this.equityRate = 0;
         this.debt = 0;
         this.debtRate = 0;
+        this.isLeader = false;
+        this.comparableStock = "";
     }
 
 
@@ -65,6 +69,8 @@ public class CompanyData {
         this.equityRate = json.getDouble("equityRate");
         this.debt = json.getDouble("debt");
         this.debtRate = json.getDouble("debtRate");
+        this.isLeader = json.getBoolean("isLeader");
+        this.comparableStock = json.getString("comparableStock");
     }
 
 
@@ -151,6 +157,26 @@ public class CompanyData {
         return this;
     }
 
+    /**
+     * Sets is company a market leader
+     * @param isLeader true if leader, false otherwise
+     * @return this company data object
+     */
+    public CompanyData setLeadership(boolean isLeader) {
+        this.isLeader = isLeader;
+        return this;
+    }
+
+    /**
+     * Sets comparable public company stock ticker/symbol
+     * @param ticker symbol of comparable public company
+     * @return this company data object
+     */
+    public CompanyData setComparableStock(String ticker) {
+        this.comparableStock = ticker;
+        return this;
+    }
+
     public String getName() { return name; }
     public Locale getCountry() { return country; }
     public int getDataFirstYear() { return dataFirstYear; }
@@ -162,7 +188,8 @@ public class CompanyData {
     public double getDebt() { return debt; }
     public double getDebtRate() { return debtRate; }
     public double getCash() { return cash; }
-
+    public boolean isLeader() { return isLeader; }
+    public String getComparableStock() { return comparableStock; }
 
     /**
      * Serializes this company data object to JSON

@@ -1,0 +1,15 @@
+{
+  "name": "INNOFORCE",
+  "country": "KZ",
+  "dataFirstYear": 2022,
+  "revenue": [886490635, 1294955619, 2800969997, 5040000000, 8400000000],
+  "ebitda": [217489666, 238429305, 933780089, 1680222085, 2800370142],
+  "freeCashFlow": [189000000, 210000000, 600000000, 1300000000, 2500000000],
+  "debt": 950000000,
+  "debtRate": 0.35,
+  "equity": 180000000,
+  "equityRate": 0.58,
+  "cash": 0,
+  "isLeader": "true",
+  "comparableStock": "PYPL"
+}
