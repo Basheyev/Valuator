@@ -57,36 +57,40 @@ public class ValuatorService {
     }
 
 
+    // fixme wrong for negative ebitda
     public double valuateMultiples(String listedCompanyTicker, StringBuilder report) {
         try {
             boolean logReport = report != null;
             StockDataService sds = new StockDataService(listedCompanyTicker);
-            System.out.println(sds);
             double EVtoRevenue = sds.getEVToRevenue();
             double EVtoEBITDA = sds.getEVToEBITDA();
             double[] revenue = company.getRevenue();
             double[] ebitda = company.getEBITDA();
-            double valuation = 0;
-            if (revenue != null) valuation = revenue[0] * EVtoRevenue;
-            if (ebitda != null) valuation = ebitda[0] * EVtoEBITDA;
+            double EVRvaluation = (revenue != null) ? revenue[0] * EVtoRevenue : 0;
+            double EVEvaluation = (ebitda != null && ebitda[0] > 0) ? ebitda[0] * EVtoEBITDA : 0;
+            int count = ((revenue != null) ? 1 :0) + ((ebitda != null && ebitda[0] > 0) ? 1 :0);
+            double valuation =  (EVRvaluation + EVEvaluation) / count;
+
             if (logReport) {
                 report.append("\n--------------------------------------------\n");
                 report.append(company.getName());
                 report.append(" Multiples Valuation\n");
                 report.append("--------------------------------------------\n");
-                report.append(sds);
+                report.append(sds).append("\n");
                 report.append(company.getName());
-                report.append(" valuation: ");
-                report.append(countryData.formatMoney(valuation));
+                report.append(" valuation:\n");
+                report.append("EV/Revenue: ").append(countryData.formatMoney(EVRvaluation)).append("\n");
+                report.append("EV/EBITDA: ").append(countryData.formatMoney(EVEvaluation)).append("\n");
+                report.append("EV average: ").append(countryData.formatMoney(valuation)).append("\n");
             }
-            return valuation;
+            return EVRvaluation;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return 0;
     }
 
-
+    // fixme wrong for negative ebitda
     public double valuateEBITDA(StringBuilder report) {
         boolean logReport = report != null;
 
