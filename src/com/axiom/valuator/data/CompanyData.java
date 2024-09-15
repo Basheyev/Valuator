@@ -1,5 +1,6 @@
 package com.axiom.valuator.data;
 
+import com.axiom.valuator.math.FinancialMath;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -222,7 +223,7 @@ public class CompanyData {
         int length = values.length;
         Object[] valuesObj = new String[length];
         for (int i=0; i<length; i++) {
-            sbFormat.append("%18s ");
+            sbFormat.append("| %20s ");
             if (money)
                 valuesObj[i] = currencyFormatter.format(values[i]);
             else valuesObj[i] = Long.toString(Math.round(values[i]));
@@ -242,35 +243,29 @@ public class CompanyData {
         currencyFormatter.setMaximumFractionDigits(0);
         StringBuilder sb = new StringBuilder();
 
-        double[] years = null;
-        if (revenue != null || ebitda !=null || freeCashFlow != null) {
-            int revenueLen = revenue != null ? revenue.length : 0;
-            int ebitdaLen = ebitda != null ? ebitda.length : 0;
-            int fcfLen = freeCashFlow != null ? freeCashFlow.length : 0;
-            int len = Math.max(Math.max(revenueLen, ebitdaLen), fcfLen);
-            years = new double[len];
-            for (int i = 0; i < len; i++) {
-                years[i] = dataFirstYear + i;
-            }
-        }
-        sb.append("-------------------------------------------------------------------------------------\n");
-        if (years != null) sb.append(generateStringOfValues(name + " ", years, false));
-        sb.append("-------------------------------------------------------------------------------------\n");
+        int revenueLen = revenue != null ? revenue.length : 0;         // Revenue array length
+        int ebitdaLen = ebitda != null ? ebitda.length : 0;            // EBITDA array length
+        int fcfLen = freeCashFlow != null ? freeCashFlow.length : 0;   // FCF array length
+        int len = Math.max(Math.max(revenueLen, ebitdaLen), fcfLen);   // Longest array
+        double[] years = new double[len];                              // Allocate memory
+        for (int i = 0; i < len; i++) years[i] = dataFirstYear + i;    // Generate years array
 
+        sb.append("\n");
+        sb.append(name).append("\n");
+        sb.append("-------------------------------------------------------------------------------------\n");
+        sb.append(generateStringOfValues("Years", years, false));
+        sb.append("-------------------------------------------------------------------------------------\n");
         if (revenue != null) sb.append(generateStringOfValues("Revenue", revenue, true));
         if (ebitda != null) sb.append(generateStringOfValues("EBITDA", ebitda, true));
         if (freeCashFlow != null) sb.append(generateStringOfValues("Free CF", freeCashFlow, true));
         sb.append("-------------------------------------------------------------------------------------\n");
-        double eRate = Math.round(equityRate * 100);
-        sb.append("Equity:\t")
-          .append(currencyFormatter.format(equity))
-          .append(" (interest rate ").append(eRate).append("%)\n");
-        double dRate = Math.round(debtRate * 100);
-        sb.append("Debt:\t")
-                .append(currencyFormatter.format(debt))
-                .append(" (interest rate ").append(dRate).append("%)\n");
-        sb.append("Cash:\t")
-                .append(currencyFormatter.format(cash));
+        double eRate = FinancialMath.toPercent(equityRate);
+        double dRate = FinancialMath.toPercent(debtRate);
+        sb.append("Equity:\t").append(currencyFormatter.format(equity))
+            .append(" (interest ").append(eRate).append("%)\n");
+        sb.append("Debt:\t").append(currencyFormatter.format(debt))
+            .append(" (interest ").append(dRate).append("%)\n");
+        sb.append("Cash:\t").append(currencyFormatter.format(cash));
         sb.append("\n-------------------------------------------------------------------------------------\n");
         return sb.toString();
     }

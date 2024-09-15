@@ -91,4 +91,14 @@ public class FinancialMath {
         return exitValue / Math.pow(1.0 + WACC, periods);
     }
 
+
+    /**
+     * Converts coefficient value to percent value
+     * @param coefficient coefficient double value
+     * @return percent with two digits precision value
+     */
+    public static double toPercent(double coefficient) {
+        return Math.round(coefficient * 10000) / 100.0;
+    }
+
 }

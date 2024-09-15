@@ -13,35 +13,49 @@ import java.text.NumberFormat;
 import java.time.Year;
 import java.util.Locale;
 
+import static com.axiom.valuator.math.FinancialMath.toPercent;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static java.net.http.HttpClient.newHttpClient;
 
 /**
- * Fetches and stores country GDP value by years,GDP growth (%),
+ * Fetches and stores country GDP values by years, GDP growth (%),
  * inflation (%), corporate tax (%) and base rate (%) that are
  * used in WACC, CAPM and Terminal Value formulas calculations
  */
 public class CountryData {
 
-    public static final String ERROR_MESSAGE = "Invalid country ISO Alpha-2 code: ";
-    public static final String WORLD_BANK_URL = "https://api.worldbank.org/v2/country/";
-    public static final String WORLD_BANK_REAL_GDP = "NY.GDP.MKTP.KD";
-    public static final String WORLD_BANK_INFLATION = "NY.GDP.DEFL.KD.ZG";
+    //-----------------------------------------------------------------------------------------------------
+    public static final String WB_URL = "https://api.worldbank.org/v2/country/{CODE}/indicator/";
+    public static final String WB_REAL_GDP = "NY.GDP.MKTP.KD";      // GDP Indicator
+    public static final String WB_INFLATION = "NY.GDP.DEFL.KD.ZG";  // Inflation Indicator
+    public static final String WB_YEARS_RANGE = "?date=";           // Years range argument
+    public static final String WB_FORMAT = "&format=json";          // Data format argument
+    public static final String WB_DATE_FIELD = "date";              // JSON value field name
+    public static final String WB_VALUE_FIELD = "value";            // JSON value field name
+    public static final int WB_RESPONSE_VALUES_INDEX = 1;           // Index of values in response
+    public static final int MINIMUM_YEARS_OF_HISTORY = 3;           // Minimum years of history
+    public static final int DEFAULT_YEARS_OF_HISTORY = 5;           // Default years of history
+    public static final int MAXIMUM_YEARS_OF_HISTORY = 10;          // Maximum years of history
 
-    private final Locale country;
-    private final int YEARS_OF_HISTORY;
-    private final NumberFormat currencyFormatter;
+    //-----------------------------------------------------------------------------------------------------
+    public static final String ERROR_WRONG_URL = "Can't fetch data from ";
+    public static final String ERROR_WRONG_LOCALE = "Locale can not be null";
 
-    private final String WORLD_BANK_API;
-    private final double[] gdpValues;
-    private final double[] inflationValues;
-    private final double averageGDPGrowthRate;
-    private final double averageInflationRate;
-    private final int lastYear;
-    private final int firstYear;
-    private final double corporateTax;
-    private final double interestRate;
-    private final double marketReturnRate;
+    //-----------------------------------------------------------------------------------------------------
+    private final String WB_API;                      // Tailored World Bank API URL for specific country
+    private final Locale country;                     // Country, currency and language
+    private final int yearsOfHistory;                 // How many years of GDP & Inflation values to store
+    private final int firstYear;                      // First year of GDP and inflation values
+    private final int lastYear;                       // last year of GDP and inflation values
+    private final double[] gdpValues;                 // Array of GDP values
+    private final double[] inflationValues;           // Array of Inflation values
+    private final double averageGDPGrowthRate;        // Average GDP growth rate
+    private final double averageInflationRate;        // Average Inflation rate
+    private final double corporateTax;                // Corporate Tax Level
+    private final double interestRate;                // Central Bank Interest Rate
+    private final double marketReturnRate;            // Average Market Return Rate
+    private final NumberFormat currencyFormatter;     // Currency formatter
+    //-----------------------------------------------------------------------------------------------------
 
 
     /**
@@ -51,89 +65,139 @@ public class CountryData {
      * @param howManyYears how many years of history to load
      */
     public CountryData(Locale countryLocale, int howManyYears) {
-
-        if (countryLocale == null) throw new IllegalArgumentException(ERROR_MESSAGE);
-        if (howManyYears < 1) throw new IllegalArgumentException(ERROR_MESSAGE);
-        this.country = countryLocale;
-        YEARS_OF_HISTORY = howManyYears;
-
-        // initialize currency formatter
-        currencyFormatter = NumberFormat.getCurrencyInstance(countryLocale);
-        currencyFormatter.setMaximumFractionDigits(0);
-
+        // Check constructor arguments
+        if (countryLocale == null) throw new IllegalArgumentException(ERROR_WRONG_LOCALE);
+        if (howManyYears < MINIMUM_YEARS_OF_HISTORY) howManyYears = MINIMUM_YEARS_OF_HISTORY;
+        else if (howManyYears > MAXIMUM_YEARS_OF_HISTORY) howManyYears = MAXIMUM_YEARS_OF_HISTORY;
         // Initialize constants
-        WORLD_BANK_API = WORLD_BANK_URL + countryLocale.getCountry() + "/indicator/";
+        country = countryLocale;
+        yearsOfHistory = howManyYears;
+        WB_API = WB_URL.replace("{CODE}", country.getCountry());
         lastYear = Year.now().getValue() - 1;
-        firstYear = lastYear - (YEARS_OF_HISTORY - 1);
+        firstYear = lastYear - (yearsOfHistory - 1);
+        gdpValues = new double[yearsOfHistory];
+        inflationValues = new double[yearsOfHistory];
+        averageGDPGrowthRate = fetchRealGDPData(firstYear, lastYear, gdpValues);
+        averageInflationRate = fetchInflationData(firstYear, lastYear, inflationValues);
+        corporateTax = fetchCorporateTaxRate(country);
+        interestRate = fetchCentralBankInterestRate(country);
+        marketReturnRate = fetchMarketReturnRate(country);
+        // initialize currency formatter
+        currencyFormatter = NumberFormat.getCurrencyInstance(country);
+        currencyFormatter.setMaximumFractionDigits(0);
+    }
 
-        // Load country GDP data
-        gdpValues = new double[YEARS_OF_HISTORY];
-        fetchRealGDPData();
-        int periods = gdpValues.length - 1;
-        double startValue = gdpValues[0];
-        double endValue = gdpValues[periods];
-        averageGDPGrowthRate = FinancialMath.getCAGR(startValue, endValue, periods);
 
-        // Load country inflation data
-        inflationValues = new double[YEARS_OF_HISTORY];
-        fetchInflationData();
-        double sum = 0;
-        for (double inflationValue : inflationValues) {
-            if (inflationValue == 0) break;
-            sum += inflationValue;
-        }
-        averageInflationRate = (sum / inflationValues.length);
-
-        // load base rate
-        interestRate = fetchInterestRate();
-        marketReturnRate = DEFAULT_MARKET_RETURN_RATE; // todo get market return
-
-        // Load country corporate tax
-        corporateTax = getTaxRate(countryLocale);
+    /**
+     * Default constructor
+     * @param countryLocale country
+     */
+    public CountryData(Locale countryLocale) {
+        this(countryLocale, DEFAULT_YEARS_OF_HISTORY);
     }
 
 
     /**
      * Fetches GDP data from World Bank for YEARS_OF_HISTORY period
+     * @param firstYear first year to fetch data
+     * @param lastYear last year to fetch data
+     * @param values output array to save inflation values
+     * @return compound average GDP growth rate
      */
-    private void fetchRealGDPData() {
-        String url = WORLD_BANK_API + WORLD_BANK_REAL_GDP + "?date=" + firstYear + ":" + lastYear + "&format=json";
-        String jsonResponse = getRequest(url);
-        if (jsonResponse==null) throw new IllegalArgumentException("Can't fetch data from " + url);
+    private double fetchRealGDPData(int firstYear, int lastYear, double[] values) {
+        // Build request URL
+        String url = WB_API + WB_REAL_GDP + WB_YEARS_RANGE + firstYear + ":" + lastYear + WB_FORMAT;
+        // Send GET request
+        String jsonResponse = sendRequest(url);
+        if (jsonResponse==null) throw new IllegalArgumentException(ERROR_WRONG_URL + url);
+        // Parse JSON Object
         JSONArray response = new JSONArray(jsonResponse);
-        JSONArray jsonArray = (JSONArray) response.get(1);
+        JSONArray jsonArray = (JSONArray) response.get(WB_RESPONSE_VALUES_INDEX);
+
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject gdpEntry = jsonArray.getJSONObject(i);
-            int year = Integer.parseInt(gdpEntry.getString("date"));
+            int year = Integer.parseInt(gdpEntry.getString(WB_DATE_FIELD));
             int index = year - firstYear;
-            double value = gdpEntry.isNull("value") ? 0.0d : gdpEntry.getDouble("value");
-            gdpValues[index] = value;
+            double value = gdpEntry.isNull(WB_VALUE_FIELD) ? 0.0d : gdpEntry.getDouble(WB_VALUE_FIELD);
+            values[index] = value;
         }
+        int periods = values.length - 1;
+        double startValue = values[0];
+        double endValue = values[periods];
+
+        return FinancialMath.getCAGR(startValue, endValue, periods);
     }
 
 
     /**
      * Fetches inflation data from World Bank for YEARS_OF_HISTORY period
+     * @param firstYear first year to fetch data
+     * @param lastYear last year to fetch data
+     * @param values output array to save inflation values
+     * @return arithmetic average inflation
      */
-    private void fetchInflationData() {
-        String url = WORLD_BANK_API + WORLD_BANK_INFLATION + "?date=" + firstYear + ":" + lastYear + "&format=json";
-        String jsonResponse = getRequest(url);
-        if (jsonResponse==null) throw new IllegalArgumentException("Can't fetch data from " + url);
+    private double fetchInflationData(int firstYear, int lastYear, double[] values) {
+        // Build request URL
+        String url = WB_API + WB_INFLATION + WB_YEARS_RANGE + firstYear + ":" + lastYear + WB_FORMAT;
+        // Send GET request
+        String jsonResponse = sendRequest(url);
+        if (jsonResponse==null) throw new IllegalArgumentException(ERROR_WRONG_URL + url);
+        // Parse JSON Object
         JSONArray response = new JSONArray(jsonResponse);
         JSONArray jsonArray = (JSONArray) response.get(1);
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject gdpEntry = jsonArray.getJSONObject(i);
-            int year = Integer.parseInt(gdpEntry.getString("date"));
+            int year = Integer.parseInt(gdpEntry.getString(WB_DATE_FIELD));
             int index = year - firstYear;
-            double value = gdpEntry.isNull("value") ? 0.0d : gdpEntry.getDouble("value");
-            inflationValues[index] = value / 100.0;
+            double value = gdpEntry.isNull(WB_VALUE_FIELD) ? 0.0d : gdpEntry.getDouble(WB_VALUE_FIELD);
+            values[index] = value / 100.0;
         }
+        return getValuesAverage(values);
     }
 
 
-    private double fetchInterestRate() {
+    /**
+     * Calculates doubles array arithmetic average value
+     * @param values array of double values
+     * @return arithmetic average value
+     */
+    private double getValuesAverage(double[] values) {
+        if (values==null || values.length==0) return 0;
+        double sum = 0;
+        for (double value : values) {
+            if (value == 0) break;
+            sum += value;
+        }
+        return sum / values.length;
+    }
+
+
+    /**
+     * Returns Country Corporate Tax Rate
+     * @param country country
+     * @return country corporate tax rate or average worldwide if unkown country
+     */
+    private static double fetchCorporateTaxRate(Locale country) {
         String iso3Code = country.getISO3Country();
-        for (Object[] tuple: COUNTRY_BASE_RATES) {
+        for (Object[] tuple: COUNTRIES_CORPORATE_TAX_RATES) {
+            String iso3 = (String) tuple[0];
+            double rate = (Double) tuple[2];
+            if (iso3.equals(iso3Code)) {
+                return rate / 100.0;
+            }
+        }
+        return WORLD_AVERAGE_CORPORATE_TAX_RATE;
+    }
+
+
+    /**
+     * Returns Central Bank Base Interest Rate from static data
+     * @param country country
+     * @return central bank interest rate or world average if country not found
+     */
+    private double fetchCentralBankInterestRate(Locale country) {
+        String iso3Code = country.getISO3Country();
+        for (Object[] tuple: COUNTRIES_BASE_RATES) {
             String iso3 = (String) tuple[0];
             double rate = (Double) tuple[1];
             if (iso3.equals(iso3Code)) {
@@ -144,56 +208,29 @@ public class CountryData {
     }
 
 
-    public String getCountryCode() {
-        return country.getCountry();
-    }
+    /**
+     * Returns Country Average Market Return Rate from static data
+     * @param country country
+     * @return country average market return rate or world average if country not found
+     */
+    private double fetchMarketReturnRate(Locale country) {
 
-    public String getCountryName() {
-        return country.getDisplayCountry();
-    }
+        // todo get real data on market return
 
-    public int getFirstYear() {
-        return firstYear;
-    }
-
-    public int getLastYear() {
-        return lastYear;
+        return DEFAULT_MARKET_RETURN_RATE;
     }
 
 
-    public double getAverageGDPGrowthRate() {
-        return averageGDPGrowthRate;
-    }
+    public String getCountryCode() { return country.getCountry(); }
+    public String getCountryName() { return country.getDisplayCountry(); }
+    public int getFirstYear() { return firstYear; }
+    public int getLastYear() { return lastYear; }
+    public double getAverageGDPGrowthRate() { return averageGDPGrowthRate; }
+    public double getAverageInflationRate() { return averageInflationRate; }
+    public double getCorporateTax() { return corporateTax; }
+    public double getRiskFreeRate() { return interestRate; }
+    public double getMarketReturn() { return marketReturnRate; }
 
-
-    public double getGDP(int year) {
-        int index = year - firstYear;
-        if (index < 0 || index >= gdpValues.length) return Double.NaN;
-        return gdpValues[index];
-    }
-
-
-    public double getAverageInflationRate() {
-        return averageInflationRate;
-    }
-
-    public double getInflation(int year) {
-        int index = year - firstYear;
-        if (index < 0 || index >= inflationValues.length) return Double.NaN;
-        return inflationValues[index];
-    }
-
-    public double getCorporateTax() {
-        return corporateTax;
-    }
-
-    public double getRiskFreeRate() {
-        return interestRate;
-    }
-
-    public double getMarketReturn() {
-        return marketReturnRate;
-    }
 
     /**
      * Validates country ISO3166 Alpha-2 code
@@ -215,12 +252,11 @@ public class CountryData {
      * @param URL required URL
      * @return response body
      */
-    private String getRequest(String URL) {
+    private String sendRequest(String URL) {
         HttpClient client = newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(URL))
             .GET().build();
-
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             int statusCode = response.statusCode();
@@ -233,69 +269,37 @@ public class CountryData {
     }
 
 
+    /**
+     * Formats double value to locale currency format
+     * @param moneyValue money value
+     * @return formatted currency string
+     */
     public String formatMoney(double moneyValue) {
         return currencyFormatter.format(moneyValue);
     }
 
-
     @Override
     public String toString() {
-
         Locale region = CountryData.getCountryByCode("US");
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(region);
         StringBuilder sb = new StringBuilder();
-
-        sb.append(getCountryName())
-            .append(" (")
-            .append(country.getCountry())
-            .append(")\n");
-
-        for (int i = 0; i < YEARS_OF_HISTORY; i++) {
-            sb.append(firstYear + i)
-                .append(" GDP: ")
-                .append(currencyFormatter.format(gdpValues[i]))
-                .append(" (");
+        sb.append(getCountryName()).append(" (").append(country.getCountry()).append(")\n");
+        for (int i = 0; i < yearsOfHistory; i++) {
+            sb.append(firstYear + i).append(" GDP: ")
+              .append(currencyFormatter.format(gdpValues[i])).append(" (");
             if (i>0) {
-                sb.append("growth ");
-                sb.append(Math.round((gdpValues[i] / gdpValues[i-1] - 1) * 10000.0) / 100.0);
-                sb.append("%, ");
+                double growthYoY = (gdpValues[i] / gdpValues[i-1] - 1.0);
+                sb.append("growth ").append(toPercent(growthYoY)).append("%, ");
             }
-            sb.append("inflation ")
-                .append(Math.round(inflationValues[i] * 10000.0) / 100.0)
-                .append("%)\n");
+            sb.append("inflation ").append(toPercent(inflationValues[i])).append("%)\n");
         }
-
-
-        sb.append("Average GDP growth rate: ")
-            .append(Math.round(getAverageGDPGrowthRate() * 10000.0) / 100.0)
-            .append("%\n");
-
-        sb.append("Average Inflation Rate: ")
-            .append(Math.round(getAverageInflationRate() * 10000.0) / 100.0)
-            .append("%\n");
-
-        sb.append("Interest Rate: ")
-            .append(Math.round(getRiskFreeRate() * 10000.0) / 100.0)
-            .append("%\n");
-
-        sb.append("Corporate Tax Rate: ")
-            .append(Math.round(getCorporateTax() * 10000.0) / 100.0)
-            .append("%");
-
+        sb.append("Average GDP growth rate: ").append(toPercent(getAverageGDPGrowthRate())).append("%\n");
+        sb.append("Average Inflation Rate: ").append(toPercent(getAverageInflationRate())).append("%\n");
+        sb.append("Interest Rate: ").append(toPercent(getRiskFreeRate())).append("%\n");
+        sb.append("Corporate Tax Rate: ").append(toPercent(getCorporateTax())).append("%");
         return sb.toString();
     }
 
-    public static double getTaxRate(Locale country) {
-        String iso3Code = country.getISO3Country();
-        for (Object[] tuple: COUNTRIES_CORPORATE_TAX_RATES) {
-            String iso3 = (String) tuple[0];
-            double rate = (Double) tuple[2];
-            if (iso3.equals(iso3Code)) {
-                return rate / 100.0;
-            }
-        }
-        return WORLD_AVERAGE_CORPORATE_TAX_RATE;
-    }
 
     // Tax data for 2023
     private static final Object[][] COUNTRIES_CORPORATE_TAX_RATES = {
@@ -486,7 +490,7 @@ public class CountryData {
 
 
     // values of Q3 2024
-    public static final Object[][] COUNTRY_BASE_RATES = {
+    public static final Object[][] COUNTRIES_BASE_RATES = {
         {"CZE", 4.50},   // Czech Republic
         {"DNK", 3.10},   // Denmark
         {"DOM", 6.75},   // Dominican Republic

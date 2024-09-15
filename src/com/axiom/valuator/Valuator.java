@@ -1,6 +1,7 @@
 package com.axiom.valuator;
 
 import com.axiom.valuator.data.CompanyData;
+import com.axiom.valuator.data.CountryData;
 import com.axiom.valuator.math.FinancialMath;
 import com.axiom.valuator.services.ValuatorService;
 import org.json.JSONObject;
@@ -22,7 +23,10 @@ public class Valuator {
         ValuatorService valuator = new ValuatorService(company);
         double dcf = valuator.valuateDCF(sb);
         double ebitda = valuator.valuateEBITDA(sb);
-        double multiples = valuator.valuateMultiples( sb);
+        double multiples = valuator.valuateMultiples(sb);
+        double average = (dcf + ebitda + multiples) / 3;
+        sb.append("\n------------------------------------------------------------\n");
+        sb.append("VALUATION AVERAGE: ").append(valuator.getCountryData().formatMoney(average)).append("\n");
         System.out.println(sb);
     }
 
