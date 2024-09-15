@@ -5,6 +5,7 @@ import com.axiom.valuator.math.FinancialMath;
 
 import java.time.Year;
 
+// todo: calculate valuate at specific year (exit year)
 public class ValuatorService {
 
     public static final int HISTORICAL_DATA_YEARS = 5;
@@ -12,13 +13,14 @@ public class ValuatorService {
     public static final int FAST_GROWTH_MULTIPLE = 6;
     public static final int LEADER_GROWTH_MULTIPLE = 8;
 
-    private CountryDataService countryData;
-    private CompanyData company;
+    private final CountryService countryData;
+    private final CompanyData company;
 
     public ValuatorService(CompanyData companyData) {
         company = companyData;
-        countryData = new CountryDataService(company.getCountry(), HISTORICAL_DATA_YEARS);
+        countryData = new CountryService(company.getCountry(), HISTORICAL_DATA_YEARS);
     }
+
 
     public double valuateDCF(StringBuilder report) {
         boolean logReport = report != null;
@@ -60,39 +62,6 @@ public class ValuatorService {
     }
 
 
-    // fixme wrong for negative ebitda
-    public double valuateMultiples(StringBuilder report) {
-        try {
-            boolean logReport = report != null;
-            String listedCompanyTicker = company.getComparableStock();
-            StockDataService sds = new StockDataService(listedCompanyTicker);
-            double EVtoRevenue = sds.getEVToRevenue();
-            double EVtoEBITDA = sds.getEVToEBITDA();
-            double[] revenue = company.getRevenue();
-            double[] ebitda = company.getEBITDA();
-            double EVRvaluation = (revenue != null) ? revenue[0] * EVtoRevenue : 0;
-            double EVEvaluation = (ebitda != null && ebitda[0] > 0) ? ebitda[0] * EVtoEBITDA : 0;
-            int count = ((revenue != null) ? 1 :0) + ((ebitda != null && ebitda[0] > 0) ? 1 :0);
-            double valuation =  (EVRvaluation + EVEvaluation) / count;
-
-            if (logReport) {
-                report.append("\n--------------------------------------------\n");
-                report.append(company.getName());
-                report.append(" Multiples Valuation\n");
-                report.append("--------------------------------------------\n");
-                report.append(sds).append("\n");
-                report.append(company.getName());
-                report.append(" valuation:\n");
-                report.append("EV/Revenue: ").append(countryData.formatMoney(EVRvaluation)).append("\n");
-                report.append("EV/EBITDA: ").append(countryData.formatMoney(EVEvaluation)).append("\n");
-                report.append("EV average: ").append(countryData.formatMoney(valuation)).append("\n");
-            }
-            return EVRvaluation;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
 
     // fixme wrong for negative ebitda
     public double valuateEBITDA(StringBuilder report) {
@@ -135,6 +104,47 @@ public class ValuatorService {
         return equityValuation;
     }
 
+    // fixme wrong for negative ebitda
+    public double valuateMultiples(StringBuilder report) {
+        try {
+            boolean logReport = report != null;
+            String listedCompanyTicker = company.getComparableStock();
+            StockService sds = new StockService(listedCompanyTicker);
+            double EVtoRevenue = sds.getEVToRevenue();
+            double EVtoEBITDA = sds.getEVToEBITDA();
+            double[] revenue = company.getRevenue();
+            double[] ebitda = company.getEBITDA();
+            int y = ebitda.length - 1; // fixme get right index
+            double EVRvaluation = (revenue != null) ? revenue[y] * EVtoRevenue : 0;
+            double EVEvaluation = (ebitda != null && ebitda[y] > 0) ? ebitda[y] * EVtoEBITDA : 0;
+            int count = ((revenue != null) ? 1 :0) + ((ebitda != null && ebitda[y] > 0) ? 1 :0);
+            double EV =  (EVRvaluation + EVEvaluation) / count;
+            double valuation = EV - company.getDebt();
 
+            if (logReport) {
+                report.append("\n--------------------------------------------\n");
+                report.append(company.getName());
+                report.append(" Multiples Valuation\n");
+                report.append("--------------------------------------------\n");
+                report.append("Comparable: ").append(sds.getName()).append("\n");
+                report.append("EV/Revenue (").append(sds.getEVToRevenue()).append("x): ")
+                    .append(countryData.formatMoney(EVRvaluation)).append("\n");
+                report.append("EV/EBITDA (").append(sds.getEVToEBITDA()).append("x): ")
+                    .append(countryData.formatMoney(EVEvaluation)).append("\n");
+                report.append("EV average: ").append(countryData.formatMoney(EV)).append("\n");
+                report.append("Valuation: ").append(countryData.formatMoney(valuation)).append("\n");
+            }
+            return EVRvaluation;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+
+    // todo startup valuation
+    public double valuateStartup() {
+        return 0.0;
+    }
 
 }

@@ -1,6 +1,7 @@
 package com.axiom.valuator;
 
 import com.axiom.valuator.data.CompanyData;
+import com.axiom.valuator.math.FinancialMath;
 import com.axiom.valuator.services.ValuatorService;
 import org.json.JSONObject;
 
@@ -10,9 +11,8 @@ import java.nio.file.Paths;
 
 public class Valuator {
 
-    public static void testValuation() throws IOException {
+    public static void testValuation(String filePath) throws IOException {
 
-        String filePath = "data/cargon.json";
         String content = new String(Files.readAllBytes(Paths.get(filePath)));
         JSONObject jsonObject = new JSONObject(content);
         CompanyData company = new CompanyData(jsonObject);
@@ -27,7 +27,8 @@ public class Valuator {
     }
 
     public static void main(String[] args) throws IOException {
-        testValuation();
+        testValuation("data/cargon.json");
+
     }
 
 }

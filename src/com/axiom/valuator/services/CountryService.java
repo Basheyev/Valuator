@@ -20,7 +20,7 @@ import static java.net.http.HttpClient.newHttpClient;
 /**
  * Country Open Data API caller service
  */
-public class CountryDataService {
+public class CountryService {
 
     public static final String ERROR_MESSAGE = "Invalid country ISO Alpha-2 code: ";
     public static final String WORLD_BANK_URL = "https://api.worldbank.org/v2/country/";
@@ -50,7 +50,7 @@ public class CountryDataService {
      * @param countryLocale country
      * @param howManyYears how many years of history to load
      */
-    public CountryDataService(Locale countryLocale, int howManyYears) {
+    public CountryService(Locale countryLocale, int howManyYears) {
 
         if (countryLocale == null) throw new IllegalArgumentException(ERROR_MESSAGE);
         if (howManyYears < 1) throw new IllegalArgumentException(ERROR_MESSAGE);
@@ -89,7 +89,7 @@ public class CountryDataService {
         marketReturnRate = 0.2493; // todo fetch market return rate
 
         // Load country corporate tax
-        corporateTax = CountryTaxService.taxRate(countryLocale);
+        corporateTax = getTaxRate(countryLocale);
     }
 
 
@@ -242,7 +242,7 @@ public class CountryDataService {
     @Override
     public String toString() {
 
-        Locale region = CountryDataService.getCountryByCode("US");
+        Locale region = CountryService.getCountryByCode("US");
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(region);
         StringBuilder sb = new StringBuilder();
 
@@ -285,4 +285,203 @@ public class CountryDataService {
 
         return sb.toString();
     }
+
+    public static double getTaxRate(Locale country) {
+        String iso3Code = country.getISO3Country();
+        for (Object[] tuple: taxData) {
+            String iso3 = (String) tuple[0];
+            double rate = (Double) tuple[2];
+            if (iso3.equals(iso3Code)) {
+                return rate / 100.0;
+            }
+        }
+        return WORLD_AVERAGE;
+    }
+
+    // Tax data for 2023
+    private static final Object[][] taxData = {
+        {"AFG","Afghanistan",20.0},
+        {"AGO","Angola",25.0},
+        {"ALB","Albania",15.0},
+        {"ARE","United Arab Emirates",9.0},
+        {"ARG","Argentina",35.0},
+        {"ARM","Armenia",18.0},
+        {"ATG","Antigua and Barbuda",25.0},
+        {"AUS","Australia",30.0},
+        {"AUT","Austria",24.0},
+        {"AZE","Azerbaijan",20.0},
+        {"BDI","Burundi",30.0},
+        {"BEL","Belgium",25.0},
+        {"BEN","Benin",30.0},
+        {"BFA","Burkina Faso",27.5},
+        {"BGD","Bangladesh",27.5},
+        {"BGR","Bulgaria",10.0},
+        {"BHR","Bahrain",0.0},
+        {"BHS","Bahamas",0.0},
+        {"BIH","Bosnia and Herzegovina",10.0},
+        {"BLR","Belarus",20.0},
+        {"BLZ","Belize",0.0},
+        {"BOL","Bolivia (Plurinational State of)",25.0},
+        {"BRA","Brazil",34.0},
+        {"BRB","Barbados",5.5},
+        {"BRN","Brunei Darussalam",18.5},
+        {"BTN","Bhutan",25.0},
+        {"BWA","Botswana",22.0},
+        {"CAF","Central African Republic",30.0},
+        {"CAN","Canada",26.21},
+        {"CHE","Switzerland",19.653},
+        {"CHL","Chile",27.0},
+        {"CHN","China",25.0},
+        {"CIV","Cote d'Ivoire",25.0},
+        {"CMR","Cameroon",33.0},
+        {"COD","Democratic Republic of the Congo",30.0},
+        {"COG","Congo",28.0},
+        {"COL","Colombia",35.0},
+        {"CPV","Cabo Verde",22.44},
+        {"CRI","Costa Rica",30.0},
+        {"CUB","Cuba",35.0},
+        {"CYP","Cyprus",12.5},
+        {"CZE","Czechia",19.0},
+        {"DEU","Germany",29.941},
+        {"DJI","Djibouti",25.0},
+        {"DMA","Dominica",25.0},
+        {"DNK","Denmark",22.0},
+        {"DOM","Dominican Republic",27.0},
+        {"DZA","Algeria",26.0},
+        {"ECU","Ecuador",25.0},
+        {"EGY","Egypt",22.5},
+        {"ERI","Eritrea",30.0},
+        {"ESP","Spain",25.0},
+        {"EST","Estonia",20.0},
+        {"ETH","Ethiopia",30.0},
+        {"FIN","Finland",20.0},
+        {"FJI","Fiji",20.0},
+        {"FRA","France",25.825},
+        {"GAB","Gabon",30.0},
+        {"GBR","United Kingdom of Great Britain and Northern Ireland",25.0},
+        {"GEO","Georgia",15.0},
+        {"GHA","Ghana",25.0},
+        {"GIN","Guinea",25.0},
+        {"GMB","Gambia",27.0},
+        {"GNB","Guinea-Bissau",25.0},
+        {"GNQ","Equatorial Guinea",35.0},
+        {"GRC","Greece",22.0},
+        {"GRD","Grenada",28.0},
+        {"GTM","Guatemala",25.0},
+        {"GUY","Guyana",25.0},
+        {"HKG","China, Hong Kong Special Administrative Region",16.5},
+        {"HND","Honduras",30.0},
+        {"HRV","Croatia",18.0},
+        {"HTI","Haiti",30.0},
+        {"HUN","Hungary",9.0},
+        {"IDN","Indonesia",22.0},
+        {"IND","India",30.0},
+        {"IRL","Ireland",12.5},
+        {"IRN","Iran (Islamic Republic of)",25.0},
+        {"IRQ","Iraq",15.0},
+        {"ISL","Iceland",20.0},
+        {"ISR","Israel",23.0},
+        {"ITA","Italy",27.81},
+        {"JAM","Jamaica",25.0},
+        {"JOR","Jordan",20.0},
+        {"JPN","Japan",29.74},
+        {"KAZ","Kazakhstan",20.0},
+        {"KEN","Kenya",30.0},
+        {"KGZ","Kyrgyzstan",10.0},
+        {"KHM","Cambodia",20.0},
+        {"KNA","Saint Kitts and Nevis",33.0},
+        {"KOR","Republic of Korea",26.5},
+        {"KWT","Kuwait",15.0},
+        {"LAO","Lao People's Democratic Republic",20.0},
+        {"LBN","Lebanon",17.0},
+        {"LBR","Liberia",25.0},
+        {"LBY","Libya",20.0},
+        {"LCA","Saint Lucia",30.0},
+        {"LKA","Sri Lanka",30.0},
+        {"LSO","Lesotho",25.0},
+        {"LTU","Lithuania",15.0},
+        {"LUX","Luxembourg",24.94},
+        {"LVA","Latvia",20.0},
+        {"MAC","China, Macao Special Administrative Region",12.0},
+        {"MAR","Morocco",32.0},
+        {"MDA","Republic of Moldova",12.0},
+        {"MDG","Madagascar",20.0},
+        {"MDV","Maldives",15.0},
+        {"MEX","Mexico",30.0},
+        {"MKD","The former Yugoslav Republic of Macedonia",10.0},
+        {"MLI","Mali",30.0},
+        {"MLT","Malta",35.0},
+        {"MMR","Myanmar",22.0},
+        {"MNG","Mongolia",25.0},
+        {"MOZ","Mozambique",32.0},
+        {"MRT","Mauritania",25.0},
+        {"MUS","Mauritius",15.0},
+        {"MWI","Malawi",30.0},
+        {"MYS","Malaysia",24.0},
+        {"NAM","Namibia",32.0},
+        {"NER","Niger",30.0},
+        {"NGA","Nigeria",30.0},
+        {"NIC","Nicaragua",30.0},
+        {"NLD","Netherlands",25.8},
+        {"NOR","Norway",22.0},
+        {"NPL","Nepal",25.0},
+        {"NZL","New Zealand",28.0},
+        {"OMN","Oman",15.0},
+        {"PAK","Pakistan",29.0},
+        {"PAN","Panama",25.0},
+        {"PER","Peru",29.5},
+        {"PHL","Philippines",25.0},
+        {"PNG","Papua New Guinea",30.0},
+        {"POL","Poland",19.0},
+        {"PRI","Puerto Rico",37.5},
+        {"PRT","Portugal",31.5},
+        {"PRY","Paraguay",10.0},
+        {"QAT","Qatar",10.0},
+        {"ROU","Romania",16.0},
+        {"RUS","Russian Federation",20.0},
+        {"RWA","Rwanda",30.0},
+        {"SAU","Saudi Arabia",20.0},
+        {"SDN","Sudan",35.0},
+        {"SEN","Senegal",30.0},
+        {"SGP","Singapore",17.0},
+        {"SLB","Solomon Islands",30.0},
+        {"SLE","Sierra Leone",25.0},
+        {"SLV","El Salvador",30.0},
+        {"SRB","Serbia",15.0},
+        {"STP","Sao Tome and Principe",25.0},
+        {"SUR","Suriname",36.0},
+        {"SVK","Slovakia",21.0},
+        {"SVN","Slovenia",19.0},
+        {"SWE","Sweden",20.6},
+        {"SWZ","Swaziland",27.5},
+        {"SYC","Seychelles",25.0},
+        {"SYR","Syrian Arab Republic",28.0},
+        {"TCD","Chad",35.0},
+        {"TGO","Togo",27.0},
+        {"THA","Thailand",20.0},
+        {"TJK","Tajikistan",18.0},
+        {"TKM","Turkmenistan",8.0},
+        {"TON","Tonga",25.0},
+        {"TTO","Trinidad and Tobago",30.0},
+        {"TUN","Tunisia",15.0},
+        {"TUR","Turkey",25.0},
+        {"TWN","Taiwan",20.0},
+        {"TZA","United Republic of Tanzania",30.0},
+        {"UGA","Uganda",30.0},
+        {"UKR","Ukraine",18.0},
+        {"URY","Uruguay",25.0},
+        {"USA","United States of America",25.768},
+        {"UZB","Uzbekistan",15.0},
+        {"VCT","Saint Vincent and the Grenadines",28.0},
+        {"VEN","Venezuela (Bolivarian Republic of)",34.0},
+        {"VNM","Viet Nam",20.0},
+        {"VUT","Vanuatu",0.0},
+        {"WSM","Samoa",27.0},
+        {"YEM","Yemen",20.0},
+        {"ZAF","South Africa",27.0},
+        {"ZMB","Zambia",30.0},
+        {"ZWE","Zimbabwe",24.72}
+    };
+
+    private static final double WORLD_AVERAGE = 23.45;
 }

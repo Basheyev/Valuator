@@ -12,14 +12,14 @@ import java.util.Locale;
 
 import static java.net.HttpURLConnection.HTTP_OK;
 
-public class StockDataService {
+public class StockService {
 
     public static final String API_URL = "https://www.alphavantage.co/query";
     public static final String API_KEY = "ZT4F55HUBU1JD2CF";
 
     private final JSONObject stock;
 
-    public StockDataService(String symbol) {
+    public StockService(String symbol) {
 
         String urlString = API_URL + "?function=OVERVIEW&symbol=" + symbol + "&apikey=" + API_KEY;
         String response = getRequest(urlString);
@@ -99,7 +99,7 @@ public class StockDataService {
 
     @Override
     public String toString() {
-        Locale region = CountryDataService.getCountryByCode("US");
+        Locale region = CountryService.getCountryByCode("US");
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(region);
         StringBuilder sb = new StringBuilder();
 

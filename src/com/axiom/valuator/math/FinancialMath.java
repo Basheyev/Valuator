@@ -5,14 +5,14 @@ public class FinancialMath {
 
     /**
      * Calculates compound average growth rate - CAGR (%)
-     * @param beginningValue beginning value (non-zero)
-     * @param endingValue ending value
-     * @param periods number of periods (non-zero)
-     * @return CAGR (%) or NaN if ending value or number of periods is zero.
+     * @param beginningValue beginning value greater than zero
+     * @param endingValue ending value greater than zero
+     * @param periods number of periods greater than zero
+     * @return CAGR (%) or NaN if one of argument are zero or negative
      */
     public static double getCAGR(double beginningValue, double endingValue, double periods) {
-        if (beginningValue==0 || periods==0) return Double.NaN;
-        return Math.pow(endingValue / beginningValue, 1 / periods) - 1.0d;
+        if (periods==0) return 0.0;
+        return Math.pow(endingValue / beginningValue, 1.0 / periods) - 1.0d;
     }
 
 
@@ -27,10 +27,10 @@ public class FinancialMath {
      */
     public static double getWACC(double D, double Dc, double E, double Ec, double corporateTax) {
         double V = D + E;
-        if (V==0) return 0.0;
-        if (D==0 & E!=0) return Ec;
-        if (D!=0 & E==0) return Dc;
-        return (E/V * Ec) + (D/V * Dc * (1.0 - corporateTax));
+        if (V==0) return 0.0;       // Return zero if there is no debt or equity
+        if (D==0 & E!=0) return Ec; // Return cost of equity if there is no debt
+        if (D!=0 & E==0) return Dc; // Return cost of debt if there is no eqiuty
+        return (E / V * Ec) + (D / V * Dc * (1.0 - corporateTax));
     }
 
 
@@ -56,8 +56,10 @@ public class FinancialMath {
     public static double getDCF(double[] fcf, double WACC) {
         if (fcf.length==0) return 0;
         double sum = 0;
+        double value;
         for (int t=0; t<fcf.length; t++) {
-            sum += getPresentValue(fcf[t], WACC, 1 + t);
+            value = getPresentValue(fcf[t], WACC, 1 + t);
+            sum += value;
         }
         return sum;
     }
@@ -71,7 +73,7 @@ public class FinancialMath {
      * @return terminal value or NaN if growth rate higher than WACC
      */
     public static double getTerminalValue(double lastFCF, double WACC, double growthRate) {
-        if (growthRate > WACC) return Double.NaN;
+        if (growthRate >= WACC) return Double.NaN;
         return (lastFCF * (1 + growthRate)) / (WACC - growthRate);
     }
 

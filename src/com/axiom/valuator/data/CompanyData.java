@@ -1,6 +1,6 @@
 package com.axiom.valuator.data;
 
-import com.axiom.valuator.services.CountryDataService;
+import com.axiom.valuator.services.CountryService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -29,7 +29,6 @@ public class CompanyData {
     private boolean isLeader;                   // Is company a leader of market
     private String comparableStock;             // Comparable stock ticker
 
-
     /**
      * Company Data Constructor
      * @param name company legal entity name for reporting
@@ -38,7 +37,7 @@ public class CompanyData {
      */
     public CompanyData(String name, String countryCode, int startYear) {
         this.name = name;
-        this.country = CountryDataService.getCountryByCode(countryCode);
+        this.country = CountryService.getCountryByCode(countryCode);
         this.dataFirstYear = startYear;
         this.revenue = null;
         this.ebitda = null;
@@ -59,7 +58,7 @@ public class CompanyData {
      */
     public CompanyData(JSONObject json) {
         this.name = json.getString("name");
-        this.country = CountryDataService.getCountryByCode(json.getString("country"));
+        this.country = CountryService.getCountryByCode(json.getString("country"));
         this.dataFirstYear = json.getInt("dataFirstYear");
         this.revenue = jsonArrayToDoubleArray(json.getJSONArray("revenue"));
         this.ebitda = jsonArrayToDoubleArray(json.getJSONArray("ebitda"));
@@ -196,7 +195,7 @@ public class CompanyData {
      * @return serialized JSONObject
      */
     public JSONObject toJson() {
-        LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>();
         map.put("name", name);
         map.put("country", country.getCountry());
         map.put("dataFirstYear", dataFirstYear);
