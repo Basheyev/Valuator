@@ -16,11 +16,19 @@ public class ValuatorService {
 
     private final CountryData countryData;
     private final CompanyData company;
+    private final int exitYear;
 
     public ValuatorService(CompanyData companyData) {
-        company = companyData;
-        countryData = new CountryData(company.getCountry());
+        this(companyData, Year.now().getValue());
+
     }
+
+    public ValuatorService(CompanyData companyData, int exitYear) {
+        this.company = companyData;
+        this.countryData = new CountryData(company.getCountry());
+        this.exitYear = exitYear;
+    }
+
 
     public CountryData getCountryData() {
         return countryData;
@@ -54,7 +62,7 @@ public class ValuatorService {
             report.append(" Discounted Cash Flow (FCF) Valuation\n");
             report.append("------------------------------------------------------------\n");
             report.append("WACC = ").append(FinancialMath.toPercent(WACC)).append("%\n");
-            report.append("Growth Rate = ").append(FinancialMath.toPercent(growthRate)).append("%\n");
+            report.append("Economy growth = ").append(FinancialMath.toPercent(growthRate)).append("%\n");
             report.append("DCF = ").append(countryData.formatMoney(DCF)).append("\n");
             report.append("TV = ").append(countryData.formatMoney(TV)).append("\n");
             report.append("NFP = ").append(countryData.formatMoney(NFP)).append("\n");
@@ -80,12 +88,12 @@ public class ValuatorService {
         if (company.isLeader()) multiple = LEADER_GROWTH_MULTIPLE;
 
         double baseEBITDA = beginningValue;
-        int currentYear = Year.now().getValue();
+
         // find first positive ebitda
         for (int i=0; i<ebitda.length; i++) {
             double value = ebitda[i];
             int year = company.getDataFirstYear() + i;
-            if (value > 0 && year >= currentYear) {
+            if (value > 0 && year >= exitYear) {
                 baseEBITDA = value;
                 break;
             }
@@ -120,12 +128,12 @@ public class ValuatorService {
             double EVtoEBITDA = sds.getEVToEBITDA();
             double[] revenue = company.getRevenue();
             double[] ebitda = company.getEBITDA();
-            int yearIndex = Year.now().getValue() - company.getDataFirstYear();
+            int yearIndex = exitYear - company.getDataFirstYear();
             if (yearIndex < 0) return 0;
 
             // calculate EV/Revenue and EV/EBITDA valuations if data available
             boolean revenueAvailable = (revenue != null);
-            boolean ebitdaAvailable = (ebitda != null && ebitda[yearIndex] > 0);
+            boolean ebitdaAvailable = (ebitda != null && ebitda[yearIndex] > 0 && EVtoEBITDA > 0);
             double EVRevenueValuation = revenueAvailable ? revenue[yearIndex] * EVtoRevenue : 0;
             double EVEBITDAValuation = ebitdaAvailable ? ebitda[yearIndex] * EVtoEBITDA : 0;
             int count = (revenueAvailable ? 1 : 0) + (ebitdaAvailable ? 1 : 0);
@@ -145,7 +153,7 @@ public class ValuatorService {
                 report.append("EV average: ").append(countryData.formatMoney(enterpriseValue)).append("\n");
                 report.append("Valuation: ").append(countryData.formatMoney(valuation)).append("\n");
             }
-            return EVRevenueValuation;
+            return valuation;
         } catch (Exception e) {
             e.printStackTrace();
         }
