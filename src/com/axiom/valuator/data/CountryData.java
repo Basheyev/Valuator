@@ -1,5 +1,4 @@
-package com.axiom.valuator.services;
-
+package com.axiom.valuator.data;
 
 import com.axiom.valuator.math.FinancialMath;
 import org.json.JSONArray;
@@ -18,9 +17,11 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import static java.net.http.HttpClient.newHttpClient;
 
 /**
- * Country Open Data API caller service
+ * Fetches and stores country GDP value by years,GDP growth (%),
+ * inflation (%), corporate tax (%) and base rate (%) that are
+ * used in WACC, CAPM and Terminal Value formulas calculations
  */
-public class CountryService {
+public class CountryData {
 
     public static final String ERROR_MESSAGE = "Invalid country ISO Alpha-2 code: ";
     public static final String WORLD_BANK_URL = "https://api.worldbank.org/v2/country/";
@@ -49,7 +50,7 @@ public class CountryService {
      * @param countryLocale country
      * @param howManyYears how many years of history to load
      */
-    public CountryService(Locale countryLocale, int howManyYears) {
+    public CountryData(Locale countryLocale, int howManyYears) {
 
         if (countryLocale == null) throw new IllegalArgumentException(ERROR_MESSAGE);
         if (howManyYears < 1) throw new IllegalArgumentException(ERROR_MESSAGE);
@@ -240,7 +241,7 @@ public class CountryService {
     @Override
     public String toString() {
 
-        Locale region = CountryService.getCountryByCode("US");
+        Locale region = CountryData.getCountryByCode("US");
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(region);
         StringBuilder sb = new StringBuilder();
 

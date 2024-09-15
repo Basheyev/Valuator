@@ -1,6 +1,5 @@
 package com.axiom.valuator.data;
 
-import com.axiom.valuator.services.CountryService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -37,7 +36,7 @@ public class CompanyData {
      */
     public CompanyData(String name, String countryCode, int startYear) {
         this.name = name;
-        this.country = CountryService.getCountryByCode(countryCode);
+        this.country = CountryData.getCountryByCode(countryCode);
         this.dataFirstYear = startYear;
         this.revenue = null;
         this.ebitda = null;
@@ -58,7 +57,7 @@ public class CompanyData {
      */
     public CompanyData(JSONObject json) {
         this.name = json.getString("name");
-        this.country = CountryService.getCountryByCode(json.getString("country"));
+        this.country = CountryData.getCountryByCode(json.getString("country"));
         this.dataFirstYear = json.getInt("dataFirstYear");
         this.revenue = jsonArrayToDoubleArray(json.getJSONArray("revenue"));
         this.ebitda = jsonArrayToDoubleArray(json.getJSONArray("ebitda"));

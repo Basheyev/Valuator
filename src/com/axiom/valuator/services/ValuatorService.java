@@ -1,6 +1,8 @@
 package com.axiom.valuator.services;
 
 import com.axiom.valuator.data.CompanyData;
+import com.axiom.valuator.data.CountryData;
+import com.axiom.valuator.data.StockData;
 import com.axiom.valuator.math.FinancialMath;
 
 import java.time.Year;
@@ -13,12 +15,12 @@ public class ValuatorService {
     public static final int FAST_GROWTH_MULTIPLE = 6;
     public static final int LEADER_GROWTH_MULTIPLE = 8;
 
-    private final CountryService countryData;
+    private final CountryData countryData;
     private final CompanyData company;
 
     public ValuatorService(CompanyData companyData) {
         company = companyData;
-        countryData = new CountryService(company.getCountry(), HISTORICAL_DATA_YEARS);
+        countryData = new CountryData(company.getCountry(), HISTORICAL_DATA_YEARS);
     }
 
 
@@ -45,6 +47,7 @@ public class ValuatorService {
         double equityValue = DCF + TV - NFP;
 
         if (logReport) {
+            report.append(countryData);
             report.append("\n--------------------------------------------\n");
             report.append(company.getName());
             report.append(" Discounted Cash Flow (FCF) Valuation\n");
@@ -110,7 +113,7 @@ public class ValuatorService {
         try {
             boolean logReport = report != null;
             String listedCompanyTicker = company.getComparableStock();
-            StockService sds = new StockService(listedCompanyTicker);
+            StockData sds = new StockData(listedCompanyTicker);
             double EVtoRevenue = sds.getEVToRevenue();
             double EVtoEBITDA = sds.getEVToEBITDA();
             double[] revenue = company.getRevenue();

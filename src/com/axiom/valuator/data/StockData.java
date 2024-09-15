@@ -1,4 +1,4 @@
-package com.axiom.valuator.services;
+package com.axiom.valuator.data;
 
 import org.json.JSONObject;
 
@@ -14,14 +14,14 @@ import static java.net.HttpURLConnection.HTTP_OK;
 
 
 // fixme: Alpha Vantage limits 25 requests per day
-public class StockService {
+public class StockData {
 
     public static final String API_URL = "https://www.alphavantage.co/query";
     public static final String API_KEY = "ZT4F55HUBU1JD2CF";
 
     private final JSONObject stock;
 
-    public StockService(String symbol) {
+    public StockData(String symbol) {
 
         String urlString = API_URL + "?function=OVERVIEW&symbol=" + symbol + "&apikey=" + API_KEY;
         String response = getRequest(urlString);
@@ -104,7 +104,7 @@ public class StockService {
 
     @Override
     public String toString() {
-        Locale region = CountryService.getCountryByCode("US");
+        Locale region = CountryData.getCountryByCode("US");
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(region);
         StringBuilder sb = new StringBuilder();
 
