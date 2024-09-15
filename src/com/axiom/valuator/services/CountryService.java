@@ -45,7 +45,7 @@ public class CountryService {
 
     /**
      * Constructor that loads economic data about the country
-     * (GDP, Inflation, Corporate Tax) from open data sources
+     * (GDP, Inflation, Corporate Tax, Base Interest Rate) from open data sources
      * @param countryLocale country
      * @param howManyYears how many years of history to load
      */
@@ -85,7 +85,7 @@ public class CountryService {
 
         // load base rate
         interestRate = fetchInterestRate();
-        marketReturnRate = DEFAULT_MARKET_RETURN_RATE;
+        marketReturnRate = DEFAULT_MARKET_RETURN_RATE; // todo get market return
 
         // Load country corporate tax
         corporateTax = getTaxRate(countryLocale);
@@ -536,5 +536,6 @@ public class CountryService {
     };
 
     private static final double WORLD_AVERAGE_BASE_RATE = 0.1411;     // 14.11%
+
     private static final double DEFAULT_MARKET_RETURN_RATE = 0.2493;  // 24.93%
 }
