@@ -26,7 +26,6 @@ public class CountryService {
     public static final String WORLD_BANK_URL = "https://api.worldbank.org/v2/country/";
     public static final String WORLD_BANK_REAL_GDP = "NY.GDP.MKTP.KD";
     public static final String WORLD_BANK_INFLATION = "NY.GDP.DEFL.KD.ZG";
-    public static final String WORLD_BANK_BASE_RATE = "NY.GDP.DEFL.KD.ZG"; // todo collect base rate
 
     private final Locale country;
     private final int YEARS_OF_HISTORY;
@@ -86,7 +85,7 @@ public class CountryService {
 
         // load base rate
         interestRate = fetchInterestRate();
-        marketReturnRate = 0.2493; // todo fetch market return rate
+        marketReturnRate = DEFAULT_MARKET_RETURN_RATE;
 
         // Load country corporate tax
         corporateTax = getTaxRate(countryLocale);
@@ -132,16 +131,15 @@ public class CountryService {
 
 
     private double fetchInterestRate() {
-        String url = WORLD_BANK_API + WORLD_BANK_BASE_RATE + "?date=" + (lastYear-1) + "&format=json";
-
-        String jsonResponse = getRequest(url);
-        if (jsonResponse==null) throw new IllegalArgumentException("Can't fetch data from " + url);
-
-        // todo fetch interest rate
-
-        //System.out.println("BASE RATE:" + jsonResponse);
-
-        return 0.1425;
+        String iso3Code = country.getISO3Country();
+        for (Object[] tuple: COUNTRY_BASE_RATES) {
+            String iso3 = (String) tuple[0];
+            double rate = (Double) tuple[1];
+            if (iso3.equals(iso3Code)) {
+                return rate / 100.0;
+            }
+        }
+        return WORLD_AVERAGE_BASE_RATE;
     }
 
 
@@ -288,18 +286,18 @@ public class CountryService {
 
     public static double getTaxRate(Locale country) {
         String iso3Code = country.getISO3Country();
-        for (Object[] tuple: taxData) {
+        for (Object[] tuple: COUNTRIES_CORPORATE_TAX_RATES) {
             String iso3 = (String) tuple[0];
             double rate = (Double) tuple[2];
             if (iso3.equals(iso3Code)) {
                 return rate / 100.0;
             }
         }
-        return WORLD_AVERAGE;
+        return WORLD_AVERAGE_CORPORATE_TAX_RATE;
     }
 
     // Tax data for 2023
-    private static final Object[][] taxData = {
+    private static final Object[][] COUNTRIES_CORPORATE_TAX_RATES = {
         {"AFG","Afghanistan",20.0},
         {"AGO","Angola",25.0},
         {"ALB","Albania",15.0},
@@ -483,5 +481,60 @@ public class CountryService {
         {"ZWE","Zimbabwe",24.72}
     };
 
-    private static final double WORLD_AVERAGE = 23.45;
+    private static final double WORLD_AVERAGE_CORPORATE_TAX_RATE = 23.45;
+
+
+    // values of Q3 2024
+    public static final Object[][] COUNTRY_BASE_RATES = {
+        {"CZE", 4.50},   // Czech Republic
+        {"DNK", 3.10},   // Denmark
+        {"DOM", 6.75},   // Dominican Republic
+        {"EGY", 27.25},  // Egypt
+        {"SWZ", 7.50},   // Eswatini
+        {"FJI", 0.25},   // Fiji
+        {"GMB", 17.00},  // Gambia
+        {"GEO", 8.00},   // Georgia
+        {"GHA", 29.00},  // Ghana
+        {"GTM", 5.00},   // Guatemala
+        {"HND", 3.00},   // Honduras
+        {"HKG", 5.75},   // Hong Kong
+        {"HUN", 7.00},   // Hungary
+        {"ISL", 9.25},   // Iceland
+        {"IND", 6.50},   // India
+        {"IDN", 6.25},   // Indonesia
+        {"IRN", 23.00},  // Iran
+        {"ISR", 4.50},   // Israel
+        {"JPN", 0.25},   // Japan
+        {"JOR", 7.50},   // Jordan
+        {"KAZ", 14.25},  // Kazakhstan
+        {"KEN", 13.00},  // Kenya
+        {"KWT", 4.25},   // Kuwait
+        {"KGZ", 9.00},   // Kyrgyzstan
+        {"LBN", 20.00},  // Lebanon
+        {"MWI", 26.00},  // Malawi
+        {"MYS", 3.00},   // Malaysia
+        {"MEX", 10.75},  // Mexico
+        {"MDA", 3.60},   // Moldova
+        {"MNG", 11.00},  // Mongolia
+        {"MAR", 2.75},   // Morocco
+        {"MOZ", 14.25},  // Mozambique
+        {"NAM", 7.50},   // Namibia
+        {"NZL", 5.25},   // New Zealand
+        {"NIC", 7.00},   // Nicaragua
+        {"NGA", 26.75},  // Nigeria
+        {"MKD", 6.30},   // North Macedonia
+        {"NLD", 3.65},   // Eurozone (Netherlands as an example)
+        {"ZAF", 8.25},   // South Africa
+        {"THA", 2.25},   // Thailand
+        {"TUR", 30.00},  // Turkey
+        {"UKR", 25.00},  // Ukraine
+        {"GBR", 5.25},   // United Kingdom
+        {"USA", 5.50},   // United States
+        {"VEN", 58.12},  // Venezuela
+        {"ZMB", 9.00},   // Zambia
+        {"ZWE", 150.00}, // Zimbabwe
+    };
+
+    private static final double WORLD_AVERAGE_BASE_RATE = 0.1411;     // 14.11%
+    private static final double DEFAULT_MARKET_RETURN_RATE = 0.2493;  // 24.93%
 }

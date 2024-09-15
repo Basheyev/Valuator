@@ -12,6 +12,8 @@ import java.util.Locale;
 
 import static java.net.HttpURLConnection.HTTP_OK;
 
+
+// fixme: Alpha Vantage limits 25 requests per day
 public class StockService {
 
     public static final String API_URL = "https://www.alphavantage.co/query";
@@ -23,11 +25,14 @@ public class StockService {
 
         String urlString = API_URL + "?function=OVERVIEW&symbol=" + symbol + "&apikey=" + API_KEY;
         String response = getRequest(urlString);
-        if (response==null) {
-            throw new IllegalArgumentException("Can't request " + urlString);
-        }
-        // fixme sometimes alpha vantage returns empty object {}
+        if (response==null) throw new IllegalArgumentException("Can't request " + urlString);
         stock = new JSONObject(response);
+        if (stock.isEmpty()) {
+            throw new IllegalArgumentException("Empty object returned from " + urlString);
+        } else if (stock.has("Information")) {
+            throw new IllegalArgumentException(stock.getString("Information"));
+        }
+
     }
 
     private String getRequest(String URL) {

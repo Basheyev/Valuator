@@ -1,6 +1,9 @@
 package com.axiom.valuator.math;
 
 
+/**
+ * Financial Mathematics
+ */
 public class FinancialMath {
 
     /**
@@ -29,7 +32,7 @@ public class FinancialMath {
         double V = D + E;
         if (V==0) return 0.0;       // Return zero if there is no debt or equity
         if (D==0 & E!=0) return Ec; // Return cost of equity if there is no debt
-        if (D!=0 & E==0) return Dc; // Return cost of debt if there is no eqiuty
+        if (D!=0 & E==0) return Dc; // Return cost of debt if there is no equity
         return (E / V * Ec) + (D / V * Dc * (1.0 - corporateTax));
     }
 
@@ -46,7 +49,6 @@ public class FinancialMath {
     }
 
 
-
     /**
      * Calculates discounted cash flow (DCF)
      * @param fcf array of free cash flow values by periods
@@ -57,8 +59,8 @@ public class FinancialMath {
         if (fcf.length==0) return 0;
         double sum = 0;
         double value;
-        for (int t=0; t<fcf.length; t++) {
-            value = getPresentValue(fcf[t], WACC, 1 + t);
+        for (int period=0; period<fcf.length; period++) {
+            value = getPresentValue(fcf[period], WACC, 1 + period);
             sum += value;
         }
         return sum;

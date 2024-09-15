@@ -37,7 +37,7 @@ public class ValuatorService {
         double marketReturn = countryData.getMarketReturn();
 
         double WACC = FinancialMath.getWACC(debt, debtRate, equity, equityRate, corporateTax);
-        if (WACC==0.0) // todo calculate beta
+        if (WACC==0.0) // todo calculate beta (sensitivity to market by GICS)
             WACC = FinancialMath.getCAPM(baseRate, 1, marketReturn);
         double DCF = FinancialMath.getDCF(fcf, WACC);
         double TV = FinancialMath.getTerminalValue(fcf[fcf.length-1], WACC, growthRate);
@@ -96,6 +96,7 @@ public class ValuatorService {
             report.append(company.getName());
             report.append(" EBITDA Multiple Valuation\n");
             report.append("--------------------------------------------\n");
+            report.append("EBITDA: ").append(countryData.formatMoney(baseEBITDA)).append("\n");
             report.append("Growth rate: ").append(Math.round(CAGR*10000.0)/100.0).append("%\n");
             report.append("Multiple: ").append(multiple).append("x\n");
             report.append("Valuation: ").append(countryData.formatMoney(equityValuation)).append("\n");
@@ -141,10 +142,5 @@ public class ValuatorService {
         return 0;
     }
 
-
-    // todo startup valuation
-    public double valuateStartup() {
-        return 0.0;
-    }
 
 }
