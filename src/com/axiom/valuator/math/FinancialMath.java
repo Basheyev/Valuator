@@ -31,8 +31,8 @@ public class FinancialMath {
     public static double getWACC(double D, double Dc, double E, double Ec, double corporateTax) {
         double V = D + E;
         if (V==0) return 0.0;       // Return zero if there is no debt or equity
-        if (D==0 & E!=0) return Ec; // Return cost of equity if there is no debt
-        if (D!=0 & E==0) return Dc; // Return cost of debt if there is no equity
+        if (D==0 && E!=0) return Ec; // Return cost of equity if there is no debt
+        if (D!=0 && E==0) return Dc; // Return cost of debt if there is no equity
         return (E / V * Ec) + (D / V * Dc * (1.0 - corporateTax));
     }
 
