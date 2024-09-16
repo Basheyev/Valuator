@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Year;
 
 public class Valuator {
 
@@ -18,15 +19,26 @@ public class Valuator {
         JSONObject jsonObject = new JSONObject(content);
         CompanyData company = new CompanyData(jsonObject);
 
+        int exitYear = 2026;
         StringBuilder sb = new StringBuilder();
         sb.append(company);
-        ValuatorService valuator = new ValuatorService(company);
+        ValuatorService valuator = new ValuatorService(company, exitYear);
         double dcf = valuator.valuateDCF(sb);
         double ebitda = valuator.valuateEBITDA(sb);
         double multiples = valuator.valuateMultiples(sb);
-        double average = (dcf + ebitda + multiples) / 3;
+        double factors = (ebitda > 0 ? 1 : 0) + (multiples > 0 ? 1 : 0) + (dcf > 0 ? 1 : 0);
+        double average = (dcf + ebitda + multiples) / factors;
+
         sb.append("\n------------------------------------------------------------\n");
-        sb.append("VALUATION AVERAGE: ").append(valuator.getCountryData().formatMoney(average)).append("\n");
+        sb.append("VALUATION AVERAGE (").append(exitYear).append("): ")
+            .append(valuator.getCountryData().formatMoney(average)).append("\n");
+        int currentYear = Year.now().getValue();
+        int yearsToExit = exitYear - currentYear;
+        if (yearsToExit >= 1) {
+            double presentValue = FinancialMath.getPresentValue(average, 0.58, yearsToExit);
+            sb.append("Present Value (").append(currentYear).append("): ")
+                .append(valuator.getCountryData().formatMoney(presentValue)).append("\n");
+        }
         System.out.println(sb);
     }
 

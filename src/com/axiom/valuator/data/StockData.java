@@ -13,7 +13,7 @@ import java.util.Locale;
 import static java.net.HttpURLConnection.HTTP_OK;
 
 
-// fixme: Alpha Vantage limits 25 requests per day
+// todo: Alpha Vantage limits 25 requests per day
 public class StockData {
 
     public static final String API_URL = "https://www.alphavantage.co/query";
