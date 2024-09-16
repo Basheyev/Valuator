@@ -19,7 +19,7 @@ public class Valuator {
         JSONObject jsonObject = new JSONObject(content);
         CompanyData company = new CompanyData(jsonObject);
 
-        int exitYear = 2026;
+        int exitYear = 2024;
         StringBuilder sb = new StringBuilder();
         sb.append(company);
         ValuatorService valuator = new ValuatorService(company, exitYear);
@@ -43,7 +43,7 @@ public class Valuator {
     }
 
     public static void main(String[] args) throws IOException {
-        testValuation("data/arta.json");
+        testValuation("data/innoforce.json");
 
     }
 

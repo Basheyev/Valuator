@@ -214,10 +214,7 @@ public class CountryData {
      * @return country average market return rate or world average if country not found
      */
     private double fetchMarketReturnRate(Locale country) {
-
-        // todo get real data on market return
-
-        return DEFAULT_MARKET_RETURN_RATE;
+        return fetchCentralBankInterestRate(country) + AVERAGE_RISK_PREMIUM;
     }
 
 
@@ -541,6 +538,5 @@ public class CountryData {
     };
 
     private static final double WORLD_AVERAGE_BASE_RATE = 0.1411;     // 14.11%
-
-    private static final double DEFAULT_MARKET_RETURN_RATE = 0.2493;  // 24.93%
+    private static final double AVERAGE_RISK_PREMIUM = 0.105;         // 10.5%
 }

@@ -7,7 +7,9 @@ import com.axiom.valuator.math.FinancialMath;
 
 import java.time.Year;
 
-// todo: calculate valuate at specific year (exit year)
+/**
+ * Company Valuation
+ */
 public class ValuatorService {
 
     public static final int DEFAULT_GROWTH_MULTIPLE = 4;
@@ -49,8 +51,10 @@ public class ValuatorService {
         double marketReturn = countryData.getMarketReturn();
 
         double WACC = FinancialMath.getWACC(debt, debtRate, equity, equityRate, corporateTax);
-        if (WACC==0.0) // todo calculate beta (sensitivity to market by GICS)
+        if (WACC==0.0) { // if neither external investments nor loans, but only own equity
+            // todo calculate beta based on public company data (unlevered beta)
             WACC = FinancialMath.getCAPM(baseRate, 1, marketReturn);
+        }
         double DCF = FinancialMath.getDCF(fcf, WACC);
         double TV = FinancialMath.getTerminalValue(fcf[fcf.length-1], WACC, growthRate);
         double NFP = debt - cash;
