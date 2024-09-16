@@ -14,33 +14,46 @@ import static java.net.HttpURLConnection.HTTP_OK;
 
 
 // todo: Alpha Vantage limits 25 requests per day
+
+/**
+ * Fetches and stores public company stock data and financials
+ * used in comparable analysis, especially EV/Revenue, EV/EBITDA
+ */
 public class StockData {
 
-    public static final String API_URL = "https://www.alphavantage.co/query";
+    public static final String API_URL = "https://www.alphavantage.co/query?function=OVERVIEW&symbol=";
     public static final String API_KEY = "ZT4F55HUBU1JD2CF";
+
+    public static final String ERROR_NULL_RESPONSE = "Can't request ";
+    public static final String ERROR_EMPTY_OBJECT = "Empty object returned from ";
+    public static final String INFORMATION_FIELD = "Information";
 
     private final JSONObject stock;
 
+    /**
+     * Stock Data Constructor
+     * @param symbol public company ticker
+     */
     public StockData(String symbol) {
-
-        String urlString = API_URL + "?function=OVERVIEW&symbol=" + symbol + "&apikey=" + API_KEY;
+        String urlString = API_URL + symbol + "&apikey=" + API_KEY;
         String response = getRequest(urlString);
-        if (response==null) throw new IllegalArgumentException("Can't request " + urlString);
+        if (response == null) throw new IllegalArgumentException(ERROR_NULL_RESPONSE + urlString);
         stock = new JSONObject(response);
-        if (stock.isEmpty()) {
-            throw new IllegalArgumentException("Empty object returned from " + urlString);
-        } else if (stock.has("Information")) {
-            throw new IllegalArgumentException(stock.getString("Information"));
-        }
-
+        if (stock.isEmpty())
+            throw new IllegalArgumentException(ERROR_EMPTY_OBJECT + urlString);
+        else if (stock.has(INFORMATION_FIELD))
+            throw new IllegalArgumentException(stock.getString(INFORMATION_FIELD));
     }
 
+
+    /**
+     * Sends GET request and returns response
+     * @param URL request URL
+     * @return response string or null if an exception occurs
+     */
     private String getRequest(String URL) {
         HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(URL))
-            .GET().build();
-
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(URL)).GET().build();
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             int statusCode = response.statusCode();
@@ -53,88 +66,31 @@ public class StockData {
     }
 
 
-    public String getSymbol() {
-        return stock.getString("Symbol");
-    }
-
-    public String getName() {
-        return stock.getString("Name");
-    }
-
-    public double getRevenueTTM() {
-        return stock.getDouble("RevenueTTM");
-    }
-
-    public double getEBITDA() {
-        return stock.getDouble("EBITDA");
-    }
-
-    public double getOperatingMarginTTM() {
-        return stock.getDouble("OperatingMarginTTM");
-    }
-
-    public double getGrossProfitTTM() {
-        return stock.getDouble("GrossProfitTTM");
-    }
-
-    public double getEVToRevenue() {
-        return stock.getDouble("EVToRevenue");
-    }
-
-    public double getEVToEBITDA() {
-        return stock.getDouble("EVToEBITDA");
-    }
-
-    public double getMarketCapitalizaion() {
-        return stock.getDouble("MarketCapitalization");
-    }
-
-    public double getEnterpriseValue() {
-        return getEBITDA() * getEVToEBITDA();
-    }
-
-    public double getEarningsPerShare() {
-        return stock.getDouble("EPS");
-    }
-
-    public double getRevenuePerShareTTM() {
-        return stock.getDouble("RevenuePerShareTTM");
-    }
+    public String getSymbol() { return stock.getString("Symbol"); }
+    public String getName() { return stock.getString("Name"); }
+    public double getRevenueTTM() { return stock.getDouble("RevenueTTM");  }
+    public double getEBITDA() { return stock.getDouble("EBITDA"); }
+    public double getOperatingMarginTTM() { return stock.getDouble("OperatingMarginTTM"); }
+    public double getGrossProfitTTM() { return stock.getDouble("GrossProfitTTM"); }
+    public double getEVToRevenue() { return stock.getDouble("EVToRevenue"); }
+    public double getEVToEBITDA() { return stock.getDouble("EVToEBITDA"); }
+    public double getMarketCapitalization() { return stock.getDouble("MarketCapitalization"); }
+    public double getEnterpriseValue() { return getEBITDA() * getEVToEBITDA(); }
+    public double getEarningsPerShare() { return stock.getDouble("EPS"); }
+    public double getRevenuePerShareTTM() { return stock.getDouble("RevenuePerShareTTM"); }
 
 
     @Override
     public String toString() {
         Locale region = CountryData.getCountryByCode("US");
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(region);
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(getName());
-        sb.append(" (");
-        sb.append(getSymbol());
-        sb.append(")");
-        sb.append("\n");
-        sb.append("Revenue (TTM): ");
-        sb.append(currencyFormatter.format(getRevenueTTM()));
-        sb.append("\n");
-        sb.append("EBITDA (TTM): ");
-        sb.append(currencyFormatter.format(getEBITDA()));
-        sb.append("\n");
-        sb.append("Gross Profit (TTM): ");
-        sb.append(currencyFormatter.format(getGrossProfitTTM()));
-        sb.append("\n");
-        sb.append("Market Capitalization: ");
-        sb.append(currencyFormatter.format(getMarketCapitalizaion()));
-        sb.append("\n");
-        sb.append("Enterprise Value: ");
-        sb.append(currencyFormatter.format(getEnterpriseValue()));
-        sb.append("\n");
-        sb.append("EV\\Revenue: ");
-        sb.append(getEVToRevenue());
-        sb.append("x\n");
-        sb.append("EV\\EBITDA: ");
-        sb.append(getEVToEBITDA());
-        sb.append("x\n");
-
-        return sb.toString();
+        return getName() + " (" + getSymbol() + ")\n" +
+            "Revenue (TTM): " + currencyFormatter.format(getRevenueTTM()) + "\n" +
+            "EBITDA (TTM): " + currencyFormatter.format(getEBITDA()) + "\n" +
+            "Gross Profit (TTM): " + currencyFormatter.format(getGrossProfitTTM()) + "\n" +
+            "Market Capitalization: " + currencyFormatter.format(getMarketCapitalization()) + "\n" +
+            "Enterprise Value: " + currencyFormatter.format(getEnterpriseValue()) + "\n" +
+            "EV\\Revenue: " + getEVToRevenue() + "x\n" +
+            "EV\\EBITDA: " + getEVToEBITDA() + "x\n";
     }
 }
