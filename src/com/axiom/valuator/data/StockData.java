@@ -1,6 +1,9 @@
 package com.axiom.valuator.data;
 
 import org.json.JSONObject;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.mapdb.HTreeMap;
 
 import java.io.IOException;
 import java.net.URI;
@@ -12,8 +15,6 @@ import java.util.Locale;
 
 import static java.net.HttpURLConnection.HTTP_OK;
 
-
-// todo: Alpha Vantage limits 25 requests per day
 
 /**
  * Fetches and stores public company stock data and financials
@@ -30,20 +31,30 @@ public class StockData {
 
     private final JSONObject stock;
 
+
+
     /**
      * Stock Data Constructor
      * @param symbol public company ticker
      */
     public StockData(String symbol) {
-        String urlString = API_URL + symbol + "&apikey=" + API_KEY;
-        String response = getRequest(urlString);
-        if (response == null) throw new IllegalArgumentException(ERROR_NULL_RESPONSE + urlString);
-        stock = new JSONObject(response);
-        if (stock.isEmpty())
-            throw new IllegalArgumentException(ERROR_EMPTY_OBJECT + urlString);
-        else if (stock.has(INFORMATION_FIELD))
-            throw new IllegalArgumentException(stock.getString(INFORMATION_FIELD));
+        // Check cache to avoid redundant requests because Alpha Vantage limits to 25 requests per day
+        if (CachedData.containsCompany(symbol)) {
+            String jsonString = CachedData.getCompany(symbol);
+            stock = new JSONObject(jsonString);  // let's throw exception if null for debug purposes
+        } else {
+            String urlString = API_URL + symbol + "&apikey=" + API_KEY;
+            String response = getRequest(urlString);
+            if (response == null) throw new IllegalArgumentException(ERROR_NULL_RESPONSE + urlString);
+            stock = new JSONObject(response);
+            if (stock.isEmpty())
+                throw new IllegalArgumentException(ERROR_EMPTY_OBJECT + urlString);
+            else if (stock.has(INFORMATION_FIELD))
+                throw new IllegalArgumentException(stock.getString(INFORMATION_FIELD));
+            CachedData.putCompany(symbol, stock.toString());
+        }
     }
+
 
 
     /**

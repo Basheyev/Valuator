@@ -1,15 +1,20 @@
 package com.axiom.valuator;
 
 import com.axiom.valuator.data.CompanyData;
-import com.axiom.valuator.data.CountryData;
 import com.axiom.valuator.math.FinancialMath;
 import com.axiom.valuator.services.ValuatorService;
 import org.json.JSONObject;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.mapdb.HTreeMap;
+
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Year;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Valuator {
 
@@ -44,7 +49,6 @@ public class Valuator {
 
     public static void main(String[] args) throws IOException {
         testValuation("data/innoforce.json");
-
     }
 
 }
