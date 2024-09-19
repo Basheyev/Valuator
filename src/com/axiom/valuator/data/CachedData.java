@@ -4,6 +4,7 @@ import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
 
+// todo: check data expiration
 public class CachedData {
 
     private static final String DB_PATH = "cache/cached_data.db";
