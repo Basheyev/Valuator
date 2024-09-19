@@ -42,19 +42,21 @@ public class CountryData {
     public static final String ERROR_WRONG_LOCALE = "Locale can not be null";
 
     //-----------------------------------------------------------------------------------------------------
-    private final String WB_API;                      // Tailored World Bank API URL for specific country
-    private final Locale country;                     // Country, currency and language
-    private final int yearsOfHistory;                 // How many years of GDP & Inflation values to store
-    private final int firstYear;                      // First year of GDP and inflation values
-    private final int lastYear;                       // last year of GDP and inflation values
-    private final double[] gdpValues;                 // Array of GDP values
-    private final double[] inflationValues;           // Array of Inflation values
-    private final double averageGDPGrowthRate;        // Average GDP growth rate
-    private final double averageInflationRate;        // Average Inflation rate
-    private final double corporateTax;                // Corporate Tax Level
-    private final double interestRate;                // Central Bank Interest Rate
-    private final double marketReturnRate;            // Average Market Return Rate
+    private String WB_API;                             // Tailored World Bank API URL for specific country
     private final NumberFormat currencyFormatter;     // Currency formatter
+
+    private Locale country;                           // Country, currency and language
+    private int yearsOfHistory;                       // How many years of GDP & Inflation values to store
+    private int firstYear;                            // First year of GDP and inflation values
+    private int lastYear;                             // last year of GDP and inflation values
+    private double[] gdpValues;                       // Array of GDP values
+    private double[] inflationValues;                 // Array of Inflation values
+    private double averageGDPGrowthRate;              // Average GDP growth rate
+    private double averageInflationRate;              // Average Inflation rate
+    private double corporateTax;                      // Corporate Tax Level
+    private double interestRate;                      // Central Bank Interest Rate
+    private double marketReturnRate;                  // Average Market Return Rate
+
     //-----------------------------------------------------------------------------------------------------
 
 
@@ -69,19 +71,29 @@ public class CountryData {
         if (countryLocale == null) throw new IllegalArgumentException(ERROR_WRONG_LOCALE);
         if (howManyYears < MINIMUM_YEARS_OF_HISTORY) howManyYears = MINIMUM_YEARS_OF_HISTORY;
         else if (howManyYears > MAXIMUM_YEARS_OF_HISTORY) howManyYears = MAXIMUM_YEARS_OF_HISTORY;
-        // Initialize constants
-        country = countryLocale;
-        yearsOfHistory = howManyYears;
-        WB_API = WB_URL.replace("{CODE}", country.getCountry());
-        lastYear = Year.now().getValue() - 1;
-        firstYear = lastYear - (yearsOfHistory - 1);
-        gdpValues = new double[yearsOfHistory];
-        inflationValues = new double[yearsOfHistory];
-        averageGDPGrowthRate = fetchRealGDPData(firstYear, lastYear, gdpValues);
-        averageInflationRate = fetchInflationData(firstYear, lastYear, inflationValues);
-        corporateTax = fetchCorporateTaxRate(country);
-        interestRate = fetchCentralBankInterestRate(country);
-        marketReturnRate = fetchMarketReturnRate(country);
+
+        String countryCode = countryLocale.getCountry();
+        if (CachedData.containsCountry(countryCode)) {
+            JSONObject obj = new JSONObject(CachedData.getCountry(countryCode));
+            fromJSON(obj);
+        } else {
+            // Initialize constants
+            country = countryLocale;
+            yearsOfHistory = howManyYears;
+            WB_API = WB_URL.replace("{CODE}", country.getCountry());
+            lastYear = Year.now().getValue() - 1;
+            firstYear = lastYear - (yearsOfHistory - 1);
+            gdpValues = new double[yearsOfHistory];
+            inflationValues = new double[yearsOfHistory];
+            averageGDPGrowthRate = fetchRealGDPData(firstYear, lastYear, gdpValues);
+            averageInflationRate = fetchInflationData(firstYear, lastYear, inflationValues);
+            corporateTax = fetchCorporateTaxRate(country);
+            interestRate = fetchCentralBankInterestRate(country);
+            marketReturnRate = fetchMarketReturnRate(country);
+            JSONObject obj = toJSONObject();
+            CachedData.putCountry(countryCode, obj.toString());
+        }
+
         // initialize currency formatter
         currencyFormatter = NumberFormat.getCurrencyInstance(country);
         currencyFormatter.setMaximumFractionDigits(0);
@@ -296,6 +308,46 @@ public class CountryData {
         sb.append("Corporate Tax Rate: ").append(toPercent(getCorporateTax())).append("%");
         return sb.toString();
     }
+
+
+    private JSONObject toJSONObject() {
+        return new JSONObject()
+            .put("country", country.getCountry())
+            .put("yearsOfHistory", yearsOfHistory)
+            .put("firstYear", firstYear)
+            .put("lastYear", lastYear)
+            .put("gdpValues", gdpValues)
+            .put("inflationValues", inflationValues)
+            .put("averageGDPGrowthRate", averageGDPGrowthRate)
+            .put("averageInflationRate", averageInflationRate)
+            .put("corporateTax", corporateTax)
+            .put("interestRate", interestRate)
+            .put("marketReturnRate", marketReturnRate);
+    }
+
+
+    private void fromJSON(JSONObject obj) {
+        country = getCountryByCode(obj.getString("country"));
+        yearsOfHistory = obj.getInt("yearsOfHistory");
+        firstYear = obj.getInt("firstYear");
+        lastYear = obj.getInt("lastYear");
+
+        gdpValues = new double[yearsOfHistory];
+        inflationValues = new double[yearsOfHistory];
+        JSONArray gdpVal = (JSONArray) obj.get("gdpValues");
+        JSONArray infVal = (JSONArray)  obj.get("inflationValues");
+        for (int i=0; i<yearsOfHistory; i++) {
+            gdpValues[i] = gdpVal.getDouble(i);
+            inflationValues[i] = infVal.getDouble(i);
+        }
+
+        averageGDPGrowthRate = obj.getDouble("averageGDPGrowthRate");
+        averageInflationRate = obj.getDouble("averageInflationRate");
+        corporateTax = obj.getDouble("corporateTax");
+        interestRate = obj.getDouble("interestRate");
+        marketReturnRate = obj.getDouble("marketReturnRate");
+    }
+
 
 
     // Tax data for 2023

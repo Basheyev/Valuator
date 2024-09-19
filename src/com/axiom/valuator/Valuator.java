@@ -48,7 +48,7 @@ public class Valuator {
     }
 
     public static void main(String[] args) throws IOException {
-        testValuation("data/innoforce.json");
+        testValuation("data/cargon.json");
     }
 
 }
