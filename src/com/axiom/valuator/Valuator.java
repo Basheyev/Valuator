@@ -3,30 +3,24 @@ package com.axiom.valuator;
 import com.axiom.valuator.data.CompanyData;
 import com.axiom.valuator.math.FinancialMath;
 import com.axiom.valuator.services.ValuatorService;
+
 import org.json.JSONObject;
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
-import org.mapdb.HTreeMap;
-
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Year;
-import java.util.HashMap;
-import java.util.Map;
+
 
 public class Valuator {
 
     public static void testValuation(String filePath) throws IOException {
-
         String content = new String(Files.readAllBytes(Paths.get(filePath)));
         JSONObject jsonObject = new JSONObject(content);
         CompanyData company = new CompanyData(jsonObject);
 
         int exitYear = 2024;
         StringBuilder sb = new StringBuilder();
-        sb.append(company);
+            sb.append(company);
         ValuatorService valuator = new ValuatorService(company, exitYear);
         double dcf = valuator.valuateDCF(sb);
         double ebitda = valuator.valuateEBITDA(sb);
@@ -40,15 +34,16 @@ public class Valuator {
         int currentYear = Year.now().getValue();
         int yearsToExit = exitYear - currentYear;
         if (yearsToExit >= 1) {
-            double presentValue = FinancialMath.getPresentValue(average, 0.58, yearsToExit);
-            sb.append("Present Value (").append(currentYear).append("): ")
+        double presentValue = FinancialMath.getPresentValue(average, 0.58, yearsToExit);
+        sb.append("Present Value (").append(currentYear).append("): ")
                 .append(valuator.getCountryData().formatMoney(presentValue)).append("\n");
         }
         System.out.println(sb);
-    }
+}
 
     public static void main(String[] args) throws IOException {
-        testValuation("data/cargon.json");
+        testValuation("data/arta.json");
     }
+
 
 }
