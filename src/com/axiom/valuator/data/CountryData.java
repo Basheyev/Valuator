@@ -73,11 +73,19 @@ public class CountryData {
         else if (howManyYears > MAXIMUM_YEARS_OF_HISTORY) howManyYears = MAXIMUM_YEARS_OF_HISTORY;
 
         String countryCode = countryLocale.getCountry();
+        boolean alreadyCached = false;
+
+        // Check cache
         if (CachedData.containsCountry(countryCode)) {
-            JSONObject obj = new JSONObject(CachedData.getCountry(countryCode));
-            fromJSON(obj);
-        } else {
-            // Initialize constants
+            String cachedString = CachedData.getCountry(countryCode);
+            if (cachedString != null) {
+                JSONObject obj = new JSONObject(cachedString);
+                fromJSON(obj);
+                alreadyCached = true;
+            }
+        }
+
+        if (!alreadyCached) {
             country = countryLocale;
             yearsOfHistory = howManyYears;
             WB_API = WB_URL.replace("{CODE}", country.getCountry());

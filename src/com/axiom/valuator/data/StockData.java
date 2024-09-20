@@ -29,7 +29,7 @@ public class StockData {
     public static final String ERROR_EMPTY_OBJECT = "Empty object returned from ";
     public static final String INFORMATION_FIELD = "Information";
 
-    private final JSONObject stock;
+    private JSONObject stock;
 
 
 
@@ -38,11 +38,19 @@ public class StockData {
      * @param symbol public company ticker
      */
     public StockData(String symbol) {
+
         // Check cache to avoid redundant requests because Alpha Vantage limits to 25 requests per day
+        boolean alreadyCached = false;
         if (CachedData.containsCompany(symbol)) {
             String jsonString = CachedData.getCompany(symbol);
-            stock = new JSONObject(jsonString);  // let's throw exception if null for debug purposes
-        } else {
+            if (jsonString != null) {
+                stock = new JSONObject(jsonString);  // let's throw exception if null for debug purposes
+                alreadyCached = true;
+            }
+        }
+
+        // if not cached
+        if (!alreadyCached) {
             String urlString = API_URL + symbol + "&apikey=" + API_KEY;
             String response = getRequest(urlString);
             if (response == null) throw new IllegalArgumentException(ERROR_NULL_RESPONSE + urlString);

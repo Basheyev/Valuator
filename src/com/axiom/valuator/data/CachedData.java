@@ -1,15 +1,24 @@
 package com.axiom.valuator.data;
 
+import org.json.JSONObject;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
 
-// todo: check data expiration
+import java.time.LocalDate;
+import java.time.Period;
+
+
 public class CachedData {
+
+    public static final int COUNTRY_DATA_EXPIRATION_PERIOD = 24;  // 24 month (2 years)
+    public static final int COMPANY_DATA_EXPIRATION_PERIOD = 3;   // 3 month (1 quarter)
 
     private static final String DB_PATH = "cache/cached_data.db";
     private static final String DB_COUNTRIES = "countries";
     private static final String DB_COMPANIES = "companies";
+    public static final String COMPANY_DATE_FIELD = "LatestQuarter";
+    public static final String COUNTRY_DATE_FIELD = "lastYear";
 
     private static boolean initialized = false;
     private static DB cacheDB;
@@ -34,7 +43,18 @@ public class CachedData {
     public static String getCompany(String key) {
         if (!initialized) initialize();
         if (!companiesCache.containsKey(key)) return null;
-        return companiesCache.get(key);
+
+        String jsonString = companiesCache.get(key);
+        if (jsonString==null) return null;
+        JSONObject json = new JSONObject(jsonString);
+        String latestQuarter = json.getString(COMPANY_DATE_FIELD);
+        LocalDate reportQuarter = LocalDate.parse(latestQuarter);
+        LocalDate today = LocalDate.now();
+        Period period = Period.between(reportQuarter, today);
+        int monthsDifference = period.getYears() * 12 + period.getMonths();
+        if (monthsDifference >= COMPANY_DATA_EXPIRATION_PERIOD) return null;
+
+        return jsonString;
     }
 
 
@@ -54,6 +74,17 @@ public class CachedData {
     public static String getCountry(String key) {
         if (!initialized) initialize();
         if (!countriesCache.containsKey(key)) return null;
+
+        String jsonString = countriesCache.get(key);
+        if (jsonString==null) return null;
+        JSONObject json = new JSONObject(jsonString);
+        int latestYear = json.getInt(COUNTRY_DATE_FIELD);
+        LocalDate reportQuarter = LocalDate.of(latestYear, 1,1);
+        LocalDate today = LocalDate.now();
+        Period period = Period.between(reportQuarter, today);
+        int monthsDifference = period.getYears() * 12 + period.getMonths();
+        if (monthsDifference >= COUNTRY_DATA_EXPIRATION_PERIOD) return null;
+
         return countriesCache.get(key);
     }
 

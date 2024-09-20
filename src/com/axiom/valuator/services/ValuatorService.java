@@ -65,8 +65,11 @@ public class ValuatorService {
             report.append(company.getName());
             report.append(" Discounted Cash Flow (FCF) Valuation\n");
             report.append("------------------------------------------------------------\n");
+            report.append("Economy growth = ").append(FinancialMath.toPercent(growthRate))
+                  .append("%").append(" (").append(countryData.getCountryName()).append(")\n");
+            report.append("Corporate Tax = ").append(FinancialMath.toPercent(corporateTax))
+                  .append("%").append(" (").append(countryData.getCountryName()).append(")\n");
             report.append("WACC = ").append(FinancialMath.toPercent(WACC)).append("%\n");
-            report.append("Economy growth = ").append(FinancialMath.toPercent(growthRate)).append("%\n");
             report.append("DCF = ").append(countryData.formatMoney(DCF)).append("\n");
             report.append("TV = ").append(countryData.formatMoney(TV)).append("\n");
             report.append("NFP = ").append(countryData.formatMoney(NFP)).append("\n");
