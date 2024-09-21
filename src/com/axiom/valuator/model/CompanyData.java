@@ -1,4 +1,4 @@
-package com.axiom.valuator.data;
+package com.axiom.valuator.model;
 
 import com.axiom.valuator.math.FinancialMath;
 import org.json.JSONArray;

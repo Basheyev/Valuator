@@ -1,8 +1,5 @@
-package com.axiom.valuator.services;
+package com.axiom.valuator.model;
 
-import com.axiom.valuator.data.CompanyData;
-import com.axiom.valuator.data.CountryData;
-import com.axiom.valuator.data.StockData;
 import com.axiom.valuator.math.FinancialMath;
 
 import java.time.Year;

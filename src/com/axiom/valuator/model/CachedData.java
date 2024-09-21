@@ -1,4 +1,4 @@
-package com.axiom.valuator.data;
+package com.axiom.valuator.model;
 
 import org.json.JSONObject;
 import org.mapdb.DB;

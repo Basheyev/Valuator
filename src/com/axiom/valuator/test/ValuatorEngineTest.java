@@ -1,8 +1,8 @@
 package com.axiom.valuator.test;
 
-import com.axiom.valuator.data.CompanyData;
+import com.axiom.valuator.model.CompanyData;
 import com.axiom.valuator.math.FinancialMath;
-import com.axiom.valuator.services.ValuatorEngine;
+import com.axiom.valuator.model.ValuatorEngine;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -20,22 +20,22 @@ public class ValuatorEngineTest {
         int exitYear = 2024;
         StringBuilder sb = new StringBuilder();
         sb.append(company);
-        ValuatorEngine valuator = new ValuatorEngine(company, exitYear);
-        double dcf = valuator.valuateDCF(sb);
-        double ebitda = valuator.valuateEBITDA(sb);
-        double multiples = valuator.valuateMultiples(sb);
+        ValuatorEngine valuatorEngine = new ValuatorEngine(company, exitYear);
+        double dcf = valuatorEngine.valuateDCF(sb);
+        double ebitda = valuatorEngine.valuateEBITDA(sb);
+        double multiples = valuatorEngine.valuateMultiples(sb);
         double factors = (ebitda > 0 ? 1 : 0) + (multiples > 0 ? 1 : 0) + (dcf > 0 ? 1 : 0);
         double average = (dcf + ebitda + multiples) / factors;
 
         sb.append("\n------------------------------------------------------------\n");
         sb.append("VALUATION AVERAGE (").append(exitYear).append("): ")
-            .append(valuator.getCountryData().formatMoney(average)).append("\n");
+            .append(valuatorEngine.getCountryData().formatMoney(average)).append("\n");
         int currentYear = Year.now().getValue();
         int yearsToExit = exitYear - currentYear;
         if (yearsToExit >= 1) {
             double presentValue = FinancialMath.getPresentValue(average, 0.58, yearsToExit);
             sb.append("Present Value (").append(currentYear).append("): ")
-                .append(valuator.getCountryData().formatMoney(presentValue)).append("\n");
+                .append(valuatorEngine.getCountryData().formatMoney(presentValue)).append("\n");
         }
         System.out.println(sb);
     }

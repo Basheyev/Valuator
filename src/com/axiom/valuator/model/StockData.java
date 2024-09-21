@@ -1,9 +1,6 @@
-package com.axiom.valuator.data;
+package com.axiom.valuator.model;
 
 import org.json.JSONObject;
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
-import org.mapdb.HTreeMap;
 
 import java.io.IOException;
 import java.net.URI;
