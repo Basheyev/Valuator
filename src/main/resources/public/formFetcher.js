@@ -1,4 +1,5 @@
 
+// todo: save form entries to LocalStorage
 
 function initialize() {
     initializeFields();
