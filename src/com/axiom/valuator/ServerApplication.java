@@ -12,7 +12,7 @@ public class ServerApplication {
         Spark.port(80);
         Spark.staticFileLocation("/main/resources/public");
         Spark.init();
-        Spark.get("/valuate", new ValuationService());
+        Spark.post("/valuate", new ValuationService());
         Spark.get("/shutdown", (request, response) -> { Spark.stop(); return "Server stopped"; } );
 
     }

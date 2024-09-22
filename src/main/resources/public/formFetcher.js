@@ -131,9 +131,26 @@ function onSubmit(event) {
     const form = event.target;
     const reportField = document.getElementById('valuationReport');
     // Получаем данные из формы
-    const data = JSONBuilder();
+    const companyData = JSONBuilder();
     // Показываем JSON на странице
-    reportField.textContent = JSON.stringify(data, null, 2);
+    reportField.textContent = JSON.stringify(companyData, null, 2);
+
+    fetch("/valuate",
+        {
+            method: "POST",
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(companyData)
+        }
+    ).then(
+        response => response.text()
+    ).then((response) =>  {
+        //if (!response.ok) throw new Error("response is not OK");
+        console.log(response);
+        reportField.textContent = response;
+    }).catch (error => {
+        console.error("Fetch failed: ", error)
+    })
+
 }
 
 

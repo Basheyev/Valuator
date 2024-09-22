@@ -57,6 +57,9 @@ public class CompanyData {
      * @param json JSONObject containing company financial data
      */
     public CompanyData(JSONObject json) {
+
+        // todo: check object because it comes from the web
+
         this.name = json.getString("name");
         this.country = CountryData.getCountryByCode(json.getString("country"));
         this.dataFirstYear = json.getInt("dataFirstYear");

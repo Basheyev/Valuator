@@ -47,6 +47,7 @@ public class CachedData {
         String jsonString = companiesCache.get(key);
         if (jsonString==null) return null;
         JSONObject json = new JSONObject(jsonString);
+        if (!json.has(COMPANY_DATE_FIELD)) return null;
         String latestQuarter = json.getString(COMPANY_DATE_FIELD);
         LocalDate reportQuarter = LocalDate.parse(latestQuarter);
         LocalDate today = LocalDate.now();
