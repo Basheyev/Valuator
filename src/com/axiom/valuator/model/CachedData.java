@@ -1,4 +1,4 @@
-package com.axiom.valuator.data;
+package com.axiom.valuator.model;
 
 import org.json.JSONObject;
 import org.mapdb.DB;
@@ -11,7 +11,7 @@ import java.time.Period;
 
 public class CachedData {
 
-    public static final int COUNTRY_DATA_EXPIRATION_PERIOD = 24;  // 24 month (2 years)
+    public static final int COUNTRY_DATA_EXPIRATION_PERIOD = 12;  // 12 month (1 year)
     public static final int COMPANY_DATA_EXPIRATION_PERIOD = 3;   // 3 month (1 quarter)
 
     private static final String DB_PATH = "cache/cached_data.db";
@@ -47,6 +47,7 @@ public class CachedData {
         String jsonString = companiesCache.get(key);
         if (jsonString==null) return null;
         JSONObject json = new JSONObject(jsonString);
+        if (!json.has(COMPANY_DATE_FIELD)) return null;
         String latestQuarter = json.getString(COMPANY_DATE_FIELD);
         LocalDate reportQuarter = LocalDate.parse(latestQuarter);
         LocalDate today = LocalDate.now();
@@ -79,7 +80,7 @@ public class CachedData {
         if (jsonString==null) return null;
         JSONObject json = new JSONObject(jsonString);
         int latestYear = json.getInt(COUNTRY_DATE_FIELD);
-        LocalDate reportQuarter = LocalDate.of(latestYear, 1,1);
+        LocalDate reportQuarter = LocalDate.of(latestYear, 12,31);
         LocalDate today = LocalDate.now();
         Period period = Period.between(reportQuarter, today);
         int monthsDifference = period.getYears() * 12 + period.getMonths();

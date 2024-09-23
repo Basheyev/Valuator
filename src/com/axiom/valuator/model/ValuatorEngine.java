@@ -1,8 +1,5 @@
-package com.axiom.valuator.services;
+package com.axiom.valuator.model;
 
-import com.axiom.valuator.data.CompanyData;
-import com.axiom.valuator.data.CountryData;
-import com.axiom.valuator.data.StockData;
 import com.axiom.valuator.math.FinancialMath;
 
 import java.time.Year;
@@ -10,7 +7,7 @@ import java.time.Year;
 /**
  * Company Valuation
  */
-public class ValuatorService {
+public class ValuatorEngine {
 
     public static final int DEFAULT_GROWTH_MULTIPLE = 4;
     public static final int FAST_GROWTH_MULTIPLE = 6;
@@ -20,12 +17,12 @@ public class ValuatorService {
     private final CompanyData company;
     private final int exitYear;
 
-    public ValuatorService(CompanyData companyData) {
+    public ValuatorEngine(CompanyData companyData) {
         this(companyData, Year.now().getValue());
 
     }
 
-    public ValuatorService(CompanyData companyData, int exitYear) {
+    public ValuatorEngine(CompanyData companyData, int exitYear) {
         this.company = companyData;
         this.countryData = new CountryData(company.getCountry());
         this.exitYear = exitYear;
