@@ -7,8 +7,9 @@ such as DCF (Discounted Cash Flow), EBITDA multiples,
 and the multiples method based on the 
 metrics of comparable public companies.
 
-## 1. Data Sources
-### 1.1. World Bank: GDP, growth (%), inflation (%), tax (%), base rate (%)
-### 1.2. Public Company Financials
-### 1.3. Industry metrics (GICS)
 
+# Things to do:
+1. Data entries persistence
+2. Replace Submit button to ordinary button
+3. Add startups valuation (exit value, present value)
+4. Find up-to-date tax rates and base rates data source
