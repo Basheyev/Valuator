@@ -6,17 +6,24 @@ function initialize() {
     document.getElementById("dataFirstYear").addEventListener("change", onPeriodChange);
     document.getElementById("forecastHorizon").addEventListener("change", onPeriodChange);
     document.getElementById("form").addEventListener("submit", onSubmit);
+    document.getElementById("form").addEventListener("change", onFormChange);
 }
 
 
 function initializeFields() {
-    const currentYear = new Date().getFullYear();
-    const DEFAULT_YEARS = 3;
-    form.name.value = "ACME";
-    form.countryCode.value = "KZ";
-    form.dataFirstYear.value = currentYear;
-    form.forecastHorizon = DEFAULT_YEARS;
-    adjustRows();
+    if (localStorage.getItem("SavedForm")) {
+        let jsonString = localStorage.getItem("SavedForm");
+        let jsonObject = JSON.parse(jsonString);
+        restoreFromJSON(jsonObject);
+    } else {
+        const currentYear = new Date().getFullYear();
+        const DEFAULT_YEARS = 3;
+        form.name.value = "ACME";
+        form.countryCode.value = "KZ";
+        form.dataFirstYear.value = currentYear;
+        form.forecastHorizon = DEFAULT_YEARS;
+        adjustRows();
+    }
 }
 
 
@@ -114,6 +121,12 @@ function JSONBuilder() {
 }
 
 
+function restoreFromJSON(savedForm) {
+
+    if ("name" in savedForm) form.name.value = savedForm.name;
+
+}
+
 
 //------------------------------------------------------------------------------------
 
@@ -123,6 +136,14 @@ function onPeriodChange(event) {
     let lastYear = baseYear + totalYears - 1;
     console.log("Time period changed: " + baseYear + " till " + lastYear);
     adjustRows();
+}
+
+
+function onFormChange() {
+    let jsonForm = JSONBuilder();
+    let jsonString = JSON.stringify(jsonForm);
+    localStorage.setItem("SavedForm", jsonString);
+    console.log("Form saved to local storage:\n" + jsonString)
 }
 
 
