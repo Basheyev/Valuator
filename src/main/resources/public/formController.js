@@ -1,4 +1,8 @@
 
+const DEFAULT_COMPANY_NAME = "A Company Making Everything (ACME)"
+const DEFAULT_COUNTRY_CODE = "KZ";
+const DEFAULT_YEARS_FORECAST = 3;
+
 // todo: save form entries to LocalStorage
 
 function initialize() {
@@ -7,6 +11,7 @@ function initialize() {
     document.getElementById("forecastHorizon").addEventListener("change", onPeriodChange);
     document.getElementById("form").addEventListener("submit", onSubmit);
     document.getElementById("form").addEventListener("change", onFormChange);
+    window.addEventListener('beforeunload', onFormChange);
 }
 
 
@@ -14,19 +19,88 @@ function initializeFields() {
     if (localStorage.getItem("SavedForm")) {
         let jsonString = localStorage.getItem("SavedForm");
         let jsonObject = JSON.parse(jsonString);
-        restoreFromJSON(jsonObject);
+        jsonToForm(jsonObject);
     } else {
-        const currentYear = new Date().getFullYear();
-        const DEFAULT_YEARS = 3;
-        form.name.value = "ACME";
-        form.countryCode.value = "KZ";
-        form.dataFirstYear.value = currentYear;
-        form.forecastHorizon = DEFAULT_YEARS;
-        adjustRows();
+        form.name.value = DEFAULT_COMPANY_NAME;
+        form.countryCode.value = DEFAULT_COUNTRY_CODE;
+        form.dataFirstYear.value = new Date().getFullYear();
+        form.forecastHorizon = DEFAULT_YEARS_FORECAST;
     }
+
+    adjustRows();
+
 }
 
 
+//------------------------------------------------------------------------------------
+function formToJSON() {
+
+    // collect financials data
+    const table = document.getElementById("financials");
+    currentRows = Number(table.rows.length) - 1;
+    const revenue = [];
+    const ebitda = [];
+    const cashflow = [];
+    for (i=1; i<=currentRows; i++) {
+        let revenueValue = Number(document.getElementById("r" + i + "c2").value);
+        let ebitdaValue = Number(document.getElementById("r" + i + "c3").value);
+        let cashflowValue = Number(document.getElementById("r" + i + "c4").value);
+        revenue.push(revenueValue);
+        ebitda.push(ebitdaValue);
+        cashflow.push(cashflowValue);
+    }
+
+    equityRate = parseFloat(form.equityCost.value) / 100.0;
+    debtRate = parseFloat(form.debtCost.value) / 100.0;
+
+
+    // Получаем данные из формы
+    const data = {
+        name: form.name.value,
+        country: form.countryCode.value,
+        dataFirstYear: Number(form.dataFirstYear.value),
+        revenue: revenue,
+        ebitda: ebitda,
+        freeCashFlow: cashflow,
+        cash: Number(form.cash.value),
+        equity: Number(form.equity.value),
+        equityRate: equityRate,
+        debt: Number(form.debt.value),
+        debtRate: debtRate,
+        isLeader: form.isLeader.checked,
+        comparableStock: form.comparableStock.value
+    };
+
+    return data;
+}
+
+
+function jsonToForm(savedForm) {
+    console.log("Loading form data from local storage:\n" + JSON.stringify(savedForm, null, 4));
+    if ("name" in savedForm) form.name.value = savedForm.name;
+    if ("country" in savedForm) form.countryCode.value = savedForm.country;
+    if ("dataFirstYear" in savedForm) form.dataFirstYear.value = savedForm.dataFirstYear;
+    if ("revenue" in savedForm) {
+        let arrayLength = savedForm.revenue.length;
+        form.forecastHorizon.value = arrayLength;
+        adjustRows();
+        for (i=1; i <= arrayLength; i++) {
+            document.getElementById("r" + i + "c2").value = savedForm.revenue[i-1];
+            document.getElementById("r" + i + "c3").value = savedForm.ebitda[i-1];
+            document.getElementById("r" + i + "c4").value = savedForm.freeCashFlow[i-1];
+        }
+    }
+    if ("cash" in savedForm) form.cash.value = Number(savedForm.cash);
+    if ("equity" in savedForm) form.equity.value = savedForm.equity;
+    if ("equityRate" in savedForm) form.equityCost.value = savedForm.equityRate * 100.0;
+    if ("debt" in savedForm) form.debt.value = savedForm.debt;
+    if ("debtRate" in savedForm) form.debtCost.value = savedForm.debtRate * 100.0;
+    if ("isLeader" in savedForm) form.isLeader.checked = savedForm.isLeader;
+    if ("comparableStock" in savedForm) form.comparableStock.value = savedForm.comparableStock;
+
+}
+
+//----------------------------------------------------------------------------------------
 function adjustRows() {
     console.log("Rows adjusting started");
 
@@ -78,54 +152,6 @@ function removeRows(table, amount) {
     }
 }
 
-//------------------------------------------------------------------------------------
-function JSONBuilder() {
-
-    // collect financials data
-    const table = document.getElementById("financials");
-    currentRows = Number(table.rows.length) - 1;
-    const revenue = [];
-    const ebitda = [];
-    const cashflow = [];
-    for (i=1; i<=currentRows; i++) {
-        let revenueValue = Number(document.getElementById("r" + i + "c2").value);
-        let ebitdaValue = Number(document.getElementById("r" + i + "c3").value);
-        let cashflowValue = Number(document.getElementById("r" + i + "c4").value);
-        revenue.push(revenueValue);
-        ebitda.push(ebitdaValue);
-        cashflow.push(cashflowValue);
-    }
-
-    equityRate = parseFloat(form.equityCost.value) / 100.0;
-    debtRate = parseFloat(form.debtCost.value) / 100.0;
-
-
-    // Получаем данные из формы
-    const data = {
-        name: form.name.value,
-        country: form.countryCode.value,
-        dataFirstYear: Number(form.dataFirstYear.value),
-        revenue: revenue,
-        ebitda: ebitda,
-        freeCashFlow: cashflow,
-        cash: Number(form.cash.value),
-        equity: Number(form.equity.value),
-        equityRate: equityRate,
-        debt: Number(form.debt.value),
-        debtRate: debtRate,
-        isLeader: form.isLeader.checked,
-        comparableStock: form.comparableStock.value
-    };
-
-    return data;
-}
-
-
-function restoreFromJSON(savedForm) {
-
-    if ("name" in savedForm) form.name.value = savedForm.name;
-
-}
 
 
 //------------------------------------------------------------------------------------
@@ -139,8 +165,8 @@ function onPeriodChange(event) {
 }
 
 
-function onFormChange() {
-    let jsonForm = JSONBuilder();
+function onFormChange(event) {
+    let jsonForm = formToJSON();
     let jsonString = JSON.stringify(jsonForm);
     localStorage.setItem("SavedForm", jsonString);
     console.log("Form saved to local storage:\n" + jsonString)
@@ -152,7 +178,7 @@ function onSubmit(event) {
     const form = event.target;
     const reportField = document.getElementById('valuationReport');
     // Получаем данные из формы
-    const companyData = JSONBuilder();
+    const companyData = formToJSON();
     // Показываем JSON на странице
     reportField.textContent = JSON.stringify(companyData, null, 2);
 
@@ -165,7 +191,6 @@ function onSubmit(event) {
     ).then(
         response => response.text()
     ).then((response) =>  {
-        //if (!response.ok) throw new Error("response is not OK");
         console.log(response);
         reportField.textContent = response;
     }).catch (error => {
@@ -175,5 +200,6 @@ function onSubmit(event) {
 }
 
 
+// entry point
 initialize()
 
