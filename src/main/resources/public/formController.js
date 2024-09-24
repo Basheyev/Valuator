@@ -20,6 +20,11 @@ function initializeFields() {
         let jsonString = localStorage.getItem("SavedForm");
         let jsonObject = JSON.parse(jsonString);
         jsonToForm(jsonObject);
+        let report = localStorage.getItem("valuationReport");
+        if (report) {
+            const reportField = document.getElementById('valuationReport');
+            reportField.textContent = report;
+        }
     } else {
         form.name.value = DEFAULT_COMPANY_NAME;
         form.countryCode.value = DEFAULT_COUNTRY_CODE;
@@ -169,7 +174,10 @@ function onFormChange(event) {
     let jsonForm = formToJSON();
     let jsonString = JSON.stringify(jsonForm);
     localStorage.setItem("SavedForm", jsonString);
-    console.log("Form saved to local storage:\n" + jsonString)
+    let report = valuationReport.value;
+    localStorage.setItem("valuationReport", report);
+    console.log("Form saved to local storage:\n" + jsonString);
+    console.log("Valuation report:\n" + report);
 }
 
 
