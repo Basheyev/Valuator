@@ -10,6 +10,7 @@
 const DEFAULT_COMPANY_NAME = "A Company Making Everything (ACME)"
 const DEFAULT_COUNTRY_CODE = "KZ";
 const DEFAULT_YEARS_FORECAST = 3;
+const DEFAULT_VENTURE_RATE = 40;
 
 
 //---------------------------------------------------------------------------------------
@@ -39,10 +40,13 @@ function initializeFields() {
             reportField.textContent = report;
         }
     } else {
+        let currentYear = new Date().getFullYear();
         form.name.value = DEFAULT_COMPANY_NAME;
         form.countryCode.value = DEFAULT_COUNTRY_CODE;
-        form.dataFirstYear.value = new Date().getFullYear();
+        form.dataFirstYear.value = currentYear;
         form.forecastHorizon = DEFAULT_YEARS_FORECAST;
+        form.exitYear.value = currentYear;
+        form.ventureRate.value = DEFAULT_VENTURE_RATE;
     }
     // Adjust rows in financials table
     adjustRows();
@@ -165,11 +169,11 @@ function addRows(table, amount) {
         let rowID = "r" + (lastIndex + i);
         cell1.innerHTML = "";
         cell2.innerHTML = "<input type=\"number\" class=\"form-control text-end\" id=\"" + rowID
-                          + "c2\" value=\"0\">";
+                          + "c2\" value=\"0\" required>";
         cell3.innerHTML = "<input type=\"number\" class=\"form-control text-end\" id=\"" + rowID
-                          + "c3\" value=\"0\">";
+                          + "c3\" value=\"0\" required>";
         cell4.innerHTML = "<input type=\"number\" class=\"form-control text-end\" id=\"" + rowID
-                          + "c4\" value=\"0\">";
+                          + "c4\" value=\"0\" required>";
     }
 }
 

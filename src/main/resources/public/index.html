@@ -12,35 +12,43 @@
     <div class="row">
         <!-- Левая колонка с формой -->
         <div class="col-md-6">
-            <h3>Valuation Form</h3>
+            <h3>Pre-money Valuation Form</h3>
+            <hr class="my-3">
             <form id="form">
-                <!-- Название компании -->
-                <div class="mb-3">
-                    <label for="name" class="form-label">Company Name</label>
-                    <input type="text" class="form-control" id="name" placeholder="Company Legal Name">
-                </div>
-
-                <!-- Год и страна -->
+                <!-- Название компании и страна -->
                 <div class="row mb-3">
-                    <div class="mb-3">
+                    <div class="col-md-6">
+                        <label for="name" class="form-label">Company Name</label>
+                        <input type="text" class="form-control" id="name" placeholder="Company Legal Name">
+                    </div>
+                    <div class="col-md-6">
                         <label for="countryCode" class="form-label">Country</label>
                         <select class="form-select" id="countryCode" name="countryCode" required>
-                            <option value="">Select a country</option>
+                            <option value="KZ">Kazakhstan (KZ)</option>
+                            <option value="UZ">Uzbekistan (UZ)</option>
+                            <option value="KG">Kyrgyzstan (KG)</option>
+                            <option value="AZ">Azerbaijan (AZ)</option>
+                            <option value="TJ">Tajikistan (TJ)</option>
+                            <option value="GE">Georgia (GE)</option>
                             <option value="US">United States (US)</option>
                             <option value="CA">Canada (CA)</option>
                             <option value="GB">United Kingdom (GB)</option>
                             <option value="DE">Germany (DE)</option>
                             <option value="FR">France (FR)</option>
+                            <option value="ES">Spain (ES)</option>
+                            <option value="IT">Italy (IT)</option>
                             <option value="NL">Netherlands (NL)</option>
-                            <option value="KZ">Kazakhstan (KZ)</option>
+                            <option value="LT">Lithuania (LT)</option>
+                            <option value="LV">Latvia (LV)</option>
                             <!-- Добавьте другие коды стран по мере необходимости -->
                         </select>
                     </div>
                 </div>
+
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="dataFirstYear" class="form-label">Base Year</label>
-                        <input type="number" class="form-control" id="dataFirstYear" placeholder="2024" required>
+                        <label for="dataFirstYear" class="form-label">Financials Base Year</label>
+                        <input type="number" class="form-control" id="dataFirstYear" required>
                     </div>
                     <div class="col-md-6">
                         <label for="forecastHorizon" class="form-label">Forecast Horizon</label>
@@ -54,8 +62,16 @@
                 </div>
 
                 <!-- Таблица с финансовыми данными -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">FINANCIAL PROJECTIONS</label>
+                    </div>
+                    <div class="col-md-6">
+                        <input class="form-check-input" type="checkbox" id="isLeader">
+                        <label class="form-check-label" for="isLeader">&nbsp; Is market Leader</label>
+                    </div>
+                </div>
                 <div class="mb-3">
-                    <label class="form-label">Revenue, EBITDA, Free Cash Flow Projections</label>
                     <table id="financials" class="table table-bordered text-center">
                         <thead>
                         <tr>
@@ -68,11 +84,6 @@
                         <tbody>
                         </tbody>
                     </table>
-                </div>
-
-                <div class="mb-3">
-                    <label for="cash" class="form-label">Cash & Equivalents</label>
-                    <input type="number" class="form-control text-end" id="cash" value="0">
                 </div>
 
                 <!-- Капитал и долг -->
@@ -113,28 +124,48 @@
                 <!-- Сравнимая акция и лидер рынка -->
                 <div class="row mb-3">
                     <div class="col-md-6">
+                        <label for="cash" class="form-label">Cash & Equivalents</label>
+                        <input type="number" class="form-control text-end" id="cash" value="0" required>
+                    </div>
+                    <div class="col-md-6">
                         <label for="comparableStock" class="form-label">Public Comparable Stock</label>
-                        <input type="text" class="form-control" id="comparableStock" placeholder="MSFT">
+                        <input type="text" class="form-control" id="comparableStock" placeholder="MSFT" required>
+                    </div>
+                </div>
+
+
+                <hr class="my-3">
+
+                <!-- Год ожидаемого exit и доходность venture -->
+                <div class="row mb-3">
+
+                    <div class="col-md-6">
+                        <label for="exitYear" class="form-label">Venture Exit Year</label>
+                        <input type="number" class="form-control" id="exitYear" required>
                     </div>
 
                     <div class="col-md-6">
-                        <input class="form-check-input" type="checkbox" id="isLeader">
-                        <label class="form-check-label" for="isLeader">Is company a market Leader</label>
+                        <label for="ventureRate" class="form-label">Venture Rate (%)</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control text-end" value="0" id="ventureRate" required>
+                            <span class="input-group-text">%</span>
+                        </div>
                     </div>
 
                 </div>
 
-
+                <hr class="my-3">
                 <!-- Кнопка -->
-                <button type="submit" class="btn btn-primary">Valuate</button>
+                <button type="submit" class="btn btn-primary">Valuate company</button>
 
             </form>
         </div>
 
         <!-- Правая колонка с результатом -->
         <div class="col-md-6">
-            <h3>Valuation Report</h3>
-            <textarea id="valuationReport" class="form-control" rows="35" placeholder="Text field..."></textarea>
+            <h3>Valuation report</h3>
+            <hr class="my-3">
+            <textarea id="valuationReport" class="form-control" rows="35" ></textarea>
         </div>
     </div>
 </div>
