@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exit Value Methods</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .formula {
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Шаг 1. Оценка ожидаемой exit-стоимости компании (Exit Value)</h2>
+<p>Оценка ожидаемой exit-стоимости компании осуществляется на основе трёх основных методов на год выхода:</p>
+
+<table>
+    <tr>
+        <th>№</th>
+        <th>Метод</th>
+        <th>Описание метода оценки стоимости</th>
+        <th>Формула расчета</th>
+    </tr>
+    <tr>
+        <td>1.</td>
+        <td>EBITDA multiple</td>
+        <td>Метод кратного EBITDA - самый быстрый способ оценки exit-стоимости на этапе soft-commitment.
+            Используется EBITDA последнего года перед выходом и мультипликатор (M) от 4 до 8.</td>
+        <td>
+            Exit Value = EBITDA × M<br>
+            Где M=4: для успешных компаний, M=6 применяются для быстрорастущих компаний или M=8 для
+            лидеров рынка с высокой прибыльностью.
+        </td>
+    </tr>
+    <tr>
+        <td>2.</td>
+        <td>Multiples</td>
+        <td>
+            Метод мультипликаторов - использование средних мультипликаторов (K)
+            ряда аналогичных публичных компаний для оценки прогнозной стоимости:<br>
+            - EV / EBITDA (Enterprise Value to EBITDA): Стоимость предприятия к EBITDA.<br>
+            - EV / Sales (Enterprise Value to Sales): Стоимость предприятия к выручке.
+        </td>
+        <td>
+            EV value = EBITDA K<sub>ebitda</sub><br>
+            EV Value = SALES × K<sub>sales</sub>
+        </td>
+    </tr>
+    <tr>
+        <td>3.</td>
+        <td>Discounted Cash Flow (DCF)</td>
+        <td>
+            Дисконтирование денежного потока. Оцениваем на основании заявленных показателей
+            свободного денежного потока на прогнозируемый период. Средневзвешенная
+            стоимость капитала:<br><br>
+            WACC = (Equity / (Equity + Debt)) × r<sub>e</sub> + (Debt / (Equity + Debt)) × r<sub>d</sub> × (1 - Tc)
+            <br><br>
+            где, Debt - совокупная сумма долговых обязательств
+            Equity - совокупная сумма инвестиций в капитал
+            R<sub>e</sub> - ставка по инвестициям в капитал
+            R<sub>d</sub> - ставка по долговым обязательствам
+            Tc - налоговая ставка (~20% КПН Казахстан)
+
+        </td>
+        <td>
+
+            Exit Value = Σ (FCF<sub>t</sub> / (1 + WACC)<sup>t</sup>) + TV - NFP<br>
+            TV = (FCF<sub>n</sub> × (1 + g)) / (WACC - g)<br><br>
+            где:<br>
+            NFP = Долги - Деньги и их эквиваленты<br>
+            TV = Терминальная стоимость<br>
+            n - количество прогнозируемых лет<br>
+            g - средневзвешенный рост экономики (~5%)
+        </td>
+    </tr>
+</table>
+
+<h3>Итоговый Exit Value - это средняя целевая оценка по перечисленным методам оценки</h3>
+
+<h2>Шаг 2. Дисконтирование exit-стоимости до сегодняшней оценки (VC)</h2>
+
+<table>
+    <tr>
+        <th>Описание метода</th>
+        <th>Формулы расчета</th>
+    </tr>
+    <tr>
+        <td>
+            Текущая стоимость до инвестирования денег
+            (pre-money Present Value) оценивается путём дисконтирования
+            от целевой exit стоимости (Exit Value) с учётом 4-6х роста
+            за 2-3 года (r=58%-82% годовых, n = 2, 3).
+        </td>
+        <td>
+            Present Value = Exit Value / (1 + r)<sup>n</sup><br><br>
+            r - требуемая доходность (58% = 4x за 3 года, 82% = 6x за 3 года), n - число лет до выхода.
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>
