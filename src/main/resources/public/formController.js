@@ -74,8 +74,9 @@ function formToJSON() {
     }
 
     // Adjust rates from number to percents
-    equityRate = parseFloat(form.equityCost.value) / 100.0;
-    debtRate = parseFloat(form.debtCost.value) / 100.0;
+    let equityRate = parseFloat(form.equityRate.value) / 100.0;
+    let debtRate = parseFloat(form.debtRate.value) / 100.0;
+    let ventureRate = parseFloat(form.ventureRate.value) / 100.0;
 
     // build JSON object
     const data = {
@@ -91,7 +92,9 @@ function formToJSON() {
         debt: Number(form.debt.value),
         debtRate: debtRate,
         isLeader: form.isLeader.checked,
-        comparableStock: form.comparableStock.value
+        comparableStock: form.comparableStock.value,
+        ventureRate: form.ventureRate.value,
+        ventureExitYear: Number(form.ventureExitYear.value)
     };
 
     return data;
@@ -118,11 +121,13 @@ function jsonToForm(savedForm) {
     }
     if ("cash" in savedForm) form.cash.value = Number(savedForm.cash);
     if ("equity" in savedForm) form.equity.value = savedForm.equity;
-    if ("equityRate" in savedForm) form.equityCost.value = savedForm.equityRate * 100.0;
+    if ("equityRate" in savedForm) form.equityRate.value = savedForm.equityRate * 100.0;
     if ("debt" in savedForm) form.debt.value = savedForm.debt;
-    if ("debtRate" in savedForm) form.debtCost.value = savedForm.debtRate * 100.0;
+    if ("debtRate" in savedForm) form.debtRate.value = savedForm.debtRate * 100.0;
     if ("isLeader" in savedForm) form.isLeader.checked = savedForm.isLeader;
     if ("comparableStock" in savedForm) form.comparableStock.value = savedForm.comparableStock;
+    if ("ventureExitYear" in savedForm) form.ventureExitYear.value = savedForm.ventureExitYear;
+    if ("ventureRate" in savedForm) form.ventureRate.value = savedForm.ventureRate;
 }
 
 //---------------------------------------------------------------------------------------
