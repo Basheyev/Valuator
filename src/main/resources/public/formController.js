@@ -1,10 +1,20 @@
+//=======================================================================================
+//
+//  PRIVATE COMPANY VALUATOR
+//  Form controller script
+//
+// (C) 2024 Axiom Capital, Bolat Basheyev
+//=======================================================================================
+
 
 const DEFAULT_COMPANY_NAME = "A Company Making Everything (ACME)"
 const DEFAULT_COUNTRY_CODE = "KZ";
 const DEFAULT_YEARS_FORECAST = 3;
 
-// todo: save form entries to LocalStorage
 
+//---------------------------------------------------------------------------------------
+// Initializes form form and adds listeners to user actions
+//---------------------------------------------------------------------------------------
 function initialize() {
     initializeFields();
     document.getElementById("dataFirstYear").addEventListener("change", onPeriodChange);
@@ -15,6 +25,9 @@ function initialize() {
 }
 
 
+//---------------------------------------------------------------------------------------
+// Loads from data from local storage or initializes fields of form
+//---------------------------------------------------------------------------------------
 function initializeFields() {
     if (localStorage.getItem("SavedForm")) {
         let jsonString = localStorage.getItem("SavedForm");
@@ -31,16 +44,17 @@ function initializeFields() {
         form.dataFirstYear.value = new Date().getFullYear();
         form.forecastHorizon = DEFAULT_YEARS_FORECAST;
     }
-
+    // Adjust rows in financials table
     adjustRows();
-
 }
 
 
-//------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------
+// Builds JSON from form values
+//---------------------------------------------------------------------------------------
 function formToJSON() {
 
-    // collect financials data
+    // retrieve financials data from table to arrays
     const table = document.getElementById("financials");
     currentRows = Number(table.rows.length) - 1;
     const revenue = [];
@@ -55,11 +69,11 @@ function formToJSON() {
         cashflow.push(cashflowValue);
     }
 
+    // Adjust rates from number to percents
     equityRate = parseFloat(form.equityCost.value) / 100.0;
     debtRate = parseFloat(form.debtCost.value) / 100.0;
 
-
-    // Получаем данные из формы
+    // build JSON object
     const data = {
         name: form.name.value,
         country: form.countryCode.value,
@@ -80,6 +94,9 @@ function formToJSON() {
 }
 
 
+//---------------------------------------------------------------------------------------
+// Parse JSON object and fill form values
+//---------------------------------------------------------------------------------------
 function jsonToForm(savedForm) {
     console.log("Loading form data from local storage:\n" + JSON.stringify(savedForm, null, 4));
     if ("name" in savedForm) form.name.value = savedForm.name;
@@ -102,24 +119,29 @@ function jsonToForm(savedForm) {
     if ("debtRate" in savedForm) form.debtCost.value = savedForm.debtRate * 100.0;
     if ("isLeader" in savedForm) form.isLeader.checked = savedForm.isLeader;
     if ("comparableStock" in savedForm) form.comparableStock.value = savedForm.comparableStock;
-
 }
 
-//----------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------
+// Adjust table rows to specified number (forecast period) and update years labels
+//---------------------------------------------------------------------------------------
 function adjustRows() {
     console.log("Rows adjusting started");
-
+    // calculate required rows and difference
     const table = document.getElementById("financials");
     let requiredRows = Number(form.forecastHorizon.value);
     let currentRows = Number(table.rows.length) - 1;
     let difference = requiredRows - currentRows;
-    console.log("Rows requered: " + requiredRows);
+    console.log("Rows required: " + requiredRows);
     console.log("Current rows: " + currentRows);
     console.log("Rows change: " + difference);
-    if (difference > 0) addRows(table, difference);
-    else if (difference < 0) removeRows(table, 1-difference);
 
-    // enumarate years
+    // adjust: add or remove rows
+    if (difference > 0)
+        addRows(table, difference);
+    else if (difference < 0)
+        removeRows(table, 1-difference);
+
+    // enumerate years labels in table after adjustments
     currentRows = Number(table.rows.length) - 1;
     let baseYear = Number(form.dataFirstYear.value);
     for (i = 1; i<= currentRows; i++) {
@@ -129,6 +151,9 @@ function adjustRows() {
 }
 
 
+//---------------------------------------------------------------------------------------
+// Add specified amount of rows to form financials table
+//---------------------------------------------------------------------------------------
 function addRows(table, amount) {
     const lastIndex = table.rows.length - 1;
     for (i = 1; i <= amount; i++) {
@@ -149,6 +174,9 @@ function addRows(table, amount) {
 }
 
 
+//---------------------------------------------------------------------------------------
+// Remove specified amount of rows to form financials table
+//---------------------------------------------------------------------------------------
 function removeRows(table, amount) {
     console.log("Remove rows: " + amount);
     for (i=1; i<amount; i++) {
@@ -158,9 +186,9 @@ function removeRows(table, amount) {
 }
 
 
-
 //------------------------------------------------------------------------------------
-
+// Event listener when base year or forecast period changed to adjust table rows
+//------------------------------------------------------------------------------------
 function onPeriodChange(event) {
     let baseYear = Number(form.dataFirstYear.value);
     let totalYears = Number(form.forecastHorizon.value);
@@ -170,6 +198,9 @@ function onPeriodChange(event) {
 }
 
 
+//------------------------------------------------------------------------------------
+// Event listener on form change to save values in local storage
+//------------------------------------------------------------------------------------
 function onFormChange(event) {
     let jsonForm = formToJSON();
     let jsonString = JSON.stringify(jsonForm);
@@ -181,15 +212,18 @@ function onFormChange(event) {
 }
 
 
+//------------------------------------------------------------------------------------
+// Event listener on when submit button pressed - sends request to back-end service
+//------------------------------------------------------------------------------------
 function onSubmit(event) {
     event.preventDefault();
     const form = event.target;
     const reportField = document.getElementById('valuationReport');
-    // Получаем данные из формы
+    // Retrieve data from form
     const companyData = formToJSON();
-    // Показываем JSON на странице
+    // Show request body in report field
     reportField.textContent = JSON.stringify(companyData, null, 2);
-
+    // Send request 
     fetch("/valuate",
         {
             method: "POST",
@@ -208,6 +242,8 @@ function onSubmit(event) {
 }
 
 
-// entry point
+//------------------------------------------------------------------------------------
+// Entry point
+//------------------------------------------------------------------------------------
 initialize()
 
