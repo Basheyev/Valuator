@@ -283,7 +283,7 @@ public class CompanyData {
         sb.append("Is market leader: ").append(isLeader).append("\n");
         sb.append("Venture Exit Year: ").append(ventureExitYear).append("\n");
         sb.append("Venture Interest Rate: ").append(vRate).append("\n");
-        sb.append("\n-------------------------------------------------------------------------------------\n");
+       // sb.append("\n-------------------------------------------------------------------------------------\n");
         return sb.toString();
     }
 }

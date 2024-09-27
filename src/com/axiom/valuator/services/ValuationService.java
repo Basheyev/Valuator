@@ -46,13 +46,16 @@ public class ValuationService implements Route {
         double average = (dcf + ebitda + multiples) / factors;
 
         sb.append("\n------------------------------------------------------------\n");
-        sb.append("VALUATION AVERAGE (").append(exitYear).append("): ")
+        sb.append("EXIT VALUE AVERAGE (").append(exitYear).append("): ")
             .append(valuatorEngine.getCountryData().formatMoney(average)).append("\n");
+
+
         int currentYear = Year.now().getValue();
         int yearsToExit = exitYear - currentYear;
+
         if (yearsToExit >= 1) {
-            double presentValue = FinancialMath.getPresentValue(average, 0.58, yearsToExit);
-            sb.append("Present Value (").append(currentYear).append("): ")
+            double presentValue = FinancialMath.getPresentValue(average, company.getVentureRate(), yearsToExit);
+            sb.append("PRESENT PRE-MONEY VALUE (").append(currentYear).append("): ")
                 .append(valuatorEngine.getCountryData().formatMoney(presentValue)).append("\n");
         }
 
