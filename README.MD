@@ -9,7 +9,6 @@ metrics of comparable public companies.
 
 
 ### Things to do:
-1. Replace Submit button to ordinary button
-2. Validate user data entries and add country codes 
-3. Add startups valuation (exit value, present value)
-4. Find up-to-date tax rates and base rates data source
+1. Make report more laconic, but official for investment case application
+2. Add country codes
+3. Find up-to-date tax rates and base rates data source
