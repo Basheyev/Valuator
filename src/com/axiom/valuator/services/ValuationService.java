@@ -29,10 +29,13 @@ public class ValuationService implements Route {
         }
 
         JSONObject companyJSON = new JSONObject(request.body());
+
         System.out.println(companyJSON.toString(4));
 
         CompanyData company = new CompanyData(companyJSON);
-        int exitYear = Year.now().getValue();
+
+        int exitYear = company.getVentureExitYear();
+
         StringBuilder sb = new StringBuilder();
         sb.append(company);
         ValuatorEngine valuatorEngine = new ValuatorEngine(company, exitYear);

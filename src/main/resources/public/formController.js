@@ -45,7 +45,7 @@ function initializeFields() {
         form.countryCode.value = DEFAULT_COUNTRY_CODE;
         form.dataFirstYear.value = currentYear;
         form.forecastHorizon = DEFAULT_YEARS_FORECAST;
-        form.exitYear.value = currentYear;
+        form.ventureExitYear.value = currentYear;
         form.ventureRate.value = DEFAULT_VENTURE_RATE;
     }
     // Adjust rows in financials table
@@ -80,21 +80,21 @@ function formToJSON() {
 
     // build JSON object
     const data = {
-        name: form.name.value,
-        country: form.countryCode.value,
-        dataFirstYear: Number(form.dataFirstYear.value),
-        revenue: revenue,
-        ebitda: ebitda,
-        freeCashFlow: cashflow,
-        cash: Number(form.cash.value),
-        equity: Number(form.equity.value),
-        equityRate: equityRate,
-        debt: Number(form.debt.value),
-        debtRate: debtRate,
-        isLeader: form.isLeader.checked,
-        comparableStock: form.comparableStock.value,
-        ventureRate: form.ventureRate.value,
-        ventureExitYear: Number(form.ventureExitYear.value)
+        name: form.name.value,                                 // get company name
+        country: form.countryCode.value,                       // get country code
+        dataFirstYear: Number(form.dataFirstYear.value),       // get data first year (base year of financial)
+        revenue: revenue,                                      // get revenue numbers array by periods
+        ebitda: ebitda,                                        // get ebitda numbers array by periods
+        freeCashFlow: cashflow,                                // get free cash flow numbers array by periods
+        cash: Number(form.cash.value),                         // get cash & equivalents amount
+        equity: Number(form.equity.value),                     // get equity invested
+        equityRate: equityRate,                                // get equity interest rate
+        debt: Number(form.debt.value),                         // get debt borrowed
+        debtRate: debtRate,                                    // get debt interest rate
+        isLeader: form.isLeader.checked,                       // get is leader status
+        comparableStock: form.comparableStock.value,           // get comparable stock value
+        ventureRate: ventureRate,                              // get venture interest rate
+        ventureExitYear: Number(form.ventureExitYear.value)    // get venture exit year
     };
 
     return data;
@@ -127,7 +127,7 @@ function jsonToForm(savedForm) {
     if ("isLeader" in savedForm) form.isLeader.checked = savedForm.isLeader;
     if ("comparableStock" in savedForm) form.comparableStock.value = savedForm.comparableStock;
     if ("ventureExitYear" in savedForm) form.ventureExitYear.value = savedForm.ventureExitYear;
-    if ("ventureRate" in savedForm) form.ventureRate.value = savedForm.ventureRate;
+    if ("ventureRate" in savedForm) form.ventureRate.value = savedForm.ventureRate * 100.0;
 }
 
 //---------------------------------------------------------------------------------------

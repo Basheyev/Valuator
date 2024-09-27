@@ -28,6 +28,8 @@ public class CompanyData {
     private double cash;                        // Cash and cash equivalents
     private boolean isLeader;                   // Is company a leader of market
     private String comparableStock;             // Comparable stock ticker
+    private int ventureExitYear;                // Venture forecasted exit year
+    private double ventureRate;                 // Venture interest rate
 
     /**
      * Company Data Constructor
@@ -49,6 +51,8 @@ public class CompanyData {
         this.debtRate = 0;
         this.isLeader = false;
         this.comparableStock = "";
+        this.ventureExitYear = dataFirstYear;
+        this.ventureRate = 0;
     }
 
 
@@ -70,6 +74,8 @@ public class CompanyData {
         this.debtRate = json.getDouble("debtRate");
         this.isLeader = json.getBoolean("isLeader");
         this.comparableStock = json.getString("comparableStock");
+        this.ventureExitYear = json.getInt("ventureExitYear");
+        this.ventureRate = json.getDouble("ventureRate");
     }
 
 
@@ -189,6 +195,8 @@ public class CompanyData {
     public double getCash() { return cash; }
     public boolean isLeader() { return isLeader; }
     public String getComparableStock() { return comparableStock; }
+    public int getVentureExitYear() { return ventureExitYear; }
+    public double getVentureRate() { return ventureRate; }
 
     /**
      * Serializes this company data object to JSON
@@ -207,6 +215,10 @@ public class CompanyData {
         map.put("debt", debt);
         map.put("debtRate", debtRate);
         map.put("cash", cash);
+        map.put("isLeader", isLeader);
+        map.put("comparableStock", comparableStock);
+        map.put("ventureExitYear", ventureExitYear);
+        map.put("ventureRate", ventureRate);
         return new JSONObject(map);
     }
 
@@ -261,11 +273,16 @@ public class CompanyData {
         sb.append("-------------------------------------------------------------------------------------\n");
         double eRate = FinancialMath.toPercent(equityRate);
         double dRate = FinancialMath.toPercent(debtRate);
+        double vRate = FinancialMath.toPercent(ventureRate);
         sb.append("Equity:\t").append(currencyFormatter.format(equity))
             .append(" (interest ").append(eRate).append("%)\n");
         sb.append("Debt:\t").append(currencyFormatter.format(debt))
             .append(" (interest ").append(dRate).append("%)\n");
-        sb.append("Cash:\t").append(currencyFormatter.format(cash));
+        sb.append("Cash:\t").append(currencyFormatter.format(cash)).append("\n");
+        sb.append("Comparable Stock: ").append(comparableStock).append("\n");
+        sb.append("Is market leader: ").append(isLeader).append("\n");
+        sb.append("Venture Exit Year: ").append(ventureExitYear).append("\n");
+        sb.append("Venture Interest Rate: ").append(vRate).append("\n");
         sb.append("\n-------------------------------------------------------------------------------------\n");
         return sb.toString();
     }
