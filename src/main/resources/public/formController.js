@@ -37,7 +37,7 @@ function initializeFields() {
         let report = localStorage.getItem("valuationReport");
         if (report) {
             const reportField = document.getElementById('valuationReport');
-            reportField.textContent = report;
+            reportField.innerHTML = report;
         }
     } else {
         let currentYear = new Date().getFullYear();
@@ -194,6 +194,22 @@ function removeRows(table, amount) {
     }
 }
 
+//------------------------------------------------------------------------------------
+// Save form & report to local storage
+//------------------------------------------------------------------------------------
+function saveForm() {
+    let jsonForm = formToJSON();
+    let jsonString = JSON.stringify(jsonForm);
+    localStorage.setItem("SavedForm", jsonString);
+    console.log("Form saved to local storage:\n" + jsonString);
+}
+
+function saveReport() {
+    let reportField = document.getElementById('valuationReport');
+    let report = reportField.innerHTML;
+    localStorage.setItem("valuationReport", report);
+    console.log("Valuation report:\n" + report);
+}
 
 //------------------------------------------------------------------------------------
 // Event listener when base year or forecast period changed to adjust table rows
@@ -211,13 +227,8 @@ function onPeriodChange(event) {
 // Event listener on form change to save values in local storage
 //------------------------------------------------------------------------------------
 function onFormChange(event) {
-    let jsonForm = formToJSON();
-    let jsonString = JSON.stringify(jsonForm);
-    localStorage.setItem("SavedForm", jsonString);
-    let report = valuationReport.value;
-    localStorage.setItem("valuationReport", report);
-    console.log("Form saved to local storage:\n" + jsonString);
-    console.log("Valuation report:\n" + report);
+    saveForm();
+    saveReport();
 }
 
 
@@ -227,11 +238,13 @@ function onFormChange(event) {
 function onSubmit(event) {
     event.preventDefault();
     const form = event.target;
-    const reportField = document.getElementById('valuationReport');
+
     // Retrieve data from form
     const companyData = formToJSON();
     // Show request body in report field
-    reportField.textContent = JSON.stringify(companyData, null, 2);
+    console.log("Request body:\n" + JSON.stringify(companyData, null, 2));
+    saveForm();
+
     // Send request 
     fetch("/valuate",
         {
@@ -241,9 +254,11 @@ function onSubmit(event) {
         }
     ).then(
         response => response.text()
-    ).then((response) =>  {
-        console.log(response);
-        reportField.textContent = response;
+    ).then((reportContent) =>  {
+        console.log(reportContent);
+        const reportField = document.getElementById('valuationReport');
+        reportField.innerHTML = reportContent;
+        saveReport();
     }).catch (error => {
         console.error("Fetch failed: ", error)
     })

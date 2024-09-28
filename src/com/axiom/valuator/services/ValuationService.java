@@ -33,35 +33,13 @@ public class ValuationService implements Route {
         System.out.println(companyJSON.toString(4));
 
         CompanyData company = new CompanyData(companyJSON);
+        StringBuilder report = new StringBuilder();
 
-        int exitYear = company.getVentureExitYear();
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(company);
-        ValuatorEngine valuatorEngine = new ValuatorEngine(company, exitYear);
-        double dcf = valuatorEngine.valuateDCF(sb);
-        double ebitda = valuatorEngine.valuateEBITDA(sb);
-        double multiples = valuatorEngine.valuateMultiples(sb);
-        double factors = (ebitda > 0 ? 1 : 0) + (multiples > 0 ? 1 : 0) + (dcf > 0 ? 1 : 0);
-        double average = (dcf + ebitda + multiples) / factors;
-
-        sb.append("\n------------------------------------------------------------\n");
-        sb.append("EXIT VALUE AVERAGE (").append(exitYear).append("): ")
-            .append(valuatorEngine.getCountryData().formatMoney(average)).append("\n");
-
-
-        int currentYear = Year.now().getValue();
-        int yearsToExit = exitYear - currentYear;
-
-        if (yearsToExit >= 1) {
-            double presentValue = FinancialMath.getPresentValue(average, company.getVentureRate(), yearsToExit);
-            sb.append("PRESENT PRE-MONEY VALUE (").append(currentYear).append("): ")
-                .append(valuatorEngine.getCountryData().formatMoney(presentValue)).append("\n");
-        }
+        generateReport(company, report);
 
         response.status(200);
-        response.body(sb.toString());
-        return sb.toString();
+        response.body(report.toString());
+        return report.toString();
     }
 
 
@@ -126,6 +104,36 @@ public class ValuationService implements Route {
             }
         }
         return true;
+    }
+
+
+    private void generateReport(CompanyData company, StringBuilder report) {
+
+        int exitYear = company.getVentureExitYear();
+
+        report.append(company.toHTML());
+
+        ValuatorEngine valuatorEngine = new ValuatorEngine(company, exitYear);
+
+        double dcf = valuatorEngine.valuateDCF(report);
+        double ebitda = valuatorEngine.valuateEBITDA(report);
+        double multiples = valuatorEngine.valuateMultiples(report);
+        double factors = (ebitda > 0 ? 1 : 0) + (multiples > 0 ? 1 : 0) + (dcf > 0 ? 1 : 0);
+        double average = (dcf + ebitda + multiples) / factors;
+
+        report.append("\n------------------------------------------------------------\n");
+        report.append("EXIT VALUE AVERAGE (").append(exitYear).append("): ")
+            .append(valuatorEngine.getCountryData().formatMoney(average)).append("\n");
+
+
+        int currentYear = Year.now().getValue();
+        int yearsToExit = exitYear - currentYear;
+
+        if (yearsToExit >= 1) {
+            double presentValue = FinancialMath.getPresentValue(average, company.getVentureRate(), yearsToExit);
+            report.append("PRESENT PRE-MONEY VALUE (").append(currentYear).append("): ")
+                .append(valuatorEngine.getCountryData().formatMoney(presentValue)).append("\n");
+        }
     }
 
 

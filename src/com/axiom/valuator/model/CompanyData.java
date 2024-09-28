@@ -286,4 +286,100 @@ public class CompanyData {
        // sb.append("\n-------------------------------------------------------------------------------------\n");
         return sb.toString();
     }
+
+    /**
+     * Generate HTML string containing company data
+     * @return HTML string containing company data
+     */
+    public String toHTML() {
+        StringBuilder sb = new StringBuilder();
+
+        NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(country);
+        currencyFormatter.setMaximumFractionDigits(0);
+
+        int revenueLen = revenue != null ? revenue.length : 0;         // Revenue array length
+        int ebitdaLen = ebitda != null ? ebitda.length : 0;            // EBITDA array length
+        int fcfLen = freeCashFlow != null ? freeCashFlow.length : 0;   // FCF array length
+        int len = Math.max(Math.max(revenueLen, ebitdaLen), fcfLen);   // Longest array
+        int[] years = new int[len];                                    // Allocate memory
+        for (int i = 0; i < len; i++) years[i] = dataFirstYear + i;    // Generate years array
+
+        sb.append("<style>\n" +
+            "  .custom-header {\n" +
+            "    background-color: #ffcc00; /* Custom yellow */\n" +
+            "    color: #000; /* Black text for contrast */\n" +
+            "  }\n" +
+            "</style>");
+        //----------------------------------------------------------------------
+        sb.append("<table class=\"table table-bordered custom-header\">");
+
+        sb.append("<tr>");
+        sb.append("<th class=\"text-start\">").append(name).append("</th>");
+        for (int year:years) sb.append("<th class=\"text-end\">").append(year).append("</th>");
+        sb.append("</tr>");
+
+        sb.append("<tr>").append("<td class=\"text-start\">Revenue</td>");
+        for (int i=0; i<len; i++) {
+            sb.append("<td class=\"text-end\">");
+            sb.append((i<revenueLen) ? currencyFormatter.format(revenue[i]) : 0);
+            sb.append("</td>");
+        }
+        sb.append("<tr>");
+
+        sb.append("<tr>").append("<td class=\"text-start\">EBITDA</td>");
+        for (int i=0; i<len; i++) {
+            sb.append("<td class=\"text-end\">");
+            sb.append((i<ebitdaLen) ? currencyFormatter.format(ebitda[i]) : 0);
+            sb.append("</td>");
+        }
+        sb.append("<tr>");
+
+        sb.append("<tr>").append("<td class=\"text-start\">Cash Flow</td>");
+        for (int i=0; i<len; i++) {
+            sb.append("<td class=\"text-end\">");
+            sb.append((i<fcfLen) ? currencyFormatter.format(freeCashFlow[i]) : 0);
+            sb.append("</td>");
+        }
+        sb.append("<tr>");
+
+        sb.append("</table>");
+
+        //----------------------------------------------------------------------
+        sb.append("<table class=\"table table-bordered text-center\">");
+
+        sb.append("<tr>");
+        sb.append("<td class=\"text-start\">").append("Equity Invested").append("</td>");
+        sb.append("<td class=\"text-end\">").append(currencyFormatter.format(equity)).append("</td>");
+        sb.append("<td class=\"text-start\">").append("Equity Rate").append("</td>");
+        sb.append("<td class=\"text-end\">").append(FinancialMath.toPercent(equityRate)).append("%</td>");
+        sb.append("</tr>");
+
+        sb.append("<tr>");
+        sb.append("<td class=\"text-start\">").append("Debt Borrowed").append("</td>");
+        sb.append("<td class=\"text-end\">").append(currencyFormatter.format(debt)).append("</td>");
+        sb.append("<td class=\"text-start\">").append("Debt Rate").append("</td>");
+        sb.append("<td class=\"text-end\">").append(FinancialMath.toPercent(debtRate)).append("%</td>");
+        sb.append("</tr>");
+
+        sb.append("<tr>");
+        sb.append("<td class=\"text-start\">").append("Cash & Equivalents").append("</td>");
+        sb.append("<td class=\"text-end\">").append(currencyFormatter.format(cash)).append("</td>");
+        sb.append("<td class=\"text-start\">").append("Comparable").append("</td>");
+        sb.append("<td class=\"text-end\">").append(comparableStock).append("</td>");
+        sb.append("</tr>");
+
+        sb.append("<tr>");
+        sb.append("<td class=\"text-start\">").append("Venture Exit Year").append("</td>");
+        sb.append("<td class=\"text-end\">").append(ventureExitYear).append("</td>");
+        sb.append("<td class=\"text-start\">").append("Venture Rate").append("</td>");
+        sb.append("<td class=\"text-end\">").append(FinancialMath.toPercent(ventureRate)).append("%</td>");
+        sb.append("</tr>");
+
+        sb.append("</table>");
+        //----------------------------------------------------------------------
+
+        return sb.toString();
+    }
+
+
 }
