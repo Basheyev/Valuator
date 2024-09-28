@@ -33,7 +33,13 @@ public class ValuatorEngine {
         return countryData;
     }
 
-    public double valuateDCF(StringBuilder report) {
+    /**
+     * Discounted Cash Flow method valuator
+     * @param report string builder to write report
+     * @param plainText if true writes plaint text report, otherwise HTML
+     * @return company valuation
+     */
+    public double valuateDCF(StringBuilder report, boolean plainText) {
         boolean logReport = report != null;
 
         double[] fcf = company.getFreeCashFlow();
@@ -58,19 +64,40 @@ public class ValuatorEngine {
         double equityValue = DCF + TV - NFP;
 
         if (logReport) {
-            report.append("\n------------------------------------------------------------\n");
-            report.append(company.getName());
-            report.append(" Discounted Cash Flow (FCF) Valuation\n");
-            report.append("------------------------------------------------------------\n");
-            report.append("Economy growth = ").append(FinancialMath.toPercent(growthRate))
-                  .append("%").append(" (").append(countryData.getCountryName()).append(")\n");
-            report.append("Corporate Tax = ").append(FinancialMath.toPercent(corporateTax))
-                  .append("%").append(" (").append(countryData.getCountryName()).append(")\n");
-            report.append("WACC = ").append(FinancialMath.toPercent(WACC)).append("%\n");
-            report.append("DCF = ").append(countryData.formatMoney(DCF)).append("\n");
-            report.append("TV = ").append(countryData.formatMoney(TV)).append("\n");
-            report.append("NFP = ").append(countryData.formatMoney(NFP)).append("\n");
-            report.append("Valuation = ").append(countryData.formatMoney(equityValue)).append("\n");
+            if (plainText) {
+                report.append("\n------------------------------------------------------------\n");
+                report.append(company.getName());
+                report.append(" Discounted Cash Flow (FCF) Valuation\n");
+                report.append("------------------------------------------------------------\n");
+                report.append("Economy growth = ").append(FinancialMath.toPercent(growthRate))
+                    .append("%").append(" (").append(countryData.getCountryName()).append(")\n");
+                report.append("Corporate Tax = ").append(FinancialMath.toPercent(corporateTax))
+                    .append("%").append(" (").append(countryData.getCountryName()).append(")\n");
+                report.append("WACC = ").append(FinancialMath.toPercent(WACC)).append("%\n");
+                report.append("DCF = ").append(countryData.formatMoney(DCF)).append("\n");
+                report.append("TV = ").append(countryData.formatMoney(TV)).append("\n");
+                report.append("NFP = ").append(countryData.formatMoney(NFP)).append("\n");
+                report.append("Valuation = ").append(countryData.formatMoney(equityValue)).append("\n");
+            } else {
+                report.append("<p>");
+                report.append("<h5>Discounted Cash Flow (FCF) - ")
+                      .append(countryData.formatMoney(equityValue)).append("</h5>");
+
+
+                report.append("Discounted Cash Flow: <b>")
+                    .append(countryData.formatMoney(DCF))
+                    .append("</b>")
+                    .append(" (WACC: ").append(FinancialMath.toPercent(WACC)).append("%)<br>");
+
+                report.append("Terminal Value: <b>")
+                    .append(countryData.formatMoney(TV))
+                    .append("</b> (GDP growth: ").append(FinancialMath.toPercent(growthRate)).append("%, ")
+                    .append("Tax: ").append(FinancialMath.toPercent(corporateTax)).append("%)")
+                    .append("<br>");
+                report.append("Net Financial Position: <b>").append(countryData.formatMoney(NFP)).append("</b><br>");
+                report.append("</p>");
+
+            }
             //report.append("--------------------------------------------\n");
         }
 

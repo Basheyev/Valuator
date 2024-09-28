@@ -304,17 +304,12 @@ public class CompanyData {
         int[] years = new int[len];                                    // Allocate memory
         for (int i = 0; i < len; i++) years[i] = dataFirstYear + i;    // Generate years array
 
-        sb.append("<style>\n" +
-            "  .custom-header {\n" +
-            "    background-color: #ffcc00; /* Custom yellow */\n" +
-            "    color: #000; /* Black text for contrast */\n" +
-            "  }\n" +
-            "</style>");
         //----------------------------------------------------------------------
+        sb.append("<h4>").append(name).append(" (").append(country.getDisplayCountry()).append(")</h4>");
         sb.append("<table class=\"table table-bordered custom-header\">");
 
         sb.append("<tr>");
-        sb.append("<th class=\"text-start\">").append(name).append("</th>");
+        sb.append("<th class=\"text-start\">").append("</th>");
         for (int year:years) sb.append("<th class=\"text-end\">").append(year).append("</th>");
         sb.append("</tr>");
 

@@ -115,7 +115,7 @@ public class ValuationService implements Route {
 
         ValuatorEngine valuatorEngine = new ValuatorEngine(company, exitYear);
 
-        double dcf = valuatorEngine.valuateDCF(report);
+        double dcf = valuatorEngine.valuateDCF(report, false);
         double ebitda = valuatorEngine.valuateEBITDA(report);
         double multiples = valuatorEngine.valuateMultiples(report);
         double factors = (ebitda > 0 ? 1 : 0) + (multiples > 0 ? 1 : 0) + (dcf > 0 ? 1 : 0);
