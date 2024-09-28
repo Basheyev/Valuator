@@ -5,8 +5,8 @@ A service for private company valuation using key methods such as DCF (Discounte
 
 
 ### Things to do:
-1. Make report more laconic, but official for investment case application
+1. Enhance EBITDA multiples method (more variate multiples)
 2. Add currency selection (national or USD) and currency tag in input fields
 3. Add thousands space separator
-3. Add country codes
-4. Find up-to-date tax rates and base rates data source
+4. Add country codes
+5. Find up-to-date tax rates and base rates data source
