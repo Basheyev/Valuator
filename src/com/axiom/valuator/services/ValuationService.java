@@ -115,27 +115,26 @@ public class ValuationService implements Route {
 
         ValuatorEngine valuatorEngine = new ValuatorEngine(company, exitYear);
         report.append("<hr class=\"my-3\">");
-        double dcf = valuatorEngine.valuateDCF(report, false);
-        report.append("<hr class=\"my-3\">");
         double ebitda = valuatorEngine.valuateEBITDA(report, false);
         report.append("<hr class=\"my-3\">");
         double multiples = valuatorEngine.valuateMultiples(report, false);
+        report.append("<hr class=\"my-3\">");
+        double dcf = valuatorEngine.valuateDCF(report, false);
 
         double factors = (ebitda > 0 ? 1 : 0) + (multiples > 0 ? 1 : 0) + (dcf > 0 ? 1 : 0);
         double average = (dcf + ebitda + multiples) / factors;
 
-        report.append("\n------------------------------------------------------------\n");
-        report.append("EXIT VALUE AVERAGE (").append(exitYear).append("): ")
-            .append(valuatorEngine.getCountryData().formatMoney(average)).append("\n");
-
+        report.append("<hr class=\"my-3\">");
+        report.append("<h5> Exit Value Average (").append(exitYear).append("): ")
+            .append(valuatorEngine.getCountryData().formatMoney(average)).append("</h5>");
 
         int currentYear = Year.now().getValue();
         int yearsToExit = exitYear - currentYear;
 
         if (yearsToExit >= 1) {
             double presentValue = FinancialMath.getPresentValue(average, company.getVentureRate(), yearsToExit);
-            report.append("PRESENT PRE-MONEY VALUE (").append(currentYear).append("): ")
-                .append(valuatorEngine.getCountryData().formatMoney(presentValue)).append("\n");
+            report.append("<h5>Present Pre-Money Value (").append(currentYear).append("): ")
+                .append(valuatorEngine.getCountryData().formatMoney(presentValue)).append("</h5>");
         }
     }
 

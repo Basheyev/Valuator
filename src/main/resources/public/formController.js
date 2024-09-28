@@ -245,6 +245,14 @@ function onSubmit(event) {
     console.log("Request body:\n" + JSON.stringify(companyData, null, 2));
     saveForm();
 
+    // Waiting message
+    const reportField = document.getElementById('valuationReport');
+    reportField.innerHTML = "Loading data...";
+
+    // Disable submit button to privent multiple requests while waiting
+    const submitButton = document.getElementById('submitButton');
+    submitButton.disabled = true;
+
     // Send request 
     fetch("/valuate",
         {
@@ -256,11 +264,12 @@ function onSubmit(event) {
         response => response.text()
     ).then((reportContent) =>  {
         console.log(reportContent);
-        const reportField = document.getElementById('valuationReport');
         reportField.innerHTML = reportContent;
         saveReport();
+        submitButton.disabled = false;
     }).catch (error => {
         console.error("Fetch failed: ", error)
+        submitButton.disabled = false;
     })
 
 }

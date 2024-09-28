@@ -80,8 +80,8 @@ public class ValuatorEngine {
                 report.append("Valuation = ").append(countryData.formatMoney(equityValue)).append("\n");
             } else {
                 report.append("<p>");
-                report.append("<h5>Discounted Cash Flow (FCF) - ")
-                      .append(countryData.formatMoney(equityValue)).append("</h5>");
+                report.append("<h6>Discounted Cash Flow (FCF) - ")
+                      .append(countryData.formatMoney(equityValue)).append("</h6>");
 
                 report.append("Discounted Cash Flow: <b>")
                     .append(countryData.formatMoney(DCF))
@@ -119,6 +119,8 @@ public class ValuatorEngine {
         double endingValue = ebitda[ebitda.length-1];
         int periods = ebitda.length-1;
         double CAGR = FinancialMath.getCAGR(beginningValue, endingValue, periods);
+
+        // todo: provide more variate multiples
         double multiple = (CAGR >= 0.5) ? FAST_GROWTH_MULTIPLE : DEFAULT_GROWTH_MULTIPLE;
         if (company.isLeader()) multiple = LEADER_GROWTH_MULTIPLE;
 
@@ -151,10 +153,10 @@ public class ValuatorEngine {
                 report.append("Valuation: ").append(countryData.formatMoney(equityValue)).append("\n");
             } else {
                 report.append("<p>");
-                report.append("<h5>EBITDA Multiple - ").append(countryData.formatMoney(equityValue)).append("</h5>");
+                report.append("<h6>EBITDA Multiple - ").append(countryData.formatMoney(equityValue)).append("</h6>");
                 report.append("EBITDA: <b>").append(countryData.formatMoney(baseEBITDA))
                     .append("</b> (").append(baseEBITDAYear).append(")<br>");
-                report.append("GAGR: <b>").append(Math.round(CAGR * 10000.0) / 100.0).append("%</b><br>");
+                report.append("CAGR: <b>").append(Math.round(CAGR * 10000.0) / 100.0).append("%</b>&nbsp");
                 report.append("Multiple: <b>").append(multiple).append("x</b><br>");
                 report.append("</p>");
             }
@@ -207,14 +209,15 @@ public class ValuatorEngine {
                     report.append("Valuation: ").append(countryData.formatMoney(equityValue)).append("\n");
                 } else {
                     report.append("<p>");
-                    report.append("<h5>Comparable Multiples - ").append(countryData.formatMoney(equityValue)).append("</h5>");
+                    report.append("<h6>Comparable Multiples - ").append(countryData.formatMoney(equityValue)).append("</h6>");
                     report.append("Comparable: ").append(sds.getName()).append("<br>");
-                    report.append("EV/Revenue (").append(sds.getEVToRevenue()).append("x): ")
-                        .append(countryData.formatMoney(EVRevenueValuation)).append("<br>");
-                    report.append("EV/EBITDA (").append(sds.getEVToEBITDA()).append("x): ")
-                        .append(countryData.formatMoney(EVEBITDAValuation)).append("<br>");
-                    report.append("Enterprise Value Average: ")
-                        .append(countryData.formatMoney(enterpriseValue)).append("<br>");
+                    report.append("EV/Revenue (<b>").append(sds.getEVToRevenue()).append("x</b>): <b>")
+                        .append(countryData.formatMoney(EVRevenueValuation)).append("</b><br>");
+                    report.append("EV/EBITDA (<b>").append(sds.getEVToEBITDA()).append("x</b>): <b>")
+                        .append(countryData.formatMoney(EVEBITDAValuation)).append("</b><br>");
+                    report.append("Enterprise Value Average: <b>")
+                        .append(countryData.formatMoney(enterpriseValue)).append("</b><br>");
+                    // todo: describe EV to valuation
                     report.append("</p>");
                 }
             }

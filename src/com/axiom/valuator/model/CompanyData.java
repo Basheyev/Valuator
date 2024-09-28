@@ -305,7 +305,7 @@ public class CompanyData {
         for (int i = 0; i < len; i++) years[i] = dataFirstYear + i;    // Generate years array
 
         //----------------------------------------------------------------------
-        sb.append("<h4>").append(name).append(" (").append(country.getDisplayCountry()).append(")</h4>");
+       // sb.append("<h5>").append(name).append(" (").append(country.getDisplayCountry()).append(")</h5>");
         sb.append("<table class=\"table table-bordered custom-header\">");
 
         sb.append("<tr>");

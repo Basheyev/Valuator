@@ -21,9 +21,9 @@ public class ValuatorEngineTest {
         StringBuilder sb = new StringBuilder();
         sb.append(company);
         ValuatorEngine valuatorEngine = new ValuatorEngine(company, exitYear);
-        double dcf = valuatorEngine.valuateDCF(sb);
-        double ebitda = valuatorEngine.valuateEBITDA(sb);
-        double multiples = valuatorEngine.valuateMultiples(sb);
+        double dcf = valuatorEngine.valuateDCF(sb, false);
+        double ebitda = valuatorEngine.valuateEBITDA(sb, false);
+        double multiples = valuatorEngine.valuateMultiples(sb, false);
         double factors = (ebitda > 0 ? 1 : 0) + (multiples > 0 ? 1 : 0) + (dcf > 0 ? 1 : 0);
         double average = (dcf + ebitda + multiples) / factors;
 
