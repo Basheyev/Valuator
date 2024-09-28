@@ -83,7 +83,6 @@ public class ValuatorEngine {
                 report.append("<h5>Discounted Cash Flow (FCF) - ")
                       .append(countryData.formatMoney(equityValue)).append("</h5>");
 
-
                 report.append("Discounted Cash Flow: <b>")
                     .append(countryData.formatMoney(DCF))
                     .append("</b>")
@@ -105,8 +104,13 @@ public class ValuatorEngine {
     }
 
 
-
-    public double valuateEBITDA(StringBuilder report) {
+    /**
+     * EBITDA multiplier method valuator
+     * @param report string builder to write report
+     * @param plainText if true writes plaint text report, otherwise HTML
+     * @return company valuation
+     */
+    public double valuateEBITDA(StringBuilder report, boolean plainText) {
         boolean logReport = report != null;
 
         double[] ebitda = company.getEBITDA();
@@ -121,35 +125,52 @@ public class ValuatorEngine {
         double baseEBITDA = beginningValue;
 
         // find first positive ebitda
+        int baseEBITDAYear = company.getDataFirstYear();
         for (int i=0; i<ebitda.length; i++) {
             double value = ebitda[i];
             int year = company.getDataFirstYear() + i;
             if (value > 0 && year >= exitYear) {
                 baseEBITDA = value;
+                baseEBITDAYear = year;
                 break;
             }
         }
 
         double enterpriseValue = baseEBITDA * multiple;
-        double equityValuation = enterpriseValue - company.getDebt();
+        double equityValue = enterpriseValue - company.getDebt();
 
         if (logReport) {
-            report.append("\n------------------------------------------------------------\n");
-            report.append(company.getName());
-            report.append(" EBITDA Multiple Valuation\n");
-            report.append("------------------------------------------------------------\n");
-            report.append("EBITDA: ").append(countryData.formatMoney(baseEBITDA)).append("\n");
-            report.append("Growth rate: ").append(Math.round(CAGR*10000.0)/100.0).append("%\n");
-            report.append("Multiple: ").append(multiple).append("x\n");
-            report.append("Valuation: ").append(countryData.formatMoney(equityValuation)).append("\n");
+            if (plainText) {
+                report.append("\n------------------------------------------------------------\n");
+                report.append(company.getName());
+                report.append(" EBITDA Multiple Valuation\n");
+                report.append("------------------------------------------------------------\n");
+                report.append("EBITDA: ").append(countryData.formatMoney(baseEBITDA)).append("\n");
+                report.append("GAGR: ").append(Math.round(CAGR * 10000.0) / 100.0).append("%\n");
+                report.append("Multiple: ").append(multiple).append("x\n");
+                report.append("Valuation: ").append(countryData.formatMoney(equityValue)).append("\n");
+            } else {
+                report.append("<p>");
+                report.append("<h5>EBITDA Multiple - ").append(countryData.formatMoney(equityValue)).append("</h5>");
+                report.append("EBITDA: <b>").append(countryData.formatMoney(baseEBITDA))
+                    .append("</b> (").append(baseEBITDAYear).append(")<br>");
+                report.append("GAGR: <b>").append(Math.round(CAGR * 10000.0) / 100.0).append("%</b><br>");
+                report.append("Multiple: <b>").append(multiple).append("x</b><br>");
+                report.append("</p>");
+            }
         }
 
-        return equityValuation;
+        return equityValue;
     }
 
 
-
-    public double valuateMultiples(StringBuilder report) {
+    /**
+     * Comparable Multiplier method valuator
+     * @param report string builder to write report
+     * @param plainText if true writes plaint text report, otherwise HTML
+     * @return company valuation
+     */
+    public double valuateMultiples(StringBuilder report, boolean plainText) {
         try {
             boolean logReport = report != null;
             String listedCompanyTicker = company.getComparableStock();
@@ -169,22 +190,35 @@ public class ValuatorEngine {
             double EVEBITDAValuation = ebitdaAvailable ? ebitda[yearIndex] * EVtoEBITDA : 0;
             int count = (revenueAvailable ? 1 : 0) + (ebitdaAvailable ? 1 : 0);
             double enterpriseValue = (EVRevenueValuation + EVEBITDAValuation) / count;
-            double valuation = enterpriseValue - company.getDebt();
+            double equityValue = enterpriseValue - company.getDebt();
 
             if (logReport) {
-                report.append("\n------------------------------------------------------------\n");
-                report.append(company.getName());
-                report.append(" Multiples Valuation\n");
-                report.append("------------------------------------------------------------\n");
-                report.append("Comparable: ").append(sds.getName()).append("\n");
-                report.append("EV/Revenue (").append(sds.getEVToRevenue()).append("x): ")
-                    .append(countryData.formatMoney(EVRevenueValuation)).append("\n");
-                report.append("EV/EBITDA (").append(sds.getEVToEBITDA()).append("x): ")
-                    .append(countryData.formatMoney(EVEBITDAValuation)).append("\n");
-                report.append("EV average: ").append(countryData.formatMoney(enterpriseValue)).append("\n");
-                report.append("Valuation: ").append(countryData.formatMoney(valuation)).append("\n");
+                if (plainText) {
+                    report.append("\n------------------------------------------------------------\n");
+                    report.append(company.getName());
+                    report.append(" Multiples Valuation\n");
+                    report.append("------------------------------------------------------------\n");
+                    report.append("Comparable: ").append(sds.getName()).append("\n");
+                    report.append("EV/Revenue (").append(sds.getEVToRevenue()).append("x): ")
+                        .append(countryData.formatMoney(EVRevenueValuation)).append("\n");
+                    report.append("EV/EBITDA (").append(sds.getEVToEBITDA()).append("x): ")
+                        .append(countryData.formatMoney(EVEBITDAValuation)).append("\n");
+                    report.append("EV average: ").append(countryData.formatMoney(enterpriseValue)).append("\n");
+                    report.append("Valuation: ").append(countryData.formatMoney(equityValue)).append("\n");
+                } else {
+                    report.append("<p>");
+                    report.append("<h5>Comparable Multiples - ").append(countryData.formatMoney(equityValue)).append("</h5>");
+                    report.append("Comparable: ").append(sds.getName()).append("<br>");
+                    report.append("EV/Revenue (").append(sds.getEVToRevenue()).append("x): ")
+                        .append(countryData.formatMoney(EVRevenueValuation)).append("<br>");
+                    report.append("EV/EBITDA (").append(sds.getEVToEBITDA()).append("x): ")
+                        .append(countryData.formatMoney(EVEBITDAValuation)).append("<br>");
+                    report.append("Enterprise Value Average: ")
+                        .append(countryData.formatMoney(enterpriseValue)).append("<br>");
+                    report.append("</p>");
+                }
             }
-            return valuation;
+            return equityValue;
         } catch (Exception e) {
             e.printStackTrace();
         }

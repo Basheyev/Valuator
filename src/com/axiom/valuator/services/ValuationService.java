@@ -114,10 +114,13 @@ public class ValuationService implements Route {
         report.append(company.toHTML());
 
         ValuatorEngine valuatorEngine = new ValuatorEngine(company, exitYear);
-
+        report.append("<hr class=\"my-3\">");
         double dcf = valuatorEngine.valuateDCF(report, false);
-        double ebitda = valuatorEngine.valuateEBITDA(report);
-        double multiples = valuatorEngine.valuateMultiples(report);
+        report.append("<hr class=\"my-3\">");
+        double ebitda = valuatorEngine.valuateEBITDA(report, false);
+        report.append("<hr class=\"my-3\">");
+        double multiples = valuatorEngine.valuateMultiples(report, false);
+
         double factors = (ebitda > 0 ? 1 : 0) + (multiples > 0 ? 1 : 0) + (dcf > 0 ? 1 : 0);
         double average = (dcf + ebitda + multiples) / factors;
 
