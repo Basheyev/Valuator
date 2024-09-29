@@ -76,7 +76,7 @@ public class ValuatorEngine {
                 report.append("Valuation = ").append(countryData.formatMoney(equityValue)).append("\n");
             } else {
                 report.append("<p>");
-                report.append("<h5>Discounted Cash Flow (FCF) - ")
+                report.append("<h5>Discounted Cash Flow - ")
                       .append(countryData.formatMoney(equityValue)).append("</h5>");
 
                 report.append("Discounted Cash Flow: <b>")

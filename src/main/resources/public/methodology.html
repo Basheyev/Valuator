@@ -3,120 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exit Value Methods</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        table, th, td {
-            border: 1px solid black;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        .formula {
-            font-family: 'Courier New', Courier, monospace;
-            white-space: pre;
-        }
-    </style>
+    <title>Valuation Methods Statement</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <div class="container mt-5">
+        <div class="row">
 
-<h2>Шаг 1. Оценка ожидаемой exit-стоимости компании (Exit Value)</h2>
-<p>Оценка ожидаемой exit-стоимости компании осуществляется на основе трёх основных методов на год выхода:</p>
+            <div class="col-8 mx-auto">
 
-<table>
-    <tr>
-        <th>№</th>
-        <th>Метод</th>
-        <th>Описание метода оценки стоимости</th>
-        <th>Формула расчета</th>
-    </tr>
-    <tr>
-        <td>1.</td>
-        <td>EBITDA multiple</td>
-        <td>Метод кратного EBITDA - самый быстрый способ оценки exit-стоимости на этапе soft-commitment.
-            Используется EBITDA последнего года перед выходом и мультипликатор (M) от 4 до 8.</td>
-        <td>
-            Exit Value = EBITDA × M<br>
-            Где M=4: для успешных компаний, M=6 применяются для быстрорастущих компаний или M=8 для
-            лидеров рынка с высокой прибыльностью.
-        </td>
-    </tr>
-    <tr>
-        <td>2.</td>
-        <td>Multiples</td>
-        <td>
-            Метод мультипликаторов - использование средних мультипликаторов (K)
-            ряда аналогичных публичных компаний для оценки прогнозной стоимости:<br>
-            - EV / EBITDA (Enterprise Value to EBITDA): Стоимость предприятия к EBITDA.<br>
-            - EV / Sales (Enterprise Value to Sales): Стоимость предприятия к выручке.
-        </td>
-        <td>
-            EV value = EBITDA K<sub>ebitda</sub><br>
-            EV Value = SALES × K<sub>sales</sub>
-        </td>
-    </tr>
-    <tr>
-        <td>3.</td>
-        <td>Discounted Cash Flow (DCF)</td>
-        <td>
-            Дисконтирование денежного потока. Оцениваем на основании заявленных показателей
-            свободного денежного потока на прогнозируемый период. Средневзвешенная
-            стоимость капитала:<br><br>
-            WACC = (Equity / (Equity + Debt)) × r<sub>e</sub> + (Debt / (Equity + Debt)) × r<sub>d</sub> × (1 - Tc)
-            <br><br>
-            где, Debt - совокупная сумма долговых обязательств
-            Equity - совокупная сумма инвестиций в капитал
-            R<sub>e</sub> - ставка по инвестициям в капитал
-            R<sub>d</sub> - ставка по долговым обязательствам
-            Tc - налоговая ставка (~20% КПН Казахстан)
+                <h3>Valuation Method Statement</h3>
+                <br>
+                <p> The service performs company valuation using four main methods:
+                    EBITDA Multiple, Comparable Multiple, Discounted Cash Flow (DCF),
+                    and the VC Method.
+                </p>
+                <p> To perform the calculations, service needs following private company
+                    data: revenue, EBITDA, free cash flow forecasts dataset for 2-5 years,
+                    equity invested and its interest rate, debt borrowed and its interest
+                    rate, cash and equivalents, venture exit year and venture interest rate,
+                    market share and public comparable company stock ticker.
+                </p>
+                <p> World Bank API provides country GDP average growth, average inflation,
+                    corporate tax rate, base rate, and market return rate. Alpha Vantage API
+                    provides public comparable company stock data,
+                </p>
+                <br>
+                <h4>1. Exit value calculation</h4>
+                <br>
+                <p>We need to estimate the exit value of the company based on its current financial
+                   situation, forecasts and country macroeconomic indicators: </p>
 
-        </td>
-        <td>
+                <table class="table table-bordered text-start">
+                    <tr>
+                        <th>No.</th>
+                        <th>Method</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td>1.</td>
+                        <td>EBITDA multiple</td>
+                        <td>The EBITDA multiple method is the fastest way to estimate a
+                            company's value by multiplying EBITDA by a multiple, which
+                            is calculated as follows. First, we need to calculate the
+                            CAGR (Compound Annual Growth Rate) between the first and
+                            last positive EBITDA values, taking into account the number
+                            of periods (years).
+                            <br><br>
+                            Next, we calculate the Net Growth Rate (NGR),
+                            which is the difference between CAGR (as a decimal, e.g., 0.0-1.0)
+                            and the Average Inflation Rate (as a decimal, e.g., 0.0-1.0).
+                            The multiplier is calculated using a base value of 1.5x,
+                            NGR, and the company's Market Share (as a decimal, e.g., 0.0-1.0).
+                            <br><br>
+                            The Enterprise Value is then calculated by multiplying the first
+                            positive EBITDA by the multiple. Next, calculate the Net Financial
+                            Position (NFP), which is the difference between the company’s debt
+                            and cash & equivalents. Finally, determine the company's valuation
+                            by subtracting NFP from the Enterprise Value.
+                            <br><br>
+                            <p>
+                                $$\text{CAGR} = \left( \frac{\text{EBITDA}_{\text{ending}}}{\text{EBITDA}_{\text{beginning}}} \right)^{\frac{1.0}{\text{periods}}} - 1.0$$
+                            </p>
+                            <p>
+                                $$\text{NGR} = \text{CAGR} - \text{Average Inflation Rate}$$
+                            </p>
+                            <p>
+                                $$\text{Multiplier} = 1.5x + (\text{NGR} + \text{Market Share}) \times 10$$
+                            </p>
+                            <p>
+                                $$\text{NFP} = \text{Debt} - \text{Cash}$$
+                            </p>
+                            <p>
+                                $$\text{Enterprise Value} = \text{EBITDA} \times \text{Multiplier}$$
+                            </p>
+                            <p>
+                                $$\text{Valuation} = \text{Enterprise Value} - \text{NFP}$$
+                            </p>
 
-            Exit Value = Σ (FCF<sub>t</sub> / (1 + WACC)<sup>t</sup>) + TV - NFP<br>
-            TV = (FCF<sub>n</sub> × (1 + g)) / (WACC - g)<br><br>
-            где:<br>
-            NFP = Долги - Деньги и их эквиваленты<br>
-            TV = Терминальная стоимость<br>
-            n - количество прогнозируемых лет<br>
-            g - средневзвешенный рост экономики (~5%)
-        </td>
-    </tr>
-</table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2.</td>
+                        <td>Comparable Multiples</td>
+                        <td>
 
-<h3>Итоговый Exit Value - это средняя целевая оценка по перечисленным методам оценки</h3>
+                            The Comparable Multiples method involves using the multiples (K)
+                            of similar comparable public companies with same markets, business
+                            activities, and business models to estimate the value based
+                            on their financial statement data.<br>
 
-<h2>Шаг 2. Дисконтирование exit-стоимости до сегодняшней оценки (VC)</h2>
+                            <p>
+                                $$ K_{\text{ebitda}} = \frac{\text{EV}_{\text{comparable}}}{\text{EBITDA}_{\text{comparable}}} $$
+                            </p>
+                            <p>
+                                $$ K_{\text{revenue}} = \frac{\text{EV}_{\text{comparable}}}{\text{Revenue}_{\text{comparable}}} $$
+                            </p>
+                            <p>
+                                $$ \text{EV}_{\text{ebitda}} = \text{EBITDA} \times K_{\text{ebitda}} $$
+                            </p>
+                            <p>
+                                $$ \text{EV}_{\text{revenue}} = \text{Revenue} \times K_{\text{revenue}} $$
+                            </p>
+                            <p>
+                                $$ \text{NFP} = \text{Debt} - \text{Cash} $$
+                            </p>
+                            <p>
+                                $$ \text{Enterprise Value} = \frac{\text{EV}_{\text{ebitda}} + \text{EV}_{\text{revenue}}}{2} $$
+                            </p>
+                            <p>
+                                $$ \text{Valuation} = \text{Enterprise Value} - \text{NFP} $$
+                            </p>
 
-<table>
-    <tr>
-        <th>Описание метода</th>
-        <th>Формулы расчета</th>
-    </tr>
-    <tr>
-        <td>
-            Текущая стоимость до инвестирования денег
-            (pre-money Present Value) оценивается путём дисконтирования
-            от целевой exit стоимости (Exit Value) с учётом 4-6х роста
-            за 2-3 года (r=58%-82% годовых, n = 2, 3).
-        </td>
-        <td>
-            Present Value = Exit Value / (1 + r)<sup>n</sup><br><br>
-            r - требуемая доходность (58% = 4x за 3 года, 82% = 6x за 3 года), n - число лет до выхода.
-        </td>
-    </tr>
-</table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>3.</td>
+                        <td>Discounted Cash Flow (DCF)</td>
+                        <td>
+                            Discounted Cash Flow. The valuation is based on the declared free cash flow (FCF)
+                            figures for the forecasted period. The Weighted Average Cost of Capital (WACC):
 
+                            <p class="text-start">
+                                $$ \text{WACC} = \left( \frac{\text{E}}{\text{E} + \text{D}} \right) \times r_e
+                                + \left( \frac{\text{D}}{\text{E}
+                                + \text{D}} \right) \times r_d \times (1 - T_c) $$
+                            </p>
+                            <p  class="text-start">
+                                $$ \text{DCF} = \sum_{t=1}^{n} \frac{\text{FCF}_t}{(1 + \text{WACC})^t} $$
+                            </p>
+                            <p>
+                                $$ \text{TV} = \frac{\text{FCF}_n \times (1 + g)}{\text{WACC} - g} $$
+                            </p>
+                            <p>
+                                $$ \text{NFP} = \text{D} - \text{C} $$
+                            </p>
+                            <p>
+                                $$ \text{Enterprise Value} = \text{DCF} + \text{TV} $$
+                            </p>
+                            <p>
+                                $$ \text{Valuation} = \text{Enterprise Value} - \text{NFP} $$
+                            </p>
+                            D - debt borrowed<br>
+                            E - equity invested<br>
+                            C - cash & equivalents<br>
+                            R<sub>e</sub> - equity interest rate<br>
+                            R<sub>d</sub> - debt interest rate<br>
+                            Tc - corporate tax rate<br>
+                            n - forecast periods (years)<br>
+                            g - economy average growth rate
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>4.</td>
+                        <td>Weighted Exit Value</td>
+                        <td>
+                            <p>The final weighted Exit Value is calculated as weighted sum of all methods:</p>
+                            <p>$$\text{Exit Value} = \text{E}_{\text{value}} \times 40\% +
+                                \text{C}_{\text{value}} \times 30\% +
+                                \text{D}_{\text{value}} \times 30\%$$
+                            </p>
+                            E<sub>value</sub> - EBITDA multiple method valuation<br>
+                            C<sub>value</sub> - Comparable Multiples valuation<br>
+                            D<sub>value</sub> - DCF method valuation<br>
+
+                        </td>
+
+                    </tr>
+                </table>
+
+
+                <br>
+                <br>
+                <h4>2. Present Value calculation (VC method)</h4>
+                <br>
+                <table class="table table-bordered text-start">
+                    <tr>
+                        <th>No.</th>
+                        <th>Method</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td>1.</td>
+                        <td>
+                            VC method
+                        </td>
+                        <td>
+                            <p>The pre-money Present Value is calculated by discounting the target Exit Value.
+                            Typically, the target return expectation for a 4x multiple over 3 years is 58%.</p>
+                            <p>$$\text{Present Value} = \frac{\text{Exit Value}}{(1 + r)^n}$$</p>
+                            <p>$$r \text{ - target return, }$$</p>
+                            <p>$$n \text{ - number of years until exit.}$$</p>
+                        </td>
+                    </tr>
+                </table>
+
+                <br>
+                <br>
+                <h4>3. Disclaimer</h4><br>
+                <p>
+                The valuation results provided are for informational purposes only and do not constitute
+                investment advice, financial guidance, or recommendations of any kind. The information
+                contained herein is based on data and methodologies that may not fully reflect the specific
+                financial circumstances, market conditions, or risks associated with any particular investment.
+                </p>
+                <p>
+                Investing in securities, businesses, or other financial instruments involves inherent risks,
+                including, but not limited to, the risk of significant loss of capital. Past performance or
+                valuation estimates do not guarantee future results. It is important to note that all investment
+                decisions should be made based on your own independent research and analysis, and in consultation
+                with professional advisors as necessary.
+                </p>
+                <p>
+                The authors, developers, and providers of these valuation tools or results disclaim any
+                responsibility for the accuracy, completeness, or reliability of the information presented,
+                as well as any liabilities or losses incurred as a result of reliance on this information.
+                All investment decisions and their outcomes are the sole responsibility of the investor,
+                and you should carefully consider your investment objectives, risk tolerance, and financial
+                situation before engaging in any investment activities.
+                </p>
+                <p>
+                By using these valuation results, you acknowledge and accept that you bear full responsibility
+                for your own investment decisions, and you agree to hold harmless the providers of this
+                information from any claims or losses arising from your investment activities.
+                </p>
+                <br>
+                <p>
+                    <b>© 2024 Axiom Capital LLP</b>
+                </p>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
