@@ -1,7 +1,11 @@
 
-# Private Company Valuator Service
+### Private Company Valuator Service
 
-A service for private company valuation using key methods such as DCF (Discounted Cash Flow), EBITDA multiples, and the multiples method based on the metrics of comparable public companies. For startups, it estimates the exit value in the future and discounts it to the present pre-money value.
+A service for private company valuation using key methods 
+such as DCF (Discounted Cash Flow), EBITDA multiples, 
+and the multiples method based on the metrics of comparable 
+public companies. For startups, it estimates the exit value in 
+the future and discounts it to the present pre-money value.
 
 
 ### Things to do:

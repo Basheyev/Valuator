@@ -110,6 +110,7 @@ public class ValuationService implements Route {
     private void generateReport(CompanyData company, StringBuilder report) {
 
         int exitYear = company.getVentureExitYear();
+        // todo validate input data
 
         report.append(company.toHTML());
 

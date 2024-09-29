@@ -130,6 +130,39 @@ function jsonToForm(savedForm) {
     if ("ventureRate" in savedForm) form.ventureRate.value = savedForm.ventureRate * 100.0;
 }
 
+
+//---------------------------------------------------------------------------------------
+// Format and logic verification
+//---------------------------------------------------------------------------------------
+function formDataVerification() {
+    const reportField = document.getElementById('valuationReport');
+    const dataFirstYear = Number(form.dataFirstYear.value);
+    const forecastHorizon = Number(form.forecastHorizon.value);
+    const dataLastYear = (dataFirstYear + forecastHorizon) - 1;
+    const exitYear = Number(form.ventureExitYear.value);
+
+    console.log("Base year: " + dataFirstYear);
+    console.log("Forecast horizon: " + forecastHorizon);
+    console.log("Last year: " + dataLastYear);
+    console.log("Exit year: " + exitYear);
+
+    // Validate EBITDA
+
+
+    // Validate exit year and forecast horizon
+    if (exitYear < dataFirstYear || (exitYear > dataLastYear)) {
+        reportField.innerHTML =
+            "Exit year (" + exitYear + ") can not exceed financials data period " +
+            "(" + dataFirstYear + "-" + dataLastYear + ")";
+        form.ventureExitYear.classList.add('is-invalid');
+        return false;
+    } else form.ventureExitYear.classList.remove('is-invalid');
+
+
+    return true;
+}
+
+
 //---------------------------------------------------------------------------------------
 // Adjust table rows to specified number (forecast period) and update years labels
 //---------------------------------------------------------------------------------------
@@ -239,10 +272,14 @@ function onSubmit(event) {
     event.preventDefault();
     const form = event.target;
 
+    // Format and logic verification
+    if (!formDataVerification()) return false;
+
     // Retrieve data from form
     const companyData = formToJSON();
     // Show request body in report field
     console.log("Request body:\n" + JSON.stringify(companyData, null, 2));
+    // Save form to local storage
     saveForm();
 
     // Waiting message

@@ -80,8 +80,8 @@ public class ValuatorEngine {
                 report.append("Valuation = ").append(countryData.formatMoney(equityValue)).append("\n");
             } else {
                 report.append("<p>");
-                report.append("<h6>Discounted Cash Flow (FCF) - ")
-                      .append(countryData.formatMoney(equityValue)).append("</h6>");
+                report.append("<h5>Discounted Cash Flow (FCF) - ")
+                      .append(countryData.formatMoney(equityValue)).append("</h5>");
 
                 report.append("Discounted Cash Flow: <b>")
                     .append(countryData.formatMoney(DCF))
@@ -153,7 +153,7 @@ public class ValuatorEngine {
                 report.append("Valuation: ").append(countryData.formatMoney(equityValue)).append("\n");
             } else {
                 report.append("<p>");
-                report.append("<h6>EBITDA Multiple - ").append(countryData.formatMoney(equityValue)).append("</h6>");
+                report.append("<h5>EBITDA Multiple - ").append(countryData.formatMoney(equityValue)).append("</h5>");
                 report.append("EBITDA: <b>").append(countryData.formatMoney(baseEBITDA))
                     .append("</b> (").append(baseEBITDAYear).append(")<br>");
                 report.append("CAGR: <b>").append(Math.round(CAGR * 10000.0) / 100.0).append("%</b>&nbsp");
@@ -209,8 +209,10 @@ public class ValuatorEngine {
                     report.append("Valuation: ").append(countryData.formatMoney(equityValue)).append("\n");
                 } else {
                     report.append("<p>");
-                    report.append("<h6>Comparable Multiples - ").append(countryData.formatMoney(equityValue)).append("</h6>");
-                    report.append("Comparable: ").append(sds.getName()).append("<br>");
+                    report.append("<h5>Comparable Multiples - ")
+                        .append(countryData.formatMoney(equityValue)).append("</h5>");
+                    report.append("Comparable: ")
+                        .append(sds.getName()).append(" (").append(company.getComparableStock()).append(")<br>");
                     report.append("EV/Revenue (<b>").append(sds.getEVToRevenue()).append("x</b>): <b>")
                         .append(countryData.formatMoney(EVRevenueValuation)).append("</b><br>");
                     report.append("EV/EBITDA (<b>").append(sds.getEVToEBITDA()).append("x</b>): <b>")
@@ -224,6 +226,12 @@ public class ValuatorEngine {
             return equityValue;
         } catch (Exception e) {
             e.printStackTrace();
+            report.append("<p>");
+            report.append("<h5>Comparable Multiples - not available</h5>");
+            report.append("Data for public company stock '")
+                .append(company.getComparableStock())
+                .append("' is not available (Alpha Vantage)<br>");
+            report.append("</p>");
         }
         return 0;
     }
