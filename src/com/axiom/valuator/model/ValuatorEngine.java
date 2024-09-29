@@ -211,8 +211,8 @@ public class ValuatorEngine {
                     report.append("<p>");
                     report.append("<h5>Comparable Multiples - ")
                         .append(countryData.formatMoney(equityValue)).append("</h5>");
-                    report.append("Comparable: ")
-                        .append(sds.getName()).append(" (").append(company.getComparableStock()).append(")<br>");
+                    report.append("Comparable: <b>")
+                        .append(sds.getName()).append(" (").append(company.getComparableStock()).append(")</b><br>");
                     report.append("EV/Revenue (<b>").append(sds.getEVToRevenue()).append("x</b>): <b>")
                         .append(countryData.formatMoney(EVRevenueValuation)).append("</b><br>");
                     report.append("EV/EBITDA (<b>").append(sds.getEVToEBITDA()).append("x</b>): <b>")

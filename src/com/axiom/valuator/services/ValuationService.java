@@ -30,7 +30,7 @@ public class ValuationService implements Route {
 
         JSONObject companyJSON = new JSONObject(request.body());
 
-        System.out.println(companyJSON.toString(4));
+        System.out.println(companyJSON.toString());
 
         CompanyData company = new CompanyData(companyJSON);
         StringBuilder report = new StringBuilder();
@@ -134,7 +134,7 @@ public class ValuationService implements Route {
 
         if (yearsToExit >= 1) {
             double presentValue = FinancialMath.getPresentValue(average, company.getVentureRate(), yearsToExit);
-            report.append("<h5>Present Pre-Money Value (").append(currentYear).append("): ")
+            report.append("<h5>Present Value (").append(currentYear).append("): ")
                 .append(valuatorEngine.getCountryData().formatMoney(presentValue)).append("</h5>");
         }
     }
