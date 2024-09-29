@@ -113,16 +113,26 @@ public class ValuatorEngine {
     public double valuateEBITDA(StringBuilder report, boolean plainText) {
         boolean logReport = report != null;
 
+        // Check if EBITDA is available
         double[] ebitda = company.getEBITDA();
         if (ebitda==null || ebitda.length == 0) return 0;
+
+        // Calculate compound average growth rate (CAGR)
+        int firstYear = company.getDataFirstYear();
+        int lastYear = firstYear + company.getEBITDA().length - 1;
+
         double beginningValue = ebitda[0];
         double endingValue = ebitda[ebitda.length-1];
         int periods = ebitda.length-1;
+        double marketShare = company.getMarketShare();
         double CAGR = FinancialMath.getCAGR(beginningValue, endingValue, periods);
 
-        // todo: provide more variate multiples
-        double multiple = (CAGR >= 0.5) ? FAST_GROWTH_MULTIPLE : DEFAULT_GROWTH_MULTIPLE;
-        if (company.isLeader()) multiple = LEADER_GROWTH_MULTIPLE;
+        // Evaluate multiple based on net growth rate and market share
+        double inflationRate = countryData.getAverageInflationRate();
+        double netGrowthRate = CAGR - inflationRate;
+        double growthMultiple = netGrowthRate * 10.0;
+        double marketShareMultiple = marketShare * 10.0;
+        double multiple = 1.0 + growthMultiple + marketShareMultiple; // todo explain methodology
 
         double baseEBITDA = beginningValue;
 
@@ -148,16 +158,24 @@ public class ValuatorEngine {
                 report.append(" EBITDA Multiple Valuation\n");
                 report.append("------------------------------------------------------------\n");
                 report.append("EBITDA: ").append(countryData.formatMoney(baseEBITDA)).append("\n");
-                report.append("GAGR: ").append(Math.round(CAGR * 10000.0) / 100.0).append("%\n");
-                report.append("Multiple: ").append(multiple).append("x\n");
+                report.append("CAGR (").append(firstYear).append("-").append(lastYear).append("): ")
+                    .append(Math.round(CAGR * 10000.0) / 100.0).append("%\n");
+                report.append("Inflation: ").append(FinancialMath.toPercent(countryData.getAverageInflationRate())).append("\n");
+                report.append("Net Growth Rate: ").append(FinancialMath.toPercent(netGrowthRate)).append("%\n");
+                report.append("Market Share: ").append(FinancialMath.toPercent(marketShare)).append("%<\n");
+                report.append("Multiple: ").append(Math.round(multiple * 10000.0) / 100.0).append("x\n");
                 report.append("Valuation: ").append(countryData.formatMoney(equityValue)).append("\n");
             } else {
                 report.append("<p>");
                 report.append("<h5>EBITDA Multiple - ").append(countryData.formatMoney(equityValue)).append("</h5>");
                 report.append("EBITDA: <b>").append(countryData.formatMoney(baseEBITDA))
-                    .append("</b> (").append(baseEBITDAYear).append(")<br>");
-                report.append("CAGR: <b>").append(Math.round(CAGR * 10000.0) / 100.0).append("%</b>&nbsp");
-                report.append("Multiple: <b>").append(multiple).append("x</b><br>");
+                    .append("</b> (").append(baseEBITDAYear).append(")&nbsp<br>");
+                report.append("CAGR (").append(firstYear).append("-").append(lastYear).append("): <b>")
+                    .append(Math.round(CAGR * 10000.0) / 100.0).append("%</b>&nbsp");
+                report.append("Inflation: <b>").append(FinancialMath.toPercent(countryData.getAverageInflationRate())).append("%</b><br>");
+                report.append("Net Growth Rate: <b>").append(FinancialMath.toPercent(netGrowthRate)).append("%</b>&nbsp");
+                report.append("Market Share: <b>").append(FinancialMath.toPercent(marketShare)).append("%</b><br>");
+                report.append("Multiple: <b>").append(Math.round(multiple * 100.0) / 100.0).append("x</b><br>");
                 report.append("</p>");
             }
         }
@@ -190,8 +208,7 @@ public class ValuatorEngine {
             boolean ebitdaAvailable = (ebitda != null && ebitda[yearIndex] > 0 && EVtoEBITDA > 0);
             double EVRevenueValuation = revenueAvailable ? revenue[yearIndex] * EVtoRevenue : 0;
             double EVEBITDAValuation = ebitdaAvailable ? ebitda[yearIndex] * EVtoEBITDA : 0;
-            int count = (revenueAvailable ? 1 : 0) + (ebitdaAvailable ? 1 : 0);
-            double enterpriseValue = (EVRevenueValuation + EVEBITDAValuation) / count;
+            double enterpriseValue = (EVRevenueValuation + EVEBITDAValuation) / 2.0;
             double equityValue = enterpriseValue - company.getDebt();
 
             if (logReport) {

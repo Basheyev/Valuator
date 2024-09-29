@@ -68,8 +68,11 @@
                         <label class="form-label">FINANCIAL PROJECTIONS</label>
                     </div>
                     <div class="col-md-6">
-                        <input class="form-check-input" type="checkbox" id="isLeader">
-                        <label class="form-check-label" for="isLeader">&nbsp; Is market Leader</label>
+                        <label for="marketShare" class="form-label">Market Share (%)</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control text-end" value="0" id="marketShare">
+                            <span class="input-group-text">%</span>
+                        </div>
                     </div>
                 </div>
                 <div class="mb-3">
@@ -93,7 +96,6 @@
                         <label for="equity" class="form-label">Equity invested</label>
                         <div class="input-group">
                             <input type="number" class="form-control text-end" value="0" id="equity">
-
                         </div>
                     </div>
                     <div class="col-md-4">

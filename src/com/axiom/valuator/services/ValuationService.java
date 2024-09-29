@@ -73,7 +73,7 @@ public class ValuationService implements Route {
            if (isInvalid(obj, "equityRate", "Number")) return "equityRate " + FIELD_WRONG;
            if (isInvalid(obj, "debt", "Number")) return "debt " + FIELD_WRONG;
            if (isInvalid(obj, "debtRate", "Number")) return "debtRate " + FIELD_WRONG;
-           if (isInvalid(obj, "isLeader", "Boolean")) return "isLeader " + FIELD_WRONG;
+           if (isInvalid(obj, "marketShare", "Number")) return "marketShare " + FIELD_WRONG;
            if (isInvalid(obj, "comparableStock", "String")) return "comparableStock " + FIELD_WRONG;
         } catch (JSONException e) {
             return "Failed to parse JSON:\n" + request.body() + "\n" + e.toString();

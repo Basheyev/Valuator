@@ -26,7 +26,7 @@ public class CompanyData {
     private double equity, equityRate;          // Equity capital and its cost
     private double debt, debtRate;              // Debt capital and its cost
     private double cash;                        // Cash and cash equivalents
-    private boolean isLeader;                   // Is company a leader of market
+    private double marketShare;                 // Market share
     private String comparableStock;             // Comparable stock ticker
     private int ventureExitYear;                // Venture forecasted exit year
     private double ventureRate;                 // Venture interest rate
@@ -49,7 +49,7 @@ public class CompanyData {
         this.equityRate = 0;
         this.debt = 0;
         this.debtRate = 0;
-        this.isLeader = false;
+        this.marketShare = 0;
         this.comparableStock = "";
         this.ventureExitYear = dataFirstYear;
         this.ventureRate = 0;
@@ -72,7 +72,7 @@ public class CompanyData {
         this.equityRate = json.getDouble("equityRate");
         this.debt = json.getDouble("debt");
         this.debtRate = json.getDouble("debtRate");
-        this.isLeader = json.getBoolean("isLeader");
+        this.marketShare = json.getDouble("marketShare");
         this.comparableStock = json.getString("comparableStock");
         this.ventureExitYear = json.getInt("ventureExitYear");
         this.ventureRate = json.getDouble("ventureRate");
@@ -163,12 +163,12 @@ public class CompanyData {
     }
 
     /**
-     * Sets is company a market leader
-     * @param isLeader true if leader, false otherwise
+     * Sets company market share value
+     * @param marketShare market share value
      * @return this company data object
      */
-    public CompanyData setLeadership(boolean isLeader) {
-        this.isLeader = isLeader;
+    public CompanyData setMarketShare(double marketShare) {
+        this.marketShare = marketShare;
         return this;
     }
 
@@ -193,7 +193,7 @@ public class CompanyData {
     public double getDebt() { return debt; }
     public double getDebtRate() { return debtRate; }
     public double getCash() { return cash; }
-    public boolean isLeader() { return isLeader; }
+    public double getMarketShare() { return marketShare; }
     public String getComparableStock() { return comparableStock; }
     public int getVentureExitYear() { return ventureExitYear; }
     public double getVentureRate() { return ventureRate; }
@@ -215,7 +215,7 @@ public class CompanyData {
         map.put("debt", debt);
         map.put("debtRate", debtRate);
         map.put("cash", cash);
-        map.put("isLeader", isLeader);
+        map.put("marketShare", marketShare);
         map.put("comparableStock", comparableStock);
         map.put("ventureExitYear", ventureExitYear);
         map.put("ventureRate", ventureRate);
@@ -274,13 +274,14 @@ public class CompanyData {
         double eRate = FinancialMath.toPercent(equityRate);
         double dRate = FinancialMath.toPercent(debtRate);
         double vRate = FinancialMath.toPercent(ventureRate);
+        double market = FinancialMath.toPercent(marketShare);
         sb.append("Equity:\t").append(currencyFormatter.format(equity))
             .append(" (interest ").append(eRate).append("%)\n");
         sb.append("Debt:\t").append(currencyFormatter.format(debt))
             .append(" (interest ").append(dRate).append("%)\n");
         sb.append("Cash:\t").append(currencyFormatter.format(cash)).append("\n");
         sb.append("Comparable Stock: ").append(comparableStock).append("\n");
-        sb.append("Is market leader: ").append(isLeader).append("\n");
+        sb.append("Market Share: ").append(market).append("%\n");
         sb.append("Venture Exit Year: ").append(ventureExitYear).append("\n");
         sb.append("Venture Interest Rate: ").append(vRate).append("\n");
        // sb.append("\n-------------------------------------------------------------------------------------\n");
@@ -359,13 +360,14 @@ public class CompanyData {
         sb.append("<tr>");
         sb.append("<td class=\"text-start\">").append("Cash & Equivalents").append("</td>");
         sb.append("<td class=\"text-end\">").append(currencyFormatter.format(cash)).append("</td>");
-        sb.append("<td class=\"text-start\">").append("Comparable").append("</td>");
-        sb.append("<td class=\"text-end\">").append(comparableStock).append("</td>");
+        sb.append("<td class=\"text-start\">").append("Market Share").append("</td>");
+        sb.append("<td class=\"text-end\">").append(FinancialMath.toPercent(marketShare)).append("%</td>");
         sb.append("</tr>");
 
         sb.append("<tr>");
-        sb.append("<td class=\"text-start\">").append("Venture Exit Year").append("</td>");
-        sb.append("<td class=\"text-end\">").append(ventureExitYear).append("</td>");
+
+        sb.append("<td class=\"text-start\">").append("Comparable").append("</td>");
+        sb.append("<td class=\"text-end\">").append(comparableStock).append("</td>");
         sb.append("<td class=\"text-start\">").append("Venture Rate").append("</td>");
         sb.append("<td class=\"text-end\">").append(FinancialMath.toPercent(ventureRate)).append("%</td>");
         sb.append("</tr>");

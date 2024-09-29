@@ -47,6 +47,7 @@ function initializeFields() {
         form.forecastHorizon = DEFAULT_YEARS_FORECAST;
         form.ventureExitYear.value = currentYear;
         form.ventureRate.value = DEFAULT_VENTURE_RATE;
+        form.marketShare.value = 1;
     }
     // Adjust rows in financials table
     adjustRows();
@@ -77,6 +78,7 @@ function formToJSON() {
     let equityRate = parseFloat(form.equityRate.value) / 100.0;
     let debtRate = parseFloat(form.debtRate.value) / 100.0;
     let ventureRate = parseFloat(form.ventureRate.value) / 100.0;
+    let marketShare = parseFloat(form.marketShare.value) / 100.0;
 
     // build JSON object
     const data = {
@@ -91,7 +93,7 @@ function formToJSON() {
         equityRate: equityRate,                                // get equity interest rate
         debt: Number(form.debt.value),                         // get debt borrowed
         debtRate: debtRate,                                    // get debt interest rate
-        isLeader: form.isLeader.checked,                       // get is leader status
+        marketShare: Number(marketShare),                      // get market share
         comparableStock: form.comparableStock.value,           // get comparable stock value
         ventureRate: ventureRate,                              // get venture interest rate
         ventureExitYear: Number(form.ventureExitYear.value)    // get venture exit year
@@ -121,13 +123,13 @@ function jsonToForm(savedForm) {
     }
     if ("cash" in savedForm) form.cash.value = Number(savedForm.cash);
     if ("equity" in savedForm) form.equity.value = savedForm.equity;
-    if ("equityRate" in savedForm) form.equityRate.value = savedForm.equityRate * 100.0;
+    if ("equityRate" in savedForm) form.equityRate.value = Math.round(savedForm.equityRate * 100.0);
     if ("debt" in savedForm) form.debt.value = savedForm.debt;
-    if ("debtRate" in savedForm) form.debtRate.value = savedForm.debtRate * 100.0;
-    if ("isLeader" in savedForm) form.isLeader.checked = savedForm.isLeader;
+    if ("debtRate" in savedForm) form.debtRate.value = Math.round(savedForm.debtRate * 100.0);
+    if ("marketShare" in savedForm) form.marketShare.value = Math.round(savedForm.marketShare * 100.0);
     if ("comparableStock" in savedForm) form.comparableStock.value = savedForm.comparableStock;
     if ("ventureExitYear" in savedForm) form.ventureExitYear.value = savedForm.ventureExitYear;
-    if ("ventureRate" in savedForm) form.ventureRate.value = savedForm.ventureRate * 100.0;
+    if ("ventureRate" in savedForm) form.ventureRate.value = Math.round(savedForm.ventureRate * 100.0);
 }
 
 
@@ -146,7 +148,7 @@ function formDataVerification() {
     console.log("Last year: " + dataLastYear);
     console.log("Exit year: " + exitYear);
 
-    // Validate EBITDA
+    // Validate EBITDA inputs
 
 
     // Validate exit year and forecast horizon
