@@ -9,10 +9,6 @@ import java.time.Year;
  */
 public class ValuatorEngine {
 
-    public static final int DEFAULT_GROWTH_MULTIPLE = 4;
-    public static final int FAST_GROWTH_MULTIPLE = 6;
-    public static final int LEADER_GROWTH_MULTIPLE = 8;
-
     private final CountryData countryData;
     private final CompanyData company;
     private final int exitYear;
@@ -43,7 +39,7 @@ public class ValuatorEngine {
         boolean logReport = report != null;
 
         double[] fcf = company.getFreeCashFlow();
-        double cash = company.getCash();
+        double cash = company.getCashAndEquivalents();
         double equity = company.getEquity();
         double equityRate = company.getEquityRate();
         double debt = company.getDebt();
@@ -132,8 +128,8 @@ public class ValuatorEngine {
         double netGrowthRate = CAGR - inflationRate;
         double growthMultiple = netGrowthRate * 10.0;
         double marketShareMultiple = marketShare * 10.0;
-        double multiple = 1.0 + growthMultiple + marketShareMultiple; // todo explain methodology
-
+        double multiple = 1.5 + growthMultiple + marketShareMultiple; // todo explain methodology
+        double NFP = company.getDebt() - company.getCashAndEquivalents();
         double baseEBITDA = beginningValue;
 
         // find first positive ebitda
@@ -149,7 +145,7 @@ public class ValuatorEngine {
         }
 
         double enterpriseValue = baseEBITDA * multiple;
-        double equityValue = enterpriseValue - company.getDebt();
+        double equityValue = enterpriseValue - NFP;
 
         if (logReport) {
             if (plainText) {
@@ -175,6 +171,7 @@ public class ValuatorEngine {
                 report.append("Inflation: <b>").append(FinancialMath.toPercent(countryData.getAverageInflationRate())).append("%</b><br>");
                 report.append("Net Growth Rate: <b>").append(FinancialMath.toPercent(netGrowthRate)).append("%</b>&nbsp");
                 report.append("Market Share: <b>").append(FinancialMath.toPercent(marketShare)).append("%</b><br>");
+                report.append("Net Financial Position: <b>").append(countryData.formatMoney(NFP)).append("</b><br>");
                 report.append("Multiple: <b>").append(Math.round(multiple * 100.0) / 100.0).append("x</b><br>");
                 report.append("</p>");
             }
@@ -209,7 +206,8 @@ public class ValuatorEngine {
             double EVRevenueValuation = revenueAvailable ? revenue[yearIndex] * EVtoRevenue : 0;
             double EVEBITDAValuation = ebitdaAvailable ? ebitda[yearIndex] * EVtoEBITDA : 0;
             double enterpriseValue = (EVRevenueValuation + EVEBITDAValuation) / 2.0;
-            double equityValue = enterpriseValue - company.getDebt();
+            double NFP = company.getDebt() - company.getCashAndEquivalents();
+            double equityValue = enterpriseValue - NFP;
 
             if (logReport) {
                 if (plainText) {
@@ -236,7 +234,7 @@ public class ValuatorEngine {
                         .append(countryData.formatMoney(EVEBITDAValuation)).append("</b><br>");
                     report.append("Enterprise Value Average: <b>")
                         .append(countryData.formatMoney(enterpriseValue)).append("</b><br>");
-                    // todo: describe EV to valuation
+                    report.append("Net Financial Position: <b>").append(countryData.formatMoney(NFP)).append("</b><br>");
                     report.append("</p>");
                 }
             }

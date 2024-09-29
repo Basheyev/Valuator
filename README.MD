@@ -9,7 +9,7 @@ the future and discounts it to the present pre-money value.
 
 
 ### Things to do:
-1. Enhance EBITDA multiples method (more variate multiples)
+1. Describe methodology 
 2. Add currency selection (national or USD) and currency tag in input fields
 3. Add thousands space separator
 4. Add country codes

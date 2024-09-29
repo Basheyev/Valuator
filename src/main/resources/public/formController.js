@@ -6,7 +6,7 @@
 // (C) 2024 Axiom Capital, Bolat Basheyev
 //=======================================================================================
 
-
+const VALUATION_SERVICE_URL = "/valuate";
 const DEFAULT_COMPANY_NAME = "A Company Making Everything (ACME)"
 const DEFAULT_COUNTRY_CODE = "KZ";
 const DEFAULT_YEARS_FORECAST = 3;
@@ -292,8 +292,10 @@ function onSubmit(event) {
     const submitButton = document.getElementById('submitButton');
     submitButton.disabled = true;
 
+    let currentURL = window.location.href;
+
     // Send request 
-    fetch("/valuate",
+    fetch(VALUATION_SERVICE_URL,
         {
             method: "POST",
             headers: {'Content-Type': 'application/json'},
@@ -308,6 +310,7 @@ function onSubmit(event) {
         submitButton.disabled = false;
     }).catch (error => {
         console.error("Fetch failed: ", error)
+        reportField.innerHTML = "Request to " + currentURL + VALUATION_SERVICE_URL + " failed:<br>" + error;
         submitButton.disabled = false;
     })
 

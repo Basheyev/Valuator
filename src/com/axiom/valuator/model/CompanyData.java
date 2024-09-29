@@ -192,7 +192,7 @@ public class CompanyData {
     public double getEquityRate() { return equityRate; }
     public double getDebt() { return debt; }
     public double getDebtRate() { return debtRate; }
-    public double getCash() { return cash; }
+    public double getCashAndEquivalents() { return cash; }
     public double getMarketShare() { return marketShare; }
     public String getComparableStock() { return comparableStock; }
     public int getVentureExitYear() { return ventureExitYear; }
