@@ -9,6 +9,9 @@ import java.time.Year;
  */
 public class ValuatorEngine {
 
+    public static final double MIN_EBITDA_MULTIPLE = 1.5;
+    public static final double MAX_EBITDA_MULTIPLE = 15.0;
+
     private final CountryData countryData;
     private final CompanyData company;
     private final int exitYear;
@@ -128,7 +131,8 @@ public class ValuatorEngine {
         double netGrowthRate = CAGR - inflationRate;
         double growthMultiple = netGrowthRate * 10.0;
         double marketShareMultiple = marketShare * 10.0;
-        double multiple = 1.5 + growthMultiple + marketShareMultiple; // todo explain methodology
+        double multiple = MIN_EBITDA_MULTIPLE + growthMultiple + marketShareMultiple;
+        if (multiple > MAX_EBITDA_MULTIPLE) multiple = MAX_EBITDA_MULTIPLE;
         double NFP = company.getDebt() - company.getCashAndEquivalents();
         double baseEBITDA = beginningValue;
 
