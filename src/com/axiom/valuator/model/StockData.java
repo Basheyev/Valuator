@@ -1,3 +1,10 @@
+//=======================================================================================
+//
+//  PRIVATE COMPANY VALUATOR
+//  Public Company Stock Data
+//
+// (C) 2024 Axiom Capital, Bolat Basheyev
+//=======================================================================================
 package com.axiom.valuator.model;
 
 import org.json.JSONObject;
@@ -53,7 +60,6 @@ public class StockData {
             if (response == null) throw new IllegalArgumentException(ERROR_NULL_RESPONSE + urlString);
             stock = new JSONObject(response);
             if (stock.isEmpty())
-                // todo process wrong stock name
                 throw new IllegalArgumentException(ERROR_EMPTY_OBJECT + urlString);
             else if (stock.has(INFORMATION_FIELD))
                 throw new IllegalArgumentException(stock.getString(INFORMATION_FIELD));

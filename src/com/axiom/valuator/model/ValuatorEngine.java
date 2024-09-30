@@ -1,3 +1,10 @@
+//=======================================================================================
+//
+//  PRIVATE COMPANY VALUATOR
+//  Valuator Engine
+//
+// (C) 2024 Axiom Capital, Bolat Basheyev
+//=======================================================================================
 package com.axiom.valuator.model;
 
 import com.axiom.valuator.math.FinancialMath;

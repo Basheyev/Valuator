@@ -1,3 +1,10 @@
+//=======================================================================================
+//
+//  PRIVATE COMPANY VALUATOR
+//  Cache for country and stock data
+//
+// (C) 2024 Axiom Capital, Bolat Basheyev
+//=======================================================================================
 package com.axiom.valuator.model;
 
 import org.json.JSONObject;
