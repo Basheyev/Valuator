@@ -1,7 +1,9 @@
 
-### Private Company Valuator Service
+## Private Company Valuator Service
 
-The service performs company valuation using four main methods: 
+### 1. Overview
+
+The Valuator service performs company valuation using four main methods: 
 EBITDA Multiple, Comparable Multiple, Discounted Cash Flow (DCF), 
 and the VC Method.
 
@@ -15,6 +17,16 @@ stock ticker.
 World Bank API provides country GDP average growth, average inflation, 
 corporate tax rate, base rate, and market return rate. Alpha Vantage 
 API provides public comparable company stock data,
+
+
+### Architecture
+##### 1.1. CompanyData
+Contains following private company data: legal entity name, country,
+revenue, EBITDA, free cash flow forecasts dataset for 2-5 years, 
+equity invested and its interest rate, debt borrowed and its interest 
+rate, cash and equivalents, venture exit year and venture interest 
+rate, market share and public comparable company stock ticker.
+
 
 
 ### Things to do:
