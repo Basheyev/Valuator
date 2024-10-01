@@ -17,11 +17,18 @@ const DEFAULT_VENTURE_RATE = 40;
 // Initializes form form and adds listeners to user actions
 //---------------------------------------------------------------------------------------
 function initialize() {
+
     initializeFields();
+
     document.getElementById("dataFirstYear").addEventListener("change", onPeriodChange);
     document.getElementById("forecastHorizon").addEventListener("change", onPeriodChange);
     document.getElementById("form").addEventListener("submit", onSubmit);
     document.getElementById("form").addEventListener("change", onFormChange);
+
+    document.getElementById('equity').addEventListener('input', onCurrencyInput);
+    document.getElementById('debt').addEventListener('input', onCurrencyInput);
+    document.getElementById('cash').addEventListener('input', onCurrencyInput);
+
     window.addEventListener('beforeunload', onFormChange);
 }
 
@@ -88,10 +95,10 @@ function formToJSON() {
         revenue: revenue,                                      // get revenue numbers array by periods
         ebitda: ebitda,                                        // get ebitda numbers array by periods
         freeCashFlow: cashflow,                                // get free cash flow numbers array by periods
-        cash: Number(form.cash.value),                         // get cash & equivalents amount
-        equity: Number(form.equity.value),                     // get equity invested
+        cash: extractNumber(form.cash.value),                  // get cash & equivalents amount
+        equity: extractNumber(form.equity.value),              // get equity invested
         equityRate: equityRate,                                // get equity interest rate
-        debt: Number(form.debt.value),                         // get debt borrowed
+        debt: extractNumber(form.debt.value),                  // get debt borrowed
         debtRate: debtRate,                                    // get debt interest rate
         marketShare: Number(marketShare),                      // get market share
         comparableStock: form.comparableStock.value,           // get comparable stock value
@@ -121,15 +128,17 @@ function jsonToForm(savedForm) {
             document.getElementById("r" + i + "c4").value = savedForm.freeCashFlow[i-1];
         }
     }
-    if ("cash" in savedForm) form.cash.value = Number(savedForm.cash);
-    if ("equity" in savedForm) form.equity.value = savedForm.equity;
+    if ("cash" in savedForm) form.cash.value = addThousandsSeparators(savedForm.cash);
+    if ("equity" in savedForm) form.equity.value = addThousandsSeparators(savedForm.equity);
     if ("equityRate" in savedForm) form.equityRate.value = Math.round(savedForm.equityRate * 100.0);
-    if ("debt" in savedForm) form.debt.value = savedForm.debt;
+    if ("debt" in savedForm) form.debt.value = addThousandsSeparators(savedForm.debt);
     if ("debtRate" in savedForm) form.debtRate.value = Math.round(savedForm.debtRate * 100.0);
     if ("marketShare" in savedForm) form.marketShare.value = Math.round(savedForm.marketShare * 100.0);
     if ("comparableStock" in savedForm) form.comparableStock.value = savedForm.comparableStock;
     if ("ventureExitYear" in savedForm) form.ventureExitYear.value = savedForm.ventureExitYear;
     if ("ventureRate" in savedForm) form.ventureRate.value = Math.round(savedForm.ventureRate * 100.0);
+
+    // todo call thousands separator
 }
 
 
@@ -245,6 +254,40 @@ function saveReport() {
     localStorage.setItem("valuationReport", report);
     console.log("Valuation report:\n" + report);
 }
+
+
+//------------------------------------------------------------------------------------
+// Event listener on numeric inputs for cash with thousands separator
+//------------------------------------------------------------------------------------
+function onCurrencyInput(event) {
+      let value = event.target.value;
+      // Remove all non-digit characters
+      value = value.replace(/\D/g, '');
+      // Format the number with thousands separators
+      value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      // Set the formatted value back to the input field
+      event.target.value = value;
+}
+
+//---------------------------------------------------------------------------------------
+// Extracts number from text (remove thousands separator)
+//---------------------------------------------------------------------------------------
+function extractNumber(value) {
+    let num = value.replace(/\D/g, '');
+    return Number(num);
+}
+
+//---------------------------------------------------------------------------------------
+// Add thousands separator
+//---------------------------------------------------------------------------------------
+function addThousandsSeparators(str) {
+      // Remove all non-digit characters
+      let value = String(str);
+      value = value.replace(/\D/g, '');
+      // Format the number with thousands separators
+      return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 
 //------------------------------------------------------------------------------------
 // Event listener when base year or forecast period changed to adjust table rows
