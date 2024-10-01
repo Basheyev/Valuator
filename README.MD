@@ -77,6 +77,6 @@ Valuation method statement and disclaimer.
 ### 4. Things to do:
 1. Add more verification on input data for front-end and back-end
 2. Add currency selection (national or USD) and currency tag in input fields
-3. Add thousands space separator in input fields add more country codes
-4. Find up-to-date tax rates and base rates data source
-5. Save & load different companies data
+3. Find up-to-date tax rates and base rates data source
+4. Save & load different companies data
+5. Add more country codes

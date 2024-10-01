@@ -11,6 +11,7 @@ const DEFAULT_COMPANY_NAME = "A Company Making Everything (ACME)"
 const DEFAULT_COUNTRY_CODE = "KZ";
 const DEFAULT_YEARS_FORECAST = 3;
 const DEFAULT_VENTURE_RATE = 40;
+const THOUSANDS_SEPARATOR = " ";
 
 
 //---------------------------------------------------------------------------------------
@@ -73,9 +74,9 @@ function formToJSON() {
     const ebitda = [];
     const cashflow = [];
     for (i=1; i<=currentRows; i++) {
-        let revenueValue = Number(document.getElementById("r" + i + "c2").value);
-        let ebitdaValue = Number(document.getElementById("r" + i + "c3").value);
-        let cashflowValue = Number(document.getElementById("r" + i + "c4").value);
+        let revenueValue = extractNumber(document.getElementById("r" + i + "c2").value);
+        let ebitdaValue = extractNumber(document.getElementById("r" + i + "c3").value);
+        let cashflowValue = extractNumber(document.getElementById("r" + i + "c4").value);
         revenue.push(revenueValue);
         ebitda.push(ebitdaValue);
         cashflow.push(cashflowValue);
@@ -123,9 +124,9 @@ function jsonToForm(savedForm) {
         form.forecastHorizon.value = arrayLength;
         adjustRows();
         for (i=1; i <= arrayLength; i++) {
-            document.getElementById("r" + i + "c2").value = savedForm.revenue[i-1];
-            document.getElementById("r" + i + "c3").value = savedForm.ebitda[i-1];
-            document.getElementById("r" + i + "c4").value = savedForm.freeCashFlow[i-1];
+            document.getElementById("r" + i + "c2").value = addThousandsSeparators(String(savedForm.revenue[i-1]));
+            document.getElementById("r" + i + "c3").value = addThousandsSeparators(String(savedForm.ebitda[i-1]));
+            document.getElementById("r" + i + "c4").value = addThousandsSeparators(String(savedForm.freeCashFlow[i-1]));
         }
     }
     if ("cash" in savedForm) form.cash.value = addThousandsSeparators(savedForm.cash);
@@ -217,12 +218,12 @@ function addRows(table, amount) {
         let cell4 = newRow.insertCell(3);
         let rowID = "r" + (lastIndex + i);
         cell1.innerHTML = "";
-        cell2.innerHTML = "<input type=\"number\" class=\"form-control text-end\" id=\"" + rowID
-                          + "c2\" value=\"0\" required>";
-        cell3.innerHTML = "<input type=\"number\" class=\"form-control text-end\" id=\"" + rowID
-                          + "c3\" value=\"0\" required>";
-        cell4.innerHTML = "<input type=\"number\" class=\"form-control text-end\" id=\"" + rowID
-                          + "c4\" value=\"0\" required>";
+        cell2.innerHTML = "<input type=\"text\" class=\"form-control text-end\" id=\"" + rowID
+                          + "c2\" value=\"0\" oninput=\"onCurrencyInput(event)\" required>";
+        cell3.innerHTML = "<input type=\"text\" class=\"form-control text-end\" id=\"" + rowID
+                          + "c3\" value=\"0\" oninput=\"onCurrencyInput(event)\" required>";
+        cell4.innerHTML = "<input type=\"text\" class=\"form-control text-end\" id=\"" + rowID
+                          + "c4\" value=\"0\" oninput=\"onCurrencyInput(event)\" required>";
     }
 }
 
@@ -261,12 +262,18 @@ function saveReport() {
 //------------------------------------------------------------------------------------
 function onCurrencyInput(event) {
       let value = event.target.value;
-      // Remove all non-digit characters
+
+      const position = event.target.selectionStart;
+      const oldLength = value.length;
+
       value = value.replace(/\D/g, '');
-      // Format the number with thousands separators
-      value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      // Set the formatted value back to the input field
+      value = value.replace(/\B(?=(\d{3})+(?!\d))/g, THOUSANDS_SEPARATOR);
+
       event.target.value = value;
+
+      const newLength = value.length;
+      const adjustment = newLength - oldLength;
+      event.target.setSelectionRange(position + adjustment, position + adjustment);
 }
 
 //---------------------------------------------------------------------------------------
@@ -285,7 +292,7 @@ function addThousandsSeparators(str) {
       let value = String(str);
       value = value.replace(/\D/g, '');
       // Format the number with thousands separators
-      return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      return value.replace(/\B(?=(\d{3})+(?!\d))/g, THOUSANDS_SEPARATOR);
 }
 
 
