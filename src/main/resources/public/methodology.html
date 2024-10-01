@@ -50,7 +50,7 @@
                         <td>1.</td>
                         <td>EBITDA multiple</td>
                         <td>The EBITDA multiple method is the fastest way to estimate a
-                            company's value by multiplying EBITDA by a multiple (1.5x-15x),
+                            company's value by multiplying EBITDA by a multiple (2x-15x),
                             which is calculated as follows. First, we need to calculate the
                             CAGR (Compound Annual Growth Rate) between the first and
                             last positive EBITDA values, taking into account the number
@@ -75,8 +75,7 @@
                                 $$\text{NGR} = \text{CAGR} - \text{Average Inflation Rate}$$
                             </p>
                             <p>
-                                $$\text{M} = 1.5x + (\text{NGR} + \text{Market Share}) \times 10$$
-                                $$\text{Multiplier } = \max(1.5, \min(\text{M}, 15))$$
+                                $$\text{Multiplier} = 2 + \min(10 \times\text{NGR} , 8) + \min(10 \times \text{Market Share}, 5)$$
                             </p>
                             <p>
                                 $$\text{NFP} = \text{Debt} - \text{Cash}$$

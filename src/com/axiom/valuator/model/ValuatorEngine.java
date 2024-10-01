@@ -16,8 +16,10 @@ import java.time.Year;
  */
 public class ValuatorEngine {
 
-    public static final double MIN_EBITDA_MULTIPLE = 1.5;
-    public static final double MAX_EBITDA_MULTIPLE = 15.0;
+    public static final double BASE_EBITDA_MULTIPLE = 2.0d;
+    public static final double MAX_GROWTH_MULTIPLE = 8.0;
+    public static final double MAX_MARKET_MULTIPLE = 5.0;
+    public static final double COEFFICIENT_TO_MULTIPLE = 10;
 
     private final CountryData countryData;
     private final CompanyData company;
@@ -37,76 +39,6 @@ public class ValuatorEngine {
 
     public CountryData getCountryData() {
         return countryData;
-    }
-
-    /**
-     * Discounted Cash Flow method valuator
-     * @param report string builder to write report
-     * @param plainText if true writes plaint text report, otherwise HTML
-     * @return company valuation
-     */
-    public double valuateDCF(StringBuilder report, boolean plainText) {
-        boolean logReport = report != null;
-
-        double[] fcf = company.getFreeCashFlow();
-        double cash = company.getCashAndEquivalents();
-        double equity = company.getEquity();
-        double equityRate = company.getEquityRate();
-        double debt = company.getDebt();
-        double debtRate = company.getDebtRate();
-        double corporateTax = countryData.getCorporateTax();
-        double growthRate = countryData.getAverageGDPGrowthRate();
-        double baseRate = countryData.getRiskFreeRate();
-        double marketReturn = countryData.getMarketReturn();
-
-        double WACC = FinancialMath.getWACC(debt, debtRate, equity, equityRate, corporateTax);
-        if (WACC==0.0) { // if neither external investments nor loans, but only own equity
-            // todo calculate beta based on public company data (unlevered beta)
-            WACC = FinancialMath.getCAPM(baseRate, 1, marketReturn);
-        }
-        double DCF = FinancialMath.getDCF(fcf, WACC);
-        double TV = FinancialMath.getTerminalValue(fcf[fcf.length-1], WACC, growthRate);
-        double NFP = debt - cash;
-        double equityValue = DCF + TV - NFP;
-
-        if (logReport) {
-            if (plainText) {
-                report.append("\n------------------------------------------------------------\n");
-                report.append(company.getName());
-                report.append(" Discounted Cash Flow (FCF) Valuation\n");
-                report.append("------------------------------------------------------------\n");
-                report.append("Economy growth = ").append(FinancialMath.toPercent(growthRate))
-                    .append("%").append(" (").append(countryData.getCountryName()).append(")\n");
-                report.append("Corporate Tax = ").append(FinancialMath.toPercent(corporateTax))
-                    .append("%").append(" (").append(countryData.getCountryName()).append(")\n");
-                report.append("WACC = ").append(FinancialMath.toPercent(WACC)).append("%\n");
-                report.append("DCF = ").append(countryData.formatMoney(DCF)).append("\n");
-                report.append("TV = ").append(countryData.formatMoney(TV)).append("\n");
-                report.append("NFP = ").append(countryData.formatMoney(NFP)).append("\n");
-                report.append("Valuation = ").append(countryData.formatMoney(equityValue)).append("\n");
-            } else {
-                report.append("<p>");
-                report.append("<h5>Discounted Cash Flow - ")
-                      .append(countryData.formatMoney(equityValue)).append("</h5>");
-
-                report.append("Discounted Cash Flow: <b>")
-                    .append(countryData.formatMoney(DCF))
-                    .append("</b>")
-                    .append(" (WACC: ").append(FinancialMath.toPercent(WACC)).append("%)<br>");
-
-                report.append("Terminal Value: <b>")
-                    .append(countryData.formatMoney(TV))
-                    .append("</b> (GDP growth: ").append(FinancialMath.toPercent(growthRate)).append("%, ")
-                    .append("Tax: ").append(FinancialMath.toPercent(corporateTax)).append("%)")
-                    .append("<br>");
-                report.append("Net Financial Position: <b>").append(countryData.formatMoney(NFP)).append("</b><br>");
-                report.append("</p>");
-
-            }
-            //report.append("--------------------------------------------\n");
-        }
-
-        return equityValue;
     }
 
 
@@ -136,10 +68,9 @@ public class ValuatorEngine {
         // Evaluate multiple based on net growth rate and market share
         double inflationRate = countryData.getAverageInflationRate();
         double netGrowthRate = CAGR - inflationRate;
-        double growthMultiple = netGrowthRate * 10.0;
-        double marketShareMultiple = marketShare * 10.0;
-        double multiple = MIN_EBITDA_MULTIPLE + growthMultiple + marketShareMultiple;
-        if (multiple > MAX_EBITDA_MULTIPLE) multiple = MAX_EBITDA_MULTIPLE;
+        double growthMultiple = Math.min(netGrowthRate * COEFFICIENT_TO_MULTIPLE, MAX_GROWTH_MULTIPLE);
+        double marketShareMultiple = Math.min(marketShare * COEFFICIENT_TO_MULTIPLE, MAX_MARKET_MULTIPLE);
+        double multiple = BASE_EBITDA_MULTIPLE + growthMultiple + marketShareMultiple;
         double NFP = company.getDebt() - company.getCashAndEquivalents();
         double baseEBITDA = beginningValue;
 
@@ -193,7 +124,7 @@ public class ValuatorEngine {
 
 
     /**
-     * Comparable Multiplier method valuator
+     * Comparable Multiples method valuator
      * @param report string builder to write report
      * @param plainText if true writes plaint text report, otherwise HTML
      * @return company valuation
@@ -262,5 +193,75 @@ public class ValuatorEngine {
         return 0;
     }
 
+
+    /**
+     * Discounted Cash Flow method valuator
+     * @param report string builder to write report
+     * @param plainText if true writes plaint text report, otherwise HTML
+     * @return company valuation
+     */
+    public double valuateDCF(StringBuilder report, boolean plainText) {
+        boolean logReport = report != null;
+
+        double[] fcf = company.getFreeCashFlow();
+        double cash = company.getCashAndEquivalents();
+        double equity = company.getEquity();
+        double equityRate = company.getEquityRate();
+        double debt = company.getDebt();
+        double debtRate = company.getDebtRate();
+        double corporateTax = countryData.getCorporateTax();
+        double growthRate = countryData.getAverageGDPGrowthRate();
+        double baseRate = countryData.getRiskFreeRate();
+        double marketReturn = countryData.getMarketReturn();
+
+        double WACC = FinancialMath.getWACC(debt, debtRate, equity, equityRate, corporateTax);
+        if (WACC==0.0) { // if neither external investments nor loans, but only own equity
+            // todo calculate beta based on public company data (unlevered beta)
+            WACC = FinancialMath.getCAPM(baseRate, 1, marketReturn);
+        }
+        double DCF = FinancialMath.getDCF(fcf, WACC);
+        double TV = FinancialMath.getTerminalValue(fcf[fcf.length-1], WACC, growthRate);
+        double NFP = debt - cash;
+        double equityValue = DCF + TV - NFP;
+
+        if (logReport) {
+            if (plainText) {
+                report.append("\n------------------------------------------------------------\n");
+                report.append(company.getName());
+                report.append(" Discounted Cash Flow (FCF) Valuation\n");
+                report.append("------------------------------------------------------------\n");
+                report.append("Economy growth = ").append(FinancialMath.toPercent(growthRate))
+                    .append("%").append(" (").append(countryData.getCountryName()).append(")\n");
+                report.append("Corporate Tax = ").append(FinancialMath.toPercent(corporateTax))
+                    .append("%").append(" (").append(countryData.getCountryName()).append(")\n");
+                report.append("WACC = ").append(FinancialMath.toPercent(WACC)).append("%\n");
+                report.append("DCF = ").append(countryData.formatMoney(DCF)).append("\n");
+                report.append("TV = ").append(countryData.formatMoney(TV)).append("\n");
+                report.append("NFP = ").append(countryData.formatMoney(NFP)).append("\n");
+                report.append("Valuation = ").append(countryData.formatMoney(equityValue)).append("\n");
+            } else {
+                report.append("<p>");
+                report.append("<h5>Discounted Cash Flow - ")
+                    .append(countryData.formatMoney(equityValue)).append("</h5>");
+
+                report.append("Discounted Cash Flow: <b>")
+                    .append(countryData.formatMoney(DCF))
+                    .append("</b>")
+                    .append(" (WACC: ").append(FinancialMath.toPercent(WACC)).append("%)<br>");
+
+                report.append("Terminal Value: <b>")
+                    .append(countryData.formatMoney(TV))
+                    .append("</b> (GDP growth: ").append(FinancialMath.toPercent(growthRate)).append("%, ")
+                    .append("Tax: ").append(FinancialMath.toPercent(corporateTax)).append("%)")
+                    .append("<br>");
+                report.append("Net Financial Position: <b>").append(countryData.formatMoney(NFP)).append("</b><br>");
+                report.append("</p>");
+
+            }
+            //report.append("--------------------------------------------\n");
+        }
+
+        return equityValue;
+    }
 
 }
