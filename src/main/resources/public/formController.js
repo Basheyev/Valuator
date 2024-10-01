@@ -262,15 +262,12 @@ function saveReport() {
 //------------------------------------------------------------------------------------
 function onCurrencyInput(event) {
       let value = event.target.value;
-
+      // save cursor position
       const position = event.target.selectionStart;
       const oldLength = value.length;
-
-      value = value.replace(/\D/g, '');
-      value = value.replace(/\B(?=(\d{3})+(?!\d))/g, THOUSANDS_SEPARATOR);
-
-      event.target.value = value;
-
+      // add separators
+      event.target.value = addThousandsSeparators(value);
+      // adjust cursor position
       const newLength = value.length;
       const adjustment = newLength - oldLength;
       event.target.setSelectionRange(position + adjustment, position + adjustment);
@@ -288,10 +285,8 @@ function extractNumber(value) {
 // Add thousands separator
 //---------------------------------------------------------------------------------------
 function addThousandsSeparators(str) {
-      // Remove all non-digit characters
       let value = String(str);
       value = value.replace(/\D/g, '');
-      // Format the number with thousands separators
       return value.replace(/\B(?=(\d{3})+(?!\d))/g, THOUSANDS_SEPARATOR);
 }
 
