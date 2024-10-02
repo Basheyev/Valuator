@@ -155,6 +155,20 @@ function formDataVerification() {
     const dataLastYear = (dataFirstYear + forecastHorizon) - 1;
     const exitYear = Number(form.ventureExitYear.value);
 
+    // Validate number fields
+    if (isInvalidField(form.cash, 0, Number.POSITIVE_INFINITY, "Cash & Equivalents can not be negative.")) return false;
+    if (isInvalidField(form.equity, 0, Number.POSITIVE_INFINITY, "Equity invested can not be negative.")) return false;
+    if (isInvalidField(form.debt, 0, Number.POSITIVE_INFINITY, "Debt borrowed can not be negative.")) return false;
+    if (isInvalidField(form.marketShare, 0, 100, "Market share should be in range between 0-100.")) return false;
+    if (isInvalidField(form.equityRate, 1, Number.POSITIVE_INFINITY, "Equity interest rate can not be negative or zero.")) return false;
+    if (isInvalidField(form.debtRate, 1, Number.POSITIVE_INFINITY, "Debt interest rate can not be negative or zero.")) return false;
+    if (isInvalidField(form.ventureRate, 1, Number.POSITIVE_INFINITY, "Venture interest rate can not be negative or zero.")) return false;
+
+    // Validate exit year and forecast horizon
+    if (isInvalidField(form.ventureExitYear, dataFirstYear, dataLastYear,
+        "Exit year (" + exitYear + ") can not exceed financials data period " +
+        "(" + dataFirstYear + "-" + dataLastYear + ")")) return false;
+
     // Validate EBITDA inputs
     const table = document.getElementById("financials");
     currentRows = Number(table.rows.length) - 1;
@@ -167,26 +181,41 @@ function formDataVerification() {
         let ebitdaValue = extractNumber(ebitdaInput.value);
         let cashflowValue = extractNumber(cashflowInput.value);
         if (ebitdaValue > revenueValue) {
-            reportField.innerHTML = "EBITDA can not exceed REVENUE";
+            reportField.innerHTML = "EBITDA can not exceed Revenue";
             ebitdaInput.classList.add('is-invalid');
             invalidEBITDA = true;
         } else ebitdaInput.classList.remove('is-invalid');
     }
     if (invalidEBITDA) return false;
 
-    // Validate exit year and forecast horizon
+
+
+    /*
     if (exitYear < dataFirstYear || (exitYear > dataLastYear)) {
         reportField.innerHTML =
             "Exit year (" + exitYear + ") can not exceed financials data period " +
             "(" + dataFirstYear + "-" + dataLastYear + ")";
         form.ventureExitYear.classList.add('is-invalid');
         return false;
-    } else form.ventureExitYear.classList.remove('is-invalid');
-
+    } else form.ventureExitYear.classList.remove('is-invalid');*/
 
     return true;
 }
 
+
+//---------------------------------------------------------------------------------------
+// Verify number input field with-in specified range
+//---------------------------------------------------------------------------------------
+function isInvalidField(inputField, min, max, errorMessage) {
+    const reportField = document.getElementById('valuationReport');
+    const value = extractNumber(inputField.value);
+    if (value < min || value > max) {
+        reportField.innerHTML = errorMessage;
+        inputField.classList.add('is-invalid');
+        return true;
+    } else inputField.classList.remove('is-invalid');
+    return false;
+}
 
 //---------------------------------------------------------------------------------------
 // Adjust table rows to specified number (forecast period) and update years labels

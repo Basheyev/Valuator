@@ -87,8 +87,8 @@ public class ValuationService implements Route {
         Object field = obj.get(fieldName);
         if ((field instanceof Boolean) && fieldType.equals("Boolean")) return false;
         if ((field instanceof String) && fieldType.equals("String")) return ((String) field).isEmpty();
-        if ( (field instanceof BigDecimal) || (field instanceof Integer) || (field instanceof Double)
-            && fieldType.equals("Number")) return false;
+        if ((field instanceof BigDecimal) || (field instanceof Integer) || (field instanceof Double)
+            || fieldType.equals("Number")) return false;
         if ((field instanceof JSONObject) && fieldType.equals("Object")) return false;
         if ((field instanceof JSONArray) && fieldType.equals("Number[]")) {
             return !isArrayOfNumbers((JSONArray) field);
@@ -110,6 +110,7 @@ public class ValuationService implements Route {
     private void generateReport(CompanyData company, StringBuilder report) {
 
         int exitYear = company.getVentureExitYear();
+
         // todo validate input data
 
         report.append(company.toHTML());
