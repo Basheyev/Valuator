@@ -56,13 +56,13 @@ HTML or text valuation report.
 
 
 ##### 2.6. FinancialMath class
-Implements financial math formulas to calculate CAGR, WACC, CAPM,
+Implements financial math formulas to calculate CAGR, AAGR, WACC, CAPM,
 DCF, Terminal Value, Present Value.
 
 ##### 2.7. ValuationService class
 REST end-point API that validates input data Company Data JSON object  
 and builds HTML valuation report using Valuator Engine. Based on
-Spark embedded microframework (jetty).
+Spark Java embedded microframework.
 
 ### 3. Front-end Architecture
 
@@ -75,10 +75,9 @@ Valuation method statement and disclaimer.
 
 
 ### 4. Things to do:
-1. Add verification on input data for front-end
+1. Save & load different companies data
 2. Add verification on input data for back-end
 3. Add currency selection (national or USD) 
 4. Add currency tag in input fields
 5. Find up-to-date tax rates and base rates data source
-6. Save & load different companies data
-7. Add more country codes
+6. Add more country codes
