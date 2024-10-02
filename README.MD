@@ -21,21 +21,21 @@ API provides public comparable company stock data,
 
 ### 2. Back-end Architecture
 
-##### 2.1. CompanyData class
+#### 2.1. CompanyData class
 Contains following private company data: legal entity name, country,
 revenue, EBITDA, free cash flow forecasts dataset for 2-5 years, 
 equity invested and its interest rate, debt borrowed and its interest 
 rate, cash and equivalents, venture exit year and venture interest 
 rate, market share and public comparable company stock ticker.
 
-##### 2.2. CountryData class
+#### 2.2. CountryData class
 Contains following country data: country code, currency,
 GDP and Inflation values for specified period, average GDP growth rate,
 average Inflation rate and values for corporate tax, central bank interest
 rate (base rate), market return rate, currency formatter. Built-in 
 integration with World Bank API and caching mechanism for faster response.
 
-##### 2.3. StockData class
+#### 2.3. StockData class
 Contains following public company stock data: company legal name,
 revenue for trailing twelve month (TTM), EBITDA, Operating margin (TTM),
 gross profit (TTM), EV to Revenue, EV to EBITDA, Market Capitalization,
@@ -44,22 +44,22 @@ Built-in integration with Alpha Vantage API and caching mechanism
 for faster response and Alpha Vantage limitations (25 request a day).
 
 
-##### 2.4. Cached Data class
+#### 2.4. Cached Data class
 Provides caching mechanism to store World Bank Country Data and
 Public Company Stock Data in key/value embedded storage (MapDB).
 
 
-##### 2.5. Valuator Engine class
+#### 2.5. Valuator Engine class
 Provides implementation of EBITDA Multiple, Comparable Multiple, 
 Discounted Cash Flow (DCF), and the VC valuation methods. Generates
 HTML or text valuation report.
 
 
-##### 2.6. FinancialMath class
+#### 2.6. FinancialMath class
 Implements financial math formulas to calculate CAGR, AAGR, WACC, CAPM,
 DCF, Terminal Value, Present Value.
 
-##### 2.7. ValuationService class
+#### 2.7. ValuationService class
 REST end-point API that validates input data Company Data JSON object  
 and builds HTML valuation report using Valuator Engine. Based on
 Spark Java embedded microframework.
