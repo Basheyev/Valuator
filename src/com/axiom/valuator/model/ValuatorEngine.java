@@ -17,6 +17,7 @@ import java.time.Year;
 public class ValuatorEngine {
 
     public static final double BASE_EBITDA_MULTIPLE = 2.0d;
+    public static final double DEFAULT_EBITDA_MULTIPLE = 4.0d;
     public static final double MAX_GROWTH_MULTIPLE = 8.0;
     public static final double MAX_MARKET_MULTIPLE = 5.0;
     public static final double COEFFICIENT_TO_MULTIPLE = 10;
@@ -63,7 +64,7 @@ public class ValuatorEngine {
         double endingValue = ebitda[ebitda.length-1];
         int periods = ebitda.length-1;
         double marketShare = company.getMarketShare();
-        // fixme: negative CAGR and multiplier
+
         double CAGR = FinancialMath.getCAGR(beginningValue, endingValue, periods);
 
         // Evaluate multiple based on net growth rate and market share
@@ -72,6 +73,7 @@ public class ValuatorEngine {
         double growthMultiple = Math.min(netGrowthRate * COEFFICIENT_TO_MULTIPLE, MAX_GROWTH_MULTIPLE);
         double marketShareMultiple = Math.min(marketShare * COEFFICIENT_TO_MULTIPLE, MAX_MARKET_MULTIPLE);
         double multiple = BASE_EBITDA_MULTIPLE + growthMultiple + marketShareMultiple;
+        if (multiple <= 0) multiple = DEFAULT_EBITDA_MULTIPLE;
         double NFP = company.getDebt() - company.getCashAndEquivalents();
         double baseEBITDA = beginningValue;
 
