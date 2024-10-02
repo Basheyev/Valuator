@@ -10,6 +10,7 @@ package com.axiom.valuator.model;
 import com.axiom.valuator.math.FinancialMath;
 
 import java.time.Year;
+import java.util.Arrays;
 
 /**
  * Company Valuation
@@ -201,6 +202,10 @@ public class ValuatorEngine {
         boolean logReport = report != null;
 
         double[] fcf = company.getFreeCashFlow();
+        int firstIndex = exitYear - company.getDataFirstYear();
+        int lastIndex = fcf.length;
+        fcf = Arrays.copyOfRange(fcf, firstIndex, lastIndex);
+
         double cash = company.getCashAndEquivalents();
         double equity = company.getEquity();
         double equityRate = company.getEquityRate();
