@@ -188,17 +188,6 @@ function formDataVerification() {
     }
     if (invalidEBITDA) return false;
 
-
-
-    /*
-    if (exitYear < dataFirstYear || (exitYear > dataLastYear)) {
-        reportField.innerHTML =
-            "Exit year (" + exitYear + ") can not exceed financials data period " +
-            "(" + dataFirstYear + "-" + dataLastYear + ")";
-        form.ventureExitYear.classList.add('is-invalid');
-        return false;
-    } else form.ventureExitYear.classList.remove('is-invalid');*/
-
     return true;
 }
 

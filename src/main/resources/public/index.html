@@ -8,199 +8,230 @@
 </head>
 <body>
 
-<div class="container mt-5">
-    <div class="row">
-        <!-- Левая колонка с формой -->
-        <div class="col-md-6">
-            <h3>Private Company</h3>
-            <hr class="my-3">
-            <form id="form">
-                <!-- Название компании и страна -->
-                <div class="row mb-3">
-                    <div class="col-md-12">
-                        <label for="name" class="form-label">Company Name</label>
-                        <input type="text" class="form-control" id="name" placeholder="Company Legal Name" required>
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="countryCode" class="form-label">Country</label>
-                        <select class="form-select" id="countryCode" name="countryCode" required>
-                            <option value="KZ">Kazakhstan (KZ)</option>
-                            <option value="UZ">Uzbekistan (UZ)</option>
-                            <option value="KG">Kyrgyzstan (KG)</option>
-                            <option value="AZ">Azerbaijan (AZ)</option>
-                            <option value="TJ">Tajikistan (TJ)</option>
-                            <option value="GE">Georgia (GE)</option>
-                            <option value="US">United States (US)</option>
-                            <option value="CA">Canada (CA)</option>
-                            <option value="GB">United Kingdom (GB)</option>
-                            <option value="DE">Germany (DE)</option>
-                            <option value="FR">France (FR)</option>
-                            <option value="ES">Spain (ES)</option>
-                            <option value="IT">Italy (IT)</option>
-                            <option value="NL">Netherlands (NL)</option>
-                            <option value="LT">Lithuania (LT)</option>
-                            <option value="LV">Latvia (LV)</option>
-                            <!-- Добавьте другие коды стран по мере необходимости -->
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="marketShare" class="form-label">Current Market Share (%)</label>
-                        <div class="input-group">
-                            <input type="number" class="form-control text-end" value="0" id="marketShare">
-                            <span class="input-group-text">%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="dataFirstYear" class="form-label">Financials Base Year</label>
-                        <input type="number" class="form-control" id="dataFirstYear" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="forecastHorizon" class="form-label">Forecast Horizon</label>
-                        <select class="form-select" id="forecastHorizon" name="forecastHorizon" required>
-                            <option value="2">2 years forecast</option>
-                            <option value="3">3 years forecast</option>
-                            <option value="4">4 years forecast</option>
-                            <option value="5">5 years forecast</option>
-                            <!-- Добавьте другие коды стран по мере необходимости -->
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Таблица с финансовыми данными -->
-                <div class="mb-3">
-                    <label class="form-label">Financial projections</label>
-                    <table id="financials" class="table table-bordered text-center">
-                        <thead>
-                        <tr>
-                            <th>Year</th>
-                            <th>Revenue</th>
-                            <th>EBITDA</th>
-                            <th>Cash Flow</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Капитал и долг -->
-                <div class="row mb-3">
-                    <div class="col-md-8">
-                        <label for="equity" class="form-label">Equity invested</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control text-end" value="0" id="equity">
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="equityRate" class="form-label">Equity Cost (%)</label>
-                        <div class="input-group">
-                            <input type="number" class="form-control text-end" value="0" id="equityRate">
-                            <span class="input-group-text">%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-8">
-                        <label for="debt" class="form-label">Debt borrowed</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control text-end" value="0" id="debt">
-
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="debtRate" class="form-label">Debt Cost (%)</label>
-                        <div class="input-group">
-                            <input type="number" class="form-control text-end" value="0" id="debtRate">
-                            <span class="input-group-text">%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Сравнимая акция и лидер рынка -->
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="cash" class="form-label">Cash & Equivalents</label>
-                        <input type="text" class="form-control text-end" id="cash" value="0" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="comparableStock" class="form-label">Public Comparable Stock</label>
-                        <input type="text" class="form-control" id="comparableStock" placeholder="MSFT" required>
-                    </div>
-                </div>
-
-
-                <hr class="my-3">
-
-                <!-- Год ожидаемого exit и доходность venture -->
-                <div class="row mb-3">
-
-                    <div class="col-md-6">
-                        <label for="ventureExitYear" class="form-label">Venture Exit Year</label>
-                        <input type="number" class="form-control" id="ventureExitYear" required>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="ventureRate" class="form-label">Venture Interest Rate (%)</label>
-                        <div class="input-group">
-                            <input type="number" class="form-control text-end" value="0" id="ventureRate" required>
-                            <span class="input-group-text">%</span>
-                        </div>
-                    </div>
-
-                </div>
-
-                <hr class="my-3">
-                <!-- Кнопка -->
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <button type="submit" class="btn btn-success" id="submitButton">Valuate company</button>
-
-                    </div>
-                    <div class="col-md-8" style="font-size: 13px;">
-                        <a href="methodology.html" style="text-decoration: none; color: inherit;">
-                            <b><u>VALUTATION METHOD STATEMENT</u></b>
-                        </a><br>
-                        <b>© 2024 Axiom Capital LLP</b>.&nbsp; <b>DISCLAIMER</b>:
-                        The valuation results are for informational purposes only
-                        and do not constitute investment advice. Investing carries inherent risks,
-                        including potential loss of capital. All investment decisions are the sole
-                        responsibility of the investor.
-                    </div>
-                </div>
-
-            </form>
+    <nav class="navbar navbar-expand navbar-dark bg-dark">
+        <div class="container-fluid">
+            <ul class="navbar-nav">
+                <!-- File Menu -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="fileMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        File
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="fileMenu">
+                        <li><a class="dropdown-item" href="#">New company...</a></li>
+                        <li><a class="dropdown-item" href="#">Open company data</a></li>
+                        <li><a class="dropdown-item" href="#">Save company data</a></li>
+                        <hr class="my-3">
+                        <li><a class="dropdown-item" href="#">Exit</a></li>
+                    </ul>
+                </li>
+                <!-- Help Menu -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="helpMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Help
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="helpMenu">
+                        <li><a class="dropdown-item" href="/methodology.html">Documentation</a></li>
+                        <hr class="my-3">
+                        <li><a class="dropdown-item" href="#">About</a></li>
+                    </ul>
+                </li>
+            </ul>
         </div>
+    </nav>
 
-        <!-- Правая колонка с результатом -->
-        <div class="col-md-6" id="reportArea" >
+    <div class="container mt-5">
+        <div class="row">
+            <!-- Левая колонка с формой -->
             <div class="col-md-6">
-                <h3> Valuation report</h3>
+                <h3>Private Company</h3>
+                <hr class="my-3">
+                <form id="form">
+                    <!-- Название компании и страна -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="name" class="form-label">Company Name</label>
+                            <input type="text" class="form-control" id="name" placeholder="Company Legal Name" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="countryCode" class="form-label">Country</label>
+                            <select class="form-select" id="countryCode" name="countryCode" required>
+                                <option value="KZ">Kazakhstan (KZ)</option>
+                                <option value="UZ">Uzbekistan (UZ)</option>
+                                <option value="KG">Kyrgyzstan (KG)</option>
+                                <option value="AZ">Azerbaijan (AZ)</option>
+                                <option value="TJ">Tajikistan (TJ)</option>
+                                <option value="GE">Georgia (GE)</option>
+                                <option value="US">United States (US)</option>
+                                <option value="CA">Canada (CA)</option>
+                                <option value="GB">United Kingdom (GB)</option>
+                                <option value="DE">Germany (DE)</option>
+                                <option value="FR">France (FR)</option>
+                                <option value="ES">Spain (ES)</option>
+                                <option value="IT">Italy (IT)</option>
+                                <option value="NL">Netherlands (NL)</option>
+                                <option value="LT">Lithuania (LT)</option>
+                                <option value="LV">Latvia (LV)</option>
+                                <!-- Добавьте другие коды стран по мере необходимости -->
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="marketShare" class="form-label">Current Market Share (%)</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control text-end" value="0" id="marketShare">
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="dataFirstYear" class="form-label">Financials Base Year</label>
+                            <input type="number" class="form-control" id="dataFirstYear" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="forecastHorizon" class="form-label">Forecast Horizon</label>
+                            <select class="form-select" id="forecastHorizon" name="forecastHorizon" required>
+                                <option value="2">2 years forecast</option>
+                                <option value="3">3 years forecast</option>
+                                <option value="4">4 years forecast</option>
+                                <option value="5">5 years forecast</option>
+                                <!-- Добавьте другие коды стран по мере необходимости -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Таблица с финансовыми данными -->
+                    <div class="mb-3">
+                        <label class="form-label">Financial projections</label>
+                        <table id="financials" class="table table-bordered text-center">
+                            <thead>
+                            <tr>
+                                <th>Year</th>
+                                <th>Revenue</th>
+                                <th>EBITDA</th>
+                                <th>Cash Flow</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Капитал и долг -->
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label for="equity" class="form-label">Equity invested</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control text-end" value="0" id="equity">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="equityRate" class="form-label">Equity Cost (%)</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control text-end" value="0" id="equityRate">
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label for="debt" class="form-label">Debt borrowed</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control text-end" value="0" id="debt">
+
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="debtRate" class="form-label">Debt Cost (%)</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control text-end" value="0" id="debtRate">
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Сравнимая акция и лидер рынка -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="cash" class="form-label">Cash & Equivalents</label>
+                            <input type="text" class="form-control text-end" id="cash" value="0" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="comparableStock" class="form-label">Public Comparable Stock</label>
+                            <input type="text" class="form-control" id="comparableStock" placeholder="MSFT" required>
+                        </div>
+                    </div>
+
+
+                    <hr class="my-3">
+
+                    <!-- Год ожидаемого exit и доходность venture -->
+                    <div class="row mb-3">
+
+                        <div class="col-md-6">
+                            <label for="ventureExitYear" class="form-label">Venture Exit Year</label>
+                            <input type="number" class="form-control" id="ventureExitYear" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="ventureRate" class="form-label">Venture Interest Rate (%)</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control text-end" value="0" id="ventureRate" required>
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <hr class="my-3">
+                    <!-- Кнопка -->
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-success" id="submitButton">Valuate company</button>
+
+                        </div>
+                        <div class="col-md-8" style="font-size: 13px;">
+                            <a href="methodology.html" style="text-decoration: none; color: inherit;">
+                                <b><u>VALUTATION METHOD STATEMENT</u></b>
+                            </a><br>
+                            <b>© 2024 Axiom Capital LLP</b>.&nbsp; <b>DISCLAIMER</b>:
+                            The valuation results are for informational purposes only
+                            and do not constitute investment advice. Investing carries inherent risks,
+                            including potential loss of capital. All investment decisions are the sole
+                            responsibility of the investor.
+                        </div>
+                    </div>
+
+                </form>
             </div>
-            <hr class="my-3">
-            <div class="col-md-12" id="valuationReport">
-                Fill the form and valuate company
-            </div>
-            <hr class="my-3">
-            <div class="col-md-6">
-                <button type="button" class="btn btn-dark" id="htmlToPDF">Download report (PDF)</button>
+
+            <!-- Правая колонка с результатом -->
+            <div class="col-md-6" id="reportArea" >
+                <div class="col-md-6">
+                    <h3> Valuation report</h3>
+                </div>
+                <hr class="my-3">
+                <div class="col-md-12" id="valuationReport">
+                    Fill the form and valuate company
+                </div>
+                <hr class="my-3">
+                <div class="col-md-6">
+                    <button type="button" class="btn btn-dark" id="htmlToPDF">Download report (PDF)</button>
+                </div>
             </div>
         </div>
-</div>
-</div>
+    </div>
 
-<!-- Include Bootstrap & html2pdf libraries -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+    <!-- Include Bootstrap & html2pdf libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 
-<!-- Form controller script -->
-<script src="formController.js"></script>
+    <!-- Form controller script -->
+    <script src="formController.js"></script>
 
 </body>
 </html>
