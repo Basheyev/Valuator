@@ -268,9 +268,10 @@ function onCurrencyInput(event) {
       const position = event.target.selectionStart;
       const oldLength = value.length;
       // add separators
-      event.target.value = addThousandsSeparators(value);
+      const newValue = addThousandsSeparators(value);
+      event.target.value = newValue;
       // adjust cursor position
-      const newLength = value.length;
+      const newLength = newValue.length;
       const adjustment = newLength - oldLength;
       event.target.setSelectionRange(position + adjustment, position + adjustment);
 }
@@ -288,8 +289,23 @@ function extractNumber(value) {
 //---------------------------------------------------------------------------------------
 function addThousandsSeparators(str) {
       let value = String(str);
+
+      // Retain the negative sign if present
+      let isNegative = false;
+      if (value.startsWith('-')) {
+          isNegative = true;
+          value = value.substring(1); // Remove the negative sign for now
+      }
+
       value = value.replace(/\D/g, '');
-      return value.replace(/\B(?=(\d{3})+(?!\d))/g, THOUSANDS_SEPARATOR);
+      value = value.replace(/\B(?=(\d{3})+(?!\d))/g, THOUSANDS_SEPARATOR);
+
+      // Reattach the negative sign if needed
+      if (isNegative) {
+          value = '-' + value;
+      }
+
+      return value;
 }
 
 
