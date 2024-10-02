@@ -160,7 +160,8 @@
                 <!-- Кнопка -->
                 <div class="row mb-3">
                     <div class="col-md-4">
-                        <button type="submit" class="btn btn-primary" id="submitButton">Valuate company</button>
+                        <button type="submit" class="btn btn-success" id="submitButton">Valuate company</button>
+
                     </div>
                     <div class="col-md-8" style="font-size: 13px;">
                         <a href="methodology.html" style="text-decoration: none; color: inherit;">
@@ -178,19 +179,27 @@
         </div>
 
         <!-- Правая колонка с результатом -->
-        <div class="col-md-6"  >
+        <div class="col-md-6" id="reportArea" >
             <div class="col-md-6">
                 <h3> Valuation report</h3>
             </div>
             <hr class="my-3">
-            <div class="vh-100" id="valuationReport">
+            <div class="col-md-12" id="valuationReport">
                 Fill the form and valuate company
+            </div>
+            <hr class="my-3">
+            <div class="col-md-6">
+                <button type="button" class="btn btn-dark" id="htmlToPDF">Download report (PDF)</button>
             </div>
         </div>
 </div>
 </div>
 
+<!-- Include Bootstrap & html2pdf libraries -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+<!-- Form controller script -->
 <script src="formController.js"></script>
 
 </body>

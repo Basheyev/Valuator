@@ -63,6 +63,7 @@ public class ValuatorEngine {
         double endingValue = ebitda[ebitda.length-1];
         int periods = ebitda.length-1;
         double marketShare = company.getMarketShare();
+        // fixme: negative CAGR and multiplier
         double CAGR = FinancialMath.getCAGR(beginningValue, endingValue, periods);
 
         // Evaluate multiple based on net growth rate and market share

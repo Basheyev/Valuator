@@ -30,6 +30,8 @@ function initialize() {
     document.getElementById('debt').addEventListener('input', onCurrencyInput);
     document.getElementById('cash').addEventListener('input', onCurrencyInput);
 
+    document.getElementById("htmlToPDF").addEventListener("click", onDownloadReport);
+
     window.addEventListener('beforeunload', onFormChange);
 }
 
@@ -313,6 +315,25 @@ function onFormChange(event) {
 
 
 //------------------------------------------------------------------------------------
+// Event listener to convert report into PDF and download it
+//------------------------------------------------------------------------------------
+function downloadReportAsPDF() {
+    var companyName = document.getElementById('name').value;
+    var element = document.getElementById('valuationReport');
+
+    html2pdf()
+        .from(element) // The source element
+        .set({
+            margin: 1,
+            pagebreak: { mode: 'avoid-all' },
+            filename: "Valuation_Report_" + companyName + ".pdf",
+            html2canvas: { scale: 4 },
+            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+        })
+        .save(); // Automatically saves the file
+}
+
+//------------------------------------------------------------------------------------
 // Event listener on when submit button pressed - sends request to back-end service
 //------------------------------------------------------------------------------------
 function onSubmit(event) {
@@ -349,7 +370,7 @@ function onSubmit(event) {
     ).then(
         response => response.text()
     ).then((reportContent) =>  {
-        console.log(reportContent);
+        console.log("Server reponse:", reportContent);
         reportField.innerHTML = reportContent;
         saveReport();
         submitButton.disabled = false;
@@ -361,6 +382,13 @@ function onSubmit(event) {
 
 }
 
+
+//------------------------------------------------------------------------------------
+// Event listener on when Download button is pressed
+//------------------------------------------------------------------------------------
+function onDownloadReport() {
+    downloadReportAsPDF();
+}
 
 //------------------------------------------------------------------------------------
 // Entry point
