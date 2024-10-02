@@ -155,13 +155,24 @@ function formDataVerification() {
     const dataLastYear = (dataFirstYear + forecastHorizon) - 1;
     const exitYear = Number(form.ventureExitYear.value);
 
-    console.log("Base year: " + dataFirstYear);
-    console.log("Forecast horizon: " + forecastHorizon);
-    console.log("Last year: " + dataLastYear);
-    console.log("Exit year: " + exitYear);
-
     // Validate EBITDA inputs
-
+    const table = document.getElementById("financials");
+    currentRows = Number(table.rows.length) - 1;
+    let invalidEBITDA = false;
+    for (i=1; i<=currentRows; i++) {
+        let revenueInput = document.getElementById("r" + i + "c2");
+        let ebitdaInput = document.getElementById("r" + i + "c3");
+        let cashflowInput = document.getElementById("r" + i + "c4");
+        let revenueValue = extractNumber(revenueInput.value);
+        let ebitdaValue = extractNumber(ebitdaInput.value);
+        let cashflowValue = extractNumber(cashflowInput.value);
+        if (ebitdaValue > revenueValue) {
+            reportField.innerHTML = "EBITDA can not exceed REVENUE";
+            ebitdaInput.classList.add('is-invalid');
+            invalidEBITDA = true;
+        } else ebitdaInput.classList.remove('is-invalid');
+    }
+    if (invalidEBITDA) return false;
 
     // Validate exit year and forecast horizon
     if (exitYear < dataFirstYear || (exitYear > dataLastYear)) {
@@ -280,8 +291,14 @@ function onCurrencyInput(event) {
 // Extracts number from text (remove thousands separator)
 //---------------------------------------------------------------------------------------
 function extractNumber(value) {
-    let num = value.replace(/\D/g, '');
-    return Number(num);
+    let isNegative = false;
+    if (value.startsWith('-')) {
+        isNegative = true;
+        value = value.substring(1);
+    }
+    value = value.replace(/\D/g, '');
+    if (isNegative) value = '-' + value;
+    return Number(value);
 }
 
 //---------------------------------------------------------------------------------------

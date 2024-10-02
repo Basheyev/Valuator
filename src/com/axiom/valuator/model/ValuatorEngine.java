@@ -56,26 +56,21 @@ public class ValuatorEngine {
         double[] ebitda = company.getEBITDA();
         if (ebitda==null || ebitda.length == 0) return 0;
 
-        // Calculate compound average growth rate (CAGR)
         int firstYear = company.getDataFirstYear();
         int lastYear = firstYear + company.getEBITDA().length - 1;
 
-        double beginningValue = ebitda[0];
-        double endingValue = ebitda[ebitda.length-1];
-        int periods = ebitda.length-1;
         double marketShare = company.getMarketShare();
-
-        double CAGR = FinancialMath.getCAGR(beginningValue, endingValue, periods);
+        double annualGrowthRate = FinancialMath.getAAGR(ebitda);;
 
         // Evaluate multiple based on net growth rate and market share
         double inflationRate = countryData.getAverageInflationRate();
-        double netGrowthRate = CAGR - inflationRate;
+        double netGrowthRate = annualGrowthRate - inflationRate;
         double growthMultiple = Math.min(netGrowthRate * COEFFICIENT_TO_MULTIPLE, MAX_GROWTH_MULTIPLE);
         double marketShareMultiple = Math.min(marketShare * COEFFICIENT_TO_MULTIPLE, MAX_MARKET_MULTIPLE);
         double multiple = BASE_EBITDA_MULTIPLE + growthMultiple + marketShareMultiple;
         if (multiple <= 0) multiple = DEFAULT_EBITDA_MULTIPLE;
         double NFP = company.getDebt() - company.getCashAndEquivalents();
-        double baseEBITDA = beginningValue;
+        double baseEBITDA = ebitda[0];
 
         // find first positive ebitda
         int baseEBITDAYear = company.getDataFirstYear();
@@ -99,8 +94,8 @@ public class ValuatorEngine {
                 report.append(" EBITDA Multiple Valuation\n");
                 report.append("------------------------------------------------------------\n");
                 report.append("EBITDA: ").append(countryData.formatMoney(baseEBITDA)).append("\n");
-                report.append("CAGR (").append(firstYear).append("-").append(lastYear).append("): ")
-                    .append(Math.round(CAGR * 10000.0) / 100.0).append("%\n");
+                report.append("AAGR (").append(firstYear).append("-").append(lastYear).append("): ")
+                    .append(Math.round(annualGrowthRate * 10000.0) / 100.0).append("%\n");
                 report.append("Inflation: ").append(FinancialMath.toPercent(countryData.getAverageInflationRate())).append("\n");
                 report.append("Net Growth Rate: ").append(FinancialMath.toPercent(netGrowthRate)).append("%\n");
                 report.append("Market Share: ").append(FinancialMath.toPercent(marketShare)).append("%<\n");
@@ -112,8 +107,8 @@ public class ValuatorEngine {
                 report.append("EBITDA: <b>").append(countryData.formatMoney(baseEBITDA))
                     .append("</b> (").append(baseEBITDAYear).append(")&nbsp;&nbsp;");
                 report.append("Multiple: <b>").append(Math.round(multiple * 100.0) / 100.0).append("x</b><br>");
-                report.append("CAGR (").append(firstYear).append("-").append(lastYear).append("): <b>")
-                    .append(Math.round(CAGR * 10000.0) / 100.0).append("%</b>&nbsp");
+                report.append("AAGR (").append(firstYear).append("-").append(lastYear).append("): <b>")
+                    .append(Math.round(annualGrowthRate * 10000.0) / 100.0).append("%</b>&nbsp");
                 report.append("Inflation: <b>").append(FinancialMath.toPercent(countryData.getAverageInflationRate())).append("%</b><br>");
                 report.append("Net Growth Rate: <b>").append(FinancialMath.toPercent(netGrowthRate)).append("%</b>&nbsp");
                 report.append("Market Share: <b>").append(FinancialMath.toPercent(marketShare)).append("%</b><br>");
