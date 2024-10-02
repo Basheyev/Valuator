@@ -75,11 +75,10 @@ Valuation method statement and disclaimer.
 
 
 ### 4. Things to do:
-1. Valuation Report Export as file (PDF)
-2. Add verification on input data for front-end
-3. Add verification on input data for back-end
-4. Add currency selection (national or USD) 
-5. Add currency tag in input fields
-6. Find up-to-date tax rates and base rates data source
-7. Save & load different companies data
-8. Add more country codes
+1. Add verification on input data for front-end
+2. Add verification on input data for back-end
+3. Add currency selection (national or USD) 
+4. Add currency tag in input fields
+5. Find up-to-date tax rates and base rates data source
+6. Save & load different companies data
+7. Add more country codes
