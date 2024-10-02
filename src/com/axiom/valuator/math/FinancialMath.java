@@ -27,6 +27,23 @@ public class FinancialMath {
 
 
     /**
+     * Annual average growth rate - AAGR (%)
+     * @param values values
+     * @return AAGR (%)
+     */
+    public static double getAAGR(double[] values) {
+        int n = values.length - 1;
+        double totalGrowthRate = 0.0;
+        for (int i = 1; i < values.length; i++) {
+            double growthRate = (values[i] - values[i - 1]) / Math.abs(values[i - 1]);
+            totalGrowthRate += growthRate;
+        }
+        // Calculate AAGR
+        return (totalGrowthRate / n);
+    }
+
+
+    /**
      * Calculates Weighted Average Cost of Capital (WACC)
      * @param D debt size
      * @param Dc debt cost (rate)

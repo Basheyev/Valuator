@@ -68,7 +68,6 @@ public class ValuatorEngine {
         double growthMultiple = Math.min(netGrowthRate * COEFFICIENT_TO_MULTIPLE, MAX_GROWTH_MULTIPLE);
         double marketShareMultiple = Math.min(marketShare * COEFFICIENT_TO_MULTIPLE, MAX_MARKET_MULTIPLE);
         double multiple = BASE_EBITDA_MULTIPLE + growthMultiple + marketShareMultiple;
-        if (multiple <= 0) multiple = DEFAULT_EBITDA_MULTIPLE;
         double NFP = company.getDebt() - company.getCashAndEquivalents();
         double baseEBITDA = ebitda[0];
 
