@@ -118,14 +118,13 @@ public class ValuationService implements Route {
         ValuatorEngine valuatorEngine = new ValuatorEngine(company, exitYear);
 
         double ebitda = valuatorEngine.valuateEBITDA(report, false);
-        report.append("<hr class=\"my-3\">");
+
         double multiples = valuatorEngine.valuateMultiples(report, false);
-        report.append("<hr class=\"my-3\">");
+
         double dcf = valuatorEngine.valuateDCF(report, false);
 
-        double average = (ebitda * 0.4) + (multiples * 0.3) + (dcf * 0.3); // todo explain
+        double average = (ebitda * 0.4) + (multiples * 0.3) + (dcf * 0.3);
 
-        report.append("<hr class=\"my-3\">");
         report.append("<h5> Exit Value (").append(exitYear).append("): ")
             .append(valuatorEngine.getCountryData().formatMoney(average)).append("</h5>");
 
@@ -134,7 +133,6 @@ public class ValuationService implements Route {
 
         if (yearsToExit >= 1) {
             double presentValue = FinancialMath.getPresentValue(average, company.getVentureRate(), yearsToExit);
-            report.append("<hr class=\"my-3\">");
             report.append("<h5>Present Value (").append(currentYear).append("): ")
                 .append(valuatorEngine.getCountryData().formatMoney(presentValue)).append("</h5>");
         }

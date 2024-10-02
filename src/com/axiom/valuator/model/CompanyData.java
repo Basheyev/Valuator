@@ -350,7 +350,7 @@ public class CompanyData {
         //----------------------------------------------------------------------
         sb.append("<table class=\"table table-bordered text-center\">");
 
-        sb.append("<tr>");
+        sb.append("<tr style=\"height: 30px;\">");
         sb.append("<td class=\"text-start\">").append("Equity Invested").append("</td>");
         sb.append("<td class=\"text-end\">").append(currencyFormatter.format(equity)).append("</td>");
         sb.append("<td class=\"text-start\">").append("Equity Rate").append("</td>");

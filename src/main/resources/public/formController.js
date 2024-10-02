@@ -320,14 +320,20 @@ function onFormChange(event) {
 function downloadReportAsPDF() {
     var companyName = document.getElementById('name').value;
     var element = document.getElementById('valuationReport');
+    const now = new Date();
+    const formattedDate = now.getFullYear() + '-' +
+                          ('0' + (now.getMonth() + 1)).slice(-2) + '-' +
+                          ('0' + now.getDate()).slice(-2) + ' ' +
+                          ('0' + now.getHours()).slice(-2) + '-' +
+                          ('0' + now.getMinutes()).slice(-2);
 
     html2pdf()
         .from(element) // The source element
         .set({
             margin: 1,
             pagebreak: { mode: 'avoid-all' },
-            filename: "Valuation_Report_" + companyName + ".pdf",
-            html2canvas: { scale: 4 },
+            filename: companyName + " valuation report " + formattedDate + ".pdf",
+            html2canvas: { scale: 3 },
             jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
         })
         .save(); // Automatically saves the file

@@ -102,20 +102,20 @@ public class ValuatorEngine {
                 report.append("Inflation: ").append(FinancialMath.toPercent(countryData.getAverageInflationRate())).append("\n");
                 report.append("Net Growth Rate: ").append(FinancialMath.toPercent(netGrowthRate)).append("%\n");
                 report.append("Market Share: ").append(FinancialMath.toPercent(marketShare)).append("%<\n");
-                report.append("Multiple: ").append(Math.round(multiple * 10000.0) / 100.0).append("x\n");
+                report.append("Multiple: ").append(Math.round(multiple * 100.0) / 100.0).append("x\n");
                 report.append("Valuation: ").append(countryData.formatMoney(equityValue)).append("\n");
             } else {
                 report.append("<p>");
                 report.append("<h5>EBITDA Multiple - ").append(countryData.formatMoney(equityValue)).append("</h5>");
                 report.append("EBITDA: <b>").append(countryData.formatMoney(baseEBITDA))
-                    .append("</b> (").append(baseEBITDAYear).append(")&nbsp<br>");
+                    .append("</b> (").append(baseEBITDAYear).append(")&nbsp;&nbsp;");
+                report.append("Multiple: <b>").append(Math.round(multiple * 100.0) / 100.0).append("x</b><br>");
                 report.append("CAGR (").append(firstYear).append("-").append(lastYear).append("): <b>")
                     .append(Math.round(CAGR * 10000.0) / 100.0).append("%</b>&nbsp");
                 report.append("Inflation: <b>").append(FinancialMath.toPercent(countryData.getAverageInflationRate())).append("%</b><br>");
                 report.append("Net Growth Rate: <b>").append(FinancialMath.toPercent(netGrowthRate)).append("%</b>&nbsp");
                 report.append("Market Share: <b>").append(FinancialMath.toPercent(marketShare)).append("%</b><br>");
                 report.append("Net Financial Position: <b>").append(countryData.formatMoney(NFP)).append("</b><br>");
-                report.append("Multiple: <b>").append(Math.round(multiple * 100.0) / 100.0).append("x</b><br>");
                 report.append("</p>");
             }
         }
@@ -248,7 +248,7 @@ public class ValuatorEngine {
                 report.append("Discounted Cash Flow: <b>")
                     .append(countryData.formatMoney(DCF))
                     .append("</b>")
-                    .append(" (WACC: ").append(FinancialMath.toPercent(WACC)).append("%)<br>");
+                    .append(" <b>(WACC: ").append(FinancialMath.toPercent(WACC)).append("%)</b><br>");
 
                 report.append("Terminal Value: <b>")
                     .append(countryData.formatMoney(TV))
